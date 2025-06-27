@@ -627,74 +627,44 @@ function InsideTab:CreateCheckbox(text,callback)
     CheatButton.MouseButton1Click:Connect(triggercheat)
 end
 
-function InsideLibrary:CreateTab(text)
-    -- Kodun devamı (seninki yukarıda)
-    local TextButton1 = Instance.new("TextButton")
-    local Frame = Instance.new("ScrollingFrame")
-    -- ... diğer ayarlar ve eventler ...
+function InsideTab:CreateTextbox(labelText, placeholder, callback)
+    local TextboxHolder = Instance.new("Frame")
+    TextboxHolder.Size = UDim2.new(1, 0, 0, 60)
+    TextboxHolder.BackgroundTransparency = 1
+    TextboxHolder.Parent = Frame  -- Frame, CreateTab içinde tanımlı scrolling frame
 
-    -- InsideTab tablosunu oluşturuyoruz:
-    local InsideTab = {}
+    local Label = Instance.new("TextLabel")
+    Label.Size = UDim2.new(1, 0, 0, 20)
+    Label.BackgroundTransparency = 1
+    Label.Text = labelText
+    Label.Font = Enum.Font.SourceSansSemibold
+    Label.TextSize = 14
+    Label.TextXAlignment = Enum.TextXAlignment.Left
+    Label.TextColor3 = Color3.fromRGB(255, 255, 255)
+    Label.Parent = TextboxHolder
 
-    -- İşte CreateTextbox fonksiyonu
-    function InsideTab:CreateTextbox(labelText, placeholder, callback)
-        local TextboxHolder = Instance.new("Frame")
-        TextboxHolder.Size = UDim2.new(1, 0, 0, 60)
-        TextboxHolder.BackgroundTransparency = 1
-        TextboxHolder.Parent = Frame  -- Burada doğru parent Frame olmalı
+    local Box = Instance.new("TextBox")
+    Box.Size = UDim2.new(1, 0, 0, 30)
+    Box.Position = UDim2.new(0, 0, 0, 25)
+    Box.BackgroundColor3 = Color3.fromRGB(26, 26, 26)
+    Box.BorderSizePixel = 0
+    Box.TextColor3 = Color3.fromRGB(255, 255, 255)
+    Box.PlaceholderText = placeholder or ""
+    Box.ClearTextOnFocus = false
+    Box.Font = Enum.Font.SourceSansSemibold
+    Box.TextSize = 14
+    Box.Parent = TextboxHolder
 
-        local Label = Instance.new("TextLabel")
-        Label.Size = UDim2.new(1, 0, 0, 20)
-        Label.BackgroundTransparency = 1
-        Label.Text = labelText
-        Label.Font = Enum.Font.SourceSansSemibold
-        Label.TextSize = 14
-        Label.TextXAlignment = Enum.TextXAlignment.Left
-        Label.TextColor3 = Color3.fromRGB(255, 255, 255)
-        Label.Parent = TextboxHolder
-
-        local Box = Instance.new("TextBox")
-        Box.Size = UDim2.new(1, 0, 0, 30)
-        Box.Position = UDim2.new(0, 0, 0, 25)
-        Box.BackgroundColor3 = Color3.fromRGB(26, 26, 26)
-        Box.BorderSizePixel = 0
-        Box.TextColor3 = Color3.fromRGB(255, 255, 255)
-        Box.PlaceholderText = placeholder or ""
-        Box.ClearTextOnFocus = false
-        Box.Font = Enum.Font.SourceSansSemibold
-        Box.TextSize = 14
-        Box.Parent = TextboxHolder
-
-        Box.FocusLost:Connect(function(enterPressed)
-            if enterPressed and callback then
-                play("rbxassetid://911422023") -- Ses efekti
-                pcall(function()
-                    callback(Box.Text)
-                end)
-            end
-        end)
-    end
-
-    -- Diğer Create fonksiyonları da burada olacak...
-
-    -- Tab gösterme fonksiyonu (zaten var sende)
-    function InsideTab:Show()
-        -- Buton rengini ve frame görünürlüğünü ayarla
-        for _, v in pairs(Items:GetChildren()) do
-            v.Visible = false
+    Box.FocusLost:Connect(function(enterPressed)
+        if enterPressed and callback then
+            play("rbxassetid://911422023")
+            pcall(function()
+                callback(Box.Text)
+            end)
         end
-        Frame.Visible = true
-        for _, t in pairs(Tabs:GetChildren()) do
-            if t:IsA("TextButton") then
-                t.TextColor3 = Color3.fromRGB(255, 255, 255)
-            end
-        end
-        TextButton1.TextColor3 = theme3
-        play("rbxassetid://1412830636")
-    end
-
-    return InsideTab
+    end)
 end
+
 
 function InsideTab:CreateButton(text, callback)
     text = text or "New Button"
