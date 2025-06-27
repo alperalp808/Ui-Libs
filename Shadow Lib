@@ -455,6 +455,48 @@ SliderButton.MouseButton1Down:Connect(function()
 end)
 end
 
+function InsideTab:CreateTextbox(text, placeholder, callback)
+	local TextboxHolder = Instance.new("Frame")
+	TextboxHolder.Name = "TextboxHolder"
+	TextboxHolder.Size = UDim2.new(1, 0, 0, 60)
+	TextboxHolder.BackgroundTransparency = 1
+	TextboxHolder.Parent = MainTabFrame -- bu "Tab" içine eklenmeli
+
+	local Label = Instance.new("TextLabel")
+	Label.Size = UDim2.new(1, 0, 0, 20)
+	Label.BackgroundTransparency = 1
+	Label.Text = text
+	Label.Font = Enum.Font.Gotham
+	Label.TextSize = 14
+	Label.TextXAlignment = Enum.TextXAlignment.Left
+	Label.TextColor3 = toolight and Color3.new(0, 0, 0) or Color3.new(1, 1, 1)
+	Label.Parent = TextboxHolder
+
+	local Box = Instance.new("TextBox")
+	Box.Size = UDim2.new(1, 0, 0, 30)
+	Box.Position = UDim2.new(0, 0, 0, 25)
+	Box.BackgroundColor3 = theme1
+	Box.BorderColor3 = theme3
+	Box.TextColor3 = Color3.new(1, 1, 1)
+	Box.PlaceholderText = placeholder or "Yaz..."
+	Box.Text = ""
+	Box.ClearTextOnFocus = false
+	Box.Font = Enum.Font.Gotham
+	Box.TextSize = 14
+	Box.Parent = TextboxHolder
+
+	Box.FocusLost:Connect(function(enterPressed)
+		if enterPressed then
+			play("rbxassetid://911422023") -- istersen ses efektini kaldırabilirsin
+			if callback then
+				pcall(function()
+					callback(Box.Text)
+				end)
+			end
+		end
+	end)
+end
+
 function InsideTab:Show()
     for i,v in next,Items:GetChildren() do
         v.Visible = false
@@ -558,43 +600,6 @@ end
 return switchactions
 end
 
-function InsideTab:CreateTextbox(text, placeholder, callback)
-    local TextboxHolder = Instance.new("Frame")
-    TextboxHolder.Name = "TextboxHolder"
-    TextboxHolder.Size = UDim2.new(0, 240, 0, 40)
-    TextboxHolder.BackgroundTransparency = 1
-    TextboxHolder.Parent = TabFrame
-
-    local Label = Instance.new("TextLabel")
-    Label.Size = UDim2.new(0, 240, 0, 20)
-    Label.BackgroundTransparency = 1
-    Label.Text = text
-    Label.TextColor3 = toolight and Color3.fromRGB(0, 0, 0) or Color3.fromRGB(255, 255, 255)
-    Label.TextXAlignment = Enum.TextXAlignment.Left
-    Label.Font = Enum.Font.Gotham
-    Label.TextSize = 14
-    Label.Parent = TextboxHolder
-
-    local Box = Instance.new("TextBox")
-    Box.Size = UDim2.new(0, 240, 0, 20)
-    Box.Position = UDim2.new(0, 0, 0, 20)
-    Box.BackgroundColor3 = theme1
-    Box.TextColor3 = Color3.fromRGB(255, 255, 255)
-    Box.PlaceholderText = placeholder or "Type here..."
-    Box.Font = Enum.Font.Gotham
-    Box.TextSize = 14
-    Box.BorderSizePixel = 0
-    Box.Parent = TextboxHolder
-
-    Box.FocusLost:Connect(function(enter)
-        if enter then
-            play("rbxassetid://911422023") -- Ses efekti
-            pcall(function()
-                callback(Box.Text)
-            end)
-        end
-    end)
-end
 
 function InsideTab:CreateCheckbox(text,callback)
     local Cheat = Instance.new("TextLabel")
