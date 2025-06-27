@@ -456,11 +456,13 @@ end)
 end
 
 function InsideTab:CreateTextbox(text, placeholder, callback)
+    local container = TabContent or TabFrame or MainTabFrame -- kendi kütüphanene göre burayı değiştir
+    
 	local TextboxHolder = Instance.new("Frame")
 	TextboxHolder.Name = "TextboxHolder"
 	TextboxHolder.Size = UDim2.new(1, 0, 0, 60)
 	TextboxHolder.BackgroundTransparency = 1
-	TextboxHolder.Parent = MainTabFrame -- bu "Tab" içine eklenmeli
+	TextboxHolder.Parent = container
 
 	local Label = Instance.new("TextLabel")
 	Label.Size = UDim2.new(1, 0, 0, 20)
@@ -469,16 +471,16 @@ function InsideTab:CreateTextbox(text, placeholder, callback)
 	Label.Font = Enum.Font.Gotham
 	Label.TextSize = 14
 	Label.TextXAlignment = Enum.TextXAlignment.Left
-	Label.TextColor3 = toolight and Color3.new(0, 0, 0) or Color3.new(1, 1, 1)
+	Label.TextColor3 = Color3.new(1, 1, 1)
 	Label.Parent = TextboxHolder
 
 	local Box = Instance.new("TextBox")
 	Box.Size = UDim2.new(1, 0, 0, 30)
 	Box.Position = UDim2.new(0, 0, 0, 25)
-	Box.BackgroundColor3 = theme1
-	Box.BorderColor3 = theme3
+	Box.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+	Box.BorderColor3 = Color3.fromRGB(100, 100, 100)
 	Box.TextColor3 = Color3.new(1, 1, 1)
-	Box.PlaceholderText = placeholder or "Yaz..."
+	Box.PlaceholderText = placeholder or "Yazınız..."
 	Box.Text = ""
 	Box.ClearTextOnFocus = false
 	Box.Font = Enum.Font.Gotham
@@ -487,7 +489,6 @@ function InsideTab:CreateTextbox(text, placeholder, callback)
 
 	Box.FocusLost:Connect(function(enterPressed)
 		if enterPressed then
-			play("rbxassetid://911422023") -- istersen ses efektini kaldırabilirsin
 			if callback then
 				pcall(function()
 					callback(Box.Text)
