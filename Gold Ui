@@ -114,7 +114,6 @@ function lib:Tab(name, icon)
     return tab
 end
 
-return lib
+return setmetatable(Lib, Lib)
 
 end
-
