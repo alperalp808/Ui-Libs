@@ -1,139 +1,153 @@
---// uilib v1.2  – Symphony-Hub stili + animasyonlar
---   Toggle, Button, Dropdown, Slider, Keybind elemanları
---   TweenService ile geçiş/geri besleme animasyonları
+--// Simple Tab UI Library (MM2 Style)
 
----------------------------------------------------------------------
---  Servisler
----------------------------------------------------------------------
-local Players      = game:GetService("Players")
-local UIS          = game:GetService("UserInputService")
-local TweenService = game:GetService("TweenService")
+local Players = game:GetService("Players")
+local LP = Players.LocalPlayer
+local PlayerGui = LP:WaitForChild("PlayerGui")
 
----------------------------------------------------------------------
---  Yardımcı fonksiyon: Tween oluştur (kısaltma)
----------------------------------------------------------------------
-local function tween(obj, t, props, dir)
-    return TweenService:Create(obj, TweenInfo.new(t, Enum.EasingStyle.Quad, dir or Enum.EasingDirection.Out), props)
+-- UI
+local ScreenGui = Instance.new("ScreenGui", PlayerGui)
+ScreenGui.Name = "TabUI"
+ScreenGui.ResetOnSpawn = false
+
+local Main = Instance.new("Frame", ScreenGui)
+Main.Size = UDim2.fromOffset(520, 360)
+Main.Position = UDim2.fromScale(0.5, 0.5)
+Main.AnchorPoint = Vector2.new(0.5, 0.5)
+Main.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+Main.BorderSizePixel = 0
+
+Instance.new("UICorner", Main).CornerRadius = UDim.new(0, 8)
+
+-- Left Tab Bar
+local Tabs = Instance.new("Frame", Main)
+Tabs.Size = UDim2.fromOffset(120, 360)
+Tabs.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+Tabs.BorderSizePixel = 0
+
+local TabLayout = Instance.new("UIListLayout", Tabs)
+TabLayout.Padding = UDim.new(0, 6)
+TabLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+
+-- Content
+local Pages = Instance.new("Frame", Main)
+Pages.Position = UDim2.fromOffset(120, 0)
+Pages.Size = UDim2.fromOffset(400, 360)
+Pages.BackgroundTransparency = 1
+
+-- LIB
+local Library = {}
+Library.Tabs = {}
+
+-- TAB CREATE
+function Library:CreateTab(name)
+	local TabButton = Instance.new("TextButton", Tabs)
+	TabButton.Size = UDim2.fromOffset(100, 36)
+	TabButton.Text = name
+	TabButton.Font = Enum.Font.GothamBold
+	TabButton.TextSize = 13
+	TabButton.TextColor3 = Color3.new(1,1,1)
+	TabButton.BackgroundColor3 = Color3.fromRGB(40,40,40)
+	Instance.new("UICorner", TabButton).CornerRadius = UDim.new(0,6)
+
+	local Page = Instance.new("ScrollingFrame", Pages)
+	Page.Size = UDim2.fromScale(1,1)
+	Page.CanvasSize = UDim2.new(0,0,0,0)
+	Page.ScrollBarImageTransparency = 1
+	Page.Visible = false
+
+	local Layout = Instance.new("UIListLayout", Page)
+	Layout.Padding = UDim.new(0, 8)
+
+	TabButton.MouseButton1Click:Connect(function()
+		for _,v in pairs(Pages:GetChildren()) do
+			if v:IsA("ScrollingFrame") then
+				v.Visible = false
+			end
+		end
+		Page.Visible = true
+	end)
+
+	if #Pages:GetChildren() == 1 then
+		Page.Visible = true
+	end
+
+	local Tab = {}
+
+	-- SECTION
+	function Tab:AddSection(title)
+		local Section = Instance.new("Frame", Page)
+		Section.Size = UDim2.new(1, -10, 0, 30)
+		Section.BackgroundColor3 = Color3.fromRGB(30,30,30)
+		Instance.new("UICorner", Section).CornerRadius = UDim.new(0,6)
+
+		local Title = Instance.new("TextLabel", Section)
+		Title.Size = UDim2.fromScale(1,1)
+		Title.Text = title
+		Title.TextColor3 = Color3.fromRGB(180,180,180)
+		Title.BackgroundTransparency = 1
+		Title.Font = Enum.Font.GothamBold
+		Title.TextSize = 12
+
+		local SectionAPI = {}
+
+		-- TOGGLE
+		function SectionAPI:AddToggle(opt)
+			local T = Instance.new("TextButton", Page)
+			T.Size = UDim2.new(1, -10, 0, 34)
+			T.Text = opt.Name
+			T.BackgroundColor3 = Color3.fromRGB(45,45,45)
+			T.TextColor3 = Color3.new(1,1,1)
+			T.Font = Enum.Font.Gotham
+			T.TextSize = 12
+			Instance.new("UICorner", T).CornerRadius = UDim.new(0,6)
+
+			local state = false
+			T.MouseButton1Click:Connect(function()
+				state = not state
+				T.BackgroundColor3 = state and Color3.fromRGB(90,60,140) or Color3.fromRGB(45,45,45)
+				if opt.Callback then
+					opt.Callback(state)
+				end
+			end)
+		end
+
+		-- BUTTON
+		function SectionAPI:AddButton(opt)
+			local B = Instance.new("TextButton", Page)
+			B.Size = UDim2.new(1, -10, 0, 32)
+			B.Text = opt.Name
+			B.BackgroundColor3 = Color3.fromRGB(60,60,60)
+			B.TextColor3 = Color3.new(1,1,1)
+			B.Font = Enum.Font.Gotham
+			B.TextSize = 12
+			Instance.new("UICorner", B).CornerRadius = UDim.new(0,6)
+
+			B.MouseButton1Click:Connect(function()
+				if opt.Callback then opt.Callback() end
+			end)
+		end
+
+		-- TEXTBOX
+		function SectionAPI:AddTextbox(opt)
+			local Box = Instance.new("TextBox", Page)
+			Box.Size = UDim2.new(1, -10, 0, 32)
+			Box.PlaceholderText = opt.Name
+			Box.BackgroundColor3 = Color3.fromRGB(50,50,50)
+			Box.TextColor3 = Color3.new(1,1,1)
+			Box.Font = Enum.Font.Gotham
+			Box.TextSize = 12
+			Instance.new("UICorner", Box).CornerRadius = UDim.new(0,6)
+
+			Box.FocusLost:Connect(function()
+				if opt.Callback then opt.Callback(Box.Text) end
+			end)
+		end
+
+		return SectionAPI
+	end
+
+	return Tab
 end
 
----------------------------------------------------------------------
---  Kütüphane tabloları
----------------------------------------------------------------------
-local Lib, Tab = {}, {}
-Lib.__index, Tab.__index = Lib, Tab
-
----------------------------------------------------------------------
---  Sürüklenebilirlik (mouse + touch)
----------------------------------------------------------------------
-local function makeDraggable(handle, window)
-    local dragging, dragStart, startPos = false, nil, nil
-    local function update(input)
-        local d = input.Position - dragStart
-        window.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + d.X, startPos.Y.Scale, startPos.Y.Offset + d.Y)
-    end
-    handle.InputBegan:Connect(function(i)
-        if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then
-            dragging, dragStart, startPos = true, i.Position, window.Position
-            i.Changed:Connect(function()
-                if i.UserInputState == Enum.UserInputState.End then dragging = false end
-            end)
-        end
-    end)
-    handle.InputChanged:Connect(function(i)
-        if dragging and (i.UserInputType == Enum.UserInputType.MouseMovement or i.UserInputType == Enum.UserInputType.Touch) then
-            update(i)
-        end
-    end)
-end
-
----------------------------------------------------------------------
---  Ana pencere oluşturucu
----------------------------------------------------------------------
-function Lib:CreateWindow(o)
-    o = o or {}
-    local title   = o.Title  or "UILib"
-    local accent  = o.Accent or Color3.fromRGB(0, 140, 255)
-    local width   = o.Width  or 550
-    local height  = o.Height or 350
-
-    local gui = Instance.new("ScreenGui")
-    gui.Name   = o.Name or "UILib"
-    gui.IgnoreGuiInset, gui.ResetOnSpawn = true, false
-    gui.Parent = Players.LocalPlayer:WaitForChild("PlayerGui")
-
-    local frame = Instance.new("Frame", gui)
-    frame.Size  = UDim2.new(0, width, 0, height)
-    frame.Position = UDim2.new(0.5, -width/2, 0.5, -height/2)
-    frame.AnchorPoint = Vector2.new(0.5, 0.5)
-    frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-    frame.BorderSizePixel = 0
-    frame.BackgroundTransparency = 0
-    frame.ClipsDescendants = true
-    frame.Name = "MainWindow"
-    frame.ZIndex = 2
-    frame:SetAttribute("Rounded", true)
-
-    local corner = Instance.new("UICorner", frame)
-    corner.CornerRadius = UDim.new(0, 8)
-
-    local top = Instance.new("TextButton", frame)
-    top.Size  = UDim2.new(1, 0, 0, 28)
-    top.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-    top.Text  = title
-    top.Font  = Enum.Font.GothamBold
-    top.TextSize, top.TextColor3 = 16, Color3.new(1, 1, 1)
-    makeDraggable(top, frame)
-    Instance.new("UICorner", top).CornerRadius = UDim.new(0, 6)
-
-    -- sol sekme barı
-    local side = Instance.new("Frame", frame)
-    side.BackgroundColor3 = Color3.fromRGB(150, 0, 0)
-    side.Size, side.Position = UDim2.new(0, 140, 1, -28), UDim2.new(0, 0, 0, 28)
-    Instance.new("UICorner", side).CornerRadius = UDim.new(0, 6)
-
-    local sideLayout = Instance.new("UIListLayout", side)
-    sideLayout.SortOrder, sideLayout.Padding = Enum.SortOrder.LayoutOrder, UDim.new(0, 4)
-
-    -- içerik sayfaları
-    local pages = Instance.new("Folder", frame)
-
-    -- API döndürülecek nesne
-    local lib = setmetatable({Accent = accent, _pages = pages, _side = side}, Lib)
-
-    -----------------------------------------------------------------
-    --  Sekme oluşturucu
-    -----------------------------------------------------------------
-    function lib:Tab(name, icon)
-        local btn = Instance.new("TextButton", side)
-        btn.Size  = UDim2.new(1, -8, 0, 32)
-        btn.Position, btn.BackgroundColor3 = UDim2.new(0, 4, 0, 0), Color3.fromRGB(180, 0, 0)
-        btn.Font, btn.TextSize, btn.TextColor3 = Enum.Font.GothamBold, 14, Color3.new(1, 1, 1)
-        btn.Text = (icon and (icon .. " ") or "") .. name
-        Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
-
-        local page = Instance.new("Frame", pages)
-        page.Size, page.Position = UDim2.new(1, -150, 1, -38), UDim2.new(0, 148, 0, 34)
-        page.BackgroundColor3, page.Visible = Color3.fromRGB(0, 60, 150), false
-        Instance.new("UICorner", page).CornerRadius = UDim.new(0, 6)
-
-        local layout = Instance.new("UIListLayout", page)
-        layout.SortOrder, layout.Padding, layout.HorizontalAlignment = Enum.SortOrder.LayoutOrder, UDim.new(0, 6), Enum.HorizontalAlignment.Center
-
-        -- ilk sekme açık olsun
-        if #side:GetChildren() == 2 then
-            page.Visible = true
-            btn.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
-        end
-
-        btn.MouseButton1Click:Connect(function()
-            for _, p in ipairs(pages:GetChildren()) do p.Visible = false end
-            for _, b in ipairs(side:GetChildren()) do if b:IsA("TextButton") then b.BackgroundColor3 = Color3.fromRGB(180, 0, 0) end end
-            page.Visible, btn.BackgroundColor3 = true, Color3.fromRGB(255, 0, 0)
-        end)
-
-        local tab = setmetatable({ _page = page, Accent = accent }, Tab)
-        return tab
-    end
-
-    return lib
-end
+-- EXPORT
+return Library
