@@ -86,7 +86,7 @@ local function GetTeamsString()
     end;
 
     table.sort(TeamList, function(str1, str2) return str1 < str2 end);
-    
+
     return TeamList;
 end;
 
@@ -615,7 +615,7 @@ do
         });
 
         local TransparencyBoxOuter, TransparencyBoxInner, TransparencyCursor;
-        
+
         if Info.Transparency then 
             TransparencyBoxOuter = Library:Create('Frame', {
                 BorderColor3 = Color3.new(0, 0, 0);
@@ -952,7 +952,7 @@ do
 
         if TransparencyBoxInner then
             TransparencyBoxInner.InputBegan:Connect(function(Input)
-                if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
+                if Input.UserInputType == Enum.UserInputType.MouseButton1  or Input.UserInputType == Enum.UserInputType.Touch then
                     while InputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton1) do
                         local MinX = TransparencyBoxInner.AbsolutePosition.X;
                         local MaxX = MinX + TransparencyBoxInner.AbsoluteSize.X;
@@ -1403,192 +1403,145 @@ do
         return Label;
     end;
 
-    function Funcs:AddButton(...)
-        -- TODO: Eventually redo this
-        local Button = {};
-        local function ProcessButtonParams(Class, Obj, ...)
-            local Props = select(1, ...)
-            if type(Props) == 'table' then
-                Obj.Text = Props.Text
-                Obj.Func = Props.Func
-                Obj.DoubleClick = Props.DoubleClick
-                Obj.Tooltip = Props.Tooltip
-            else
-                Obj.Text = select(1, ...)
-                Obj.Func = select(2, ...)
-            end
-
-            assert(type(Obj.Func) == 'function', 'AddButton: `Func` callback is missing.');
+function Funcs:AddButton(...)
+    local Button = {};
+    local function ProcessButtonParams(Class, Obj, ...)
+        local Props = select(1, ...)
+        if type(Props) == 'table' then
+            Obj.Text = Props.Text
+            Obj.Func = Props.Func
+            Obj.DoubleClick = Props.DoubleClick
+            Obj.Tooltip = Props.Tooltip
+        else
+            Obj.Text = select(1, ...)
+            Obj.Func = select(2, ...)
         end
 
-        ProcessButtonParams('Button', Button, ...)
+        assert(type(Obj.Func) == 'function', 'AddButton: `Func` callback is missing.');
+    end
 
-        local Groupbox = self;
-        local Container = Groupbox.Container;
+    ProcessButtonParams('Button', Button, ...)
 
-        local function CreateBaseButton(Button)
-            local Outer = Library:Create('Frame', {
-                BackgroundColor3 = Color3.new(0, 0, 0);
-                BorderColor3 = Color3.new(0, 0, 0);
-                Size = UDim2.new(1, -4, 0, 20);
-                ZIndex = 5;
+    local Groupbox = self;
+    local Container = Groupbox.Container;
+
+    local function CreateBaseButton(Button)
+        local Outer = Library:Create('Frame', {
+            BackgroundColor3 = Color3.new(0, 0, 0);
+            BorderColor3 = Color3.new(0, 0, 0);
+            Size = UDim2.new(1, -4, 0, 20);
+            ZIndex = 5;
+        });
+
+        local Inner = Library:Create('Frame', {
+            BackgroundColor3 = Library.MainColor;
+            BorderColor3 = Library.OutlineColor;
+            BorderMode = Enum.BorderMode.Inset;
+            Size = UDim2.new(1, 0, 1, 0);
+            ZIndex = 6;
+            Parent = Outer;
+        });
+
+        local Label = Library:CreateLabel({
+            Size = UDim2.new(1, 0, 1, 0);
+            TextSize = 14;
+            Text = Button.Text;
+            ZIndex = 6;
+            Parent = Inner;
+        });
+
+        Library:Create('UIGradient', {
+            Color = ColorSequence.new({
+                ColorSequenceKeypoint.new(0, Color3.new(1, 1, 1)),
+                ColorSequenceKeypoint.new(1, Color3.fromRGB(212, 212, 212))
             });
+            Rotation = 90;
+            Parent = Inner;
+        });
 
-            local Inner = Library:Create('Frame', {
-                BackgroundColor3 = Library.MainColor;
-                BorderColor3 = Library.OutlineColor;
-                BorderMode = Enum.BorderMode.Inset;
-                Size = UDim2.new(1, 0, 1, 0);
-                ZIndex = 6;
-                Parent = Outer;
-            });
+        Library:AddToRegistry(Outer, {
+            BorderColor3 = 'Black';
+        });
 
-            local Label = Library:CreateLabel({
-                Size = UDim2.new(1, 0, 1, 0);
-                TextSize = 14;
-                Text = Button.Text;
-                ZIndex = 6;
-                Parent = Inner;
-            });
+        Library:AddToRegistry(Inner, {
+            BackgroundColor3 = 'MainColor';
+            BorderColor3 = 'OutlineColor';
+        });
 
-            Library:Create('UIGradient', {
-                Color = ColorSequence.new({
-                    ColorSequenceKeypoint.new(0, Color3.new(1, 1, 1)),
-                    ColorSequenceKeypoint.new(1, Color3.fromRGB(212, 212, 212))
-                });
-                Rotation = 90;
-                Parent = Inner;
-            });
+        Library:OnHighlight(Outer, Outer,
+            { BorderColor3 = 'AccentColor' },
+            { BorderColor3 = 'Black' }
+        );
 
-            Library:AddToRegistry(Outer, {
-                BorderColor3 = 'Black';
-            });
+        return Outer, Inner, Label
+    end
 
-            Library:AddToRegistry(Inner, {
-                BackgroundColor3 = 'MainColor';
-                BorderColor3 = 'OutlineColor';
-            });
-
-            Library:OnHighlight(Outer, Outer,
-                { BorderColor3 = 'AccentColor' },
-                { BorderColor3 = 'Black' }
-            );
-
-            return Outer, Inner, Label
+    local function InitEvents(Button)
+        local function ValidateClick(Input)
+            -- Android touch ve MouseButton1 için geçerli
+            local InputType = Input.UserInputType
+            return InputType == Enum.UserInputType.MouseButton1
+               or InputType == Enum.UserInputType.Touch
         end
 
-        local function InitEvents(Button)
-            local function WaitForEvent(event, timeout, validator)
-                local bindable = Instance.new('BindableEvent')
-                local connection = event:Once(function(...)
+        Button.Outer.InputBegan:Connect(function(Input)
+            if not ValidateClick(Input) then return end
+            if Button.Locked then return end
 
-                    if type(validator) == 'function' and validator(...) then
-                        bindable:Fire(true)
-                    else
-                        bindable:Fire(false)
+            if Button.DoubleClick then
+                Library:RemoveFromRegistry(Button.Label)
+                Library:AddToRegistry(Button.Label, { TextColor3 = 'AccentColor' })
+
+                Button.Label.TextColor3 = Library.AccentColor
+                Button.Label.Text = 'Are you sure?'
+                Button.Locked = true
+
+                local clicked = false
+                local function OnClick(EventInput)
+                    if ValidateClick(EventInput) then
+                        clicked = true
                     end
-                end)
-                task.delay(timeout, function()
-                    connection:disconnect()
-                    bindable:Fire(false)
-                end)
-                return bindable.Event:Wait()
-            end
+                end
+                local connection
+                connection = Button.Outer.InputBegan:Connect(OnClick)
+                task.wait(0.5)
+                connection:Disconnect()
 
-            local function ValidateClick(Input)
-                if Library:MouseIsOverOpenedFrame() then
-                    return false
+                Library:RemoveFromRegistry(Button.Label)
+                Library:AddToRegistry(Button.Label, { TextColor3 = 'FontColor' })
+
+                Button.Label.TextColor3 = Library.FontColor
+                Button.Label.Text = Button.Text
+                Button.Locked = false
+
+                if clicked then
+                    Library:SafeCallback(Button.Func)
                 end
 
-                if Input.UserInputType ~= Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
-                    return false
-                end
-
-                return true
+                return
             end
 
-            Button.Outer.InputBegan:Connect(function(Input)
-                if not ValidateClick(Input) then return end
-                if Button.Locked then return end
+            Library:SafeCallback(Button.Func);
+        end)
+    end
 
-                if Button.DoubleClick then
-                    Library:RemoveFromRegistry(Button.Label)
-                    Library:AddToRegistry(Button.Label, { TextColor3 = 'AccentColor' })
+    Button.Outer, Button.Inner, Button.Label = CreateBaseButton(Button)
+    Button.Outer.Parent = Container
 
-                    Button.Label.TextColor3 = Library.AccentColor
-                    Button.Label.Text = 'Are you sure?'
-                    Button.Locked = true
+    InitEvents(Button)
 
-                    local clicked = WaitForEvent(Button.Outer.InputBegan, 0.5, ValidateClick)
-
-                    Library:RemoveFromRegistry(Button.Label)
-                    Library:AddToRegistry(Button.Label, { TextColor3 = 'FontColor' })
-
-                    Button.Label.TextColor3 = Library.FontColor
-                    Button.Label.Text = Button.Text
-                    task.defer(rawset, Button, 'Locked', false)
-
-                    if clicked then
-                        Library:SafeCallback(Button.Func)
-                    end
-
-                    return
-                end
-
-                Library:SafeCallback(Button.Func);
-            end)
+    function Button:AddTooltip(tooltip)
+        if type(tooltip) == 'string' then
+            Library:AddToolTip(tooltip, self.Outer)
         end
+        return self
+    end
 
-        Button.Outer, Button.Inner, Button.Label = CreateBaseButton(Button)
-        Button.Outer.Parent = Container
+    Groupbox:AddBlank(5);
+    Groupbox:Resize();
 
-        InitEvents(Button)
-
-        function Button:AddTooltip(tooltip)
-            if type(tooltip) == 'string' then
-                Library:AddToolTip(tooltip, self.Outer)
-            end
-            return self
-        end
-
-
-        function Button:AddButton(...)
-            local SubButton = {}
-
-            ProcessButtonParams('SubButton', SubButton, ...)
-
-            self.Outer.Size = UDim2.new(0.5, -2, 0, 20)
-
-            SubButton.Outer, SubButton.Inner, SubButton.Label = CreateBaseButton(SubButton)
-
-            SubButton.Outer.Position = UDim2.new(1, 3, 0, 0)
-            SubButton.Outer.Size = UDim2.fromOffset(self.Outer.AbsoluteSize.X - 2, self.Outer.AbsoluteSize.Y)
-            SubButton.Outer.Parent = self.Outer
-
-            function SubButton:AddTooltip(tooltip)
-                if type(tooltip) == 'string' then
-                    Library:AddToolTip(tooltip, self.Outer)
-                end
-                return SubButton
-            end
-
-            if type(SubButton.Tooltip) == 'string' then
-                SubButton:AddTooltip(SubButton.Tooltip)
-            end
-
-            InitEvents(SubButton)
-            return SubButton
-        end
-
-        if type(Button.Tooltip) == 'string' then
-            Button:AddTooltip(Button.Tooltip)
-        end
-
-        Groupbox:AddBlank(5);
-        Groupbox:Resize();
-
-        return Button;
-    end;
+    return Button;
+end
 
     function Funcs:AddDivider()
         local Groupbox = self;
@@ -2599,7 +2552,7 @@ do
         local Depbox = {
             Dependencies = {};
         };
-        
+
         local Groupbox = self;
         local Container = Groupbox.Container;
 
@@ -3047,7 +3000,7 @@ function Library:CreateWindow(...)
         ZIndex = 2;
         Parent = MainSectionInner;
     });
-    
+
 
     Library:AddToRegistry(TabContainer, {
         BackgroundColor3 = 'MainColor';
