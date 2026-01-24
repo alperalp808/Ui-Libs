@@ -218,350 +218,214 @@ end
 
 function OpenedColor(text,ColourDisplay,Action,def)
 
-        local COLORPALLETE = Instance.new("Frame")
-        local ANIMATEFRAME01 = Instance.new("Frame")
-        local Holder = Instance.new("Frame")
-        local BG = Instance.new("Frame")
-        local S12 = Instance.new("Frame")
-        local ColourWheel = Instance.new("ImageButton")
-        local UIAspectRatioConstraint = Instance.new("UIAspectRatioConstraint")
-        local Picker = Instance.new("ImageLabel")
-        local S523 = Instance.new("UICorner")
-        local DarknessPicker = Instance.new("ImageButton")
-        local UIGradient = Instance.new("UIGradient")
-        local Slider = Instance.new("ImageLabel")
-        local UIAspectRatioConstraint_2 = Instance.new("UIAspectRatioConstraint")
-        local S13 = Instance.new("Frame")
-        local SDFH = Instance.new("UICorner")
-        local ColourDisplayBIG = Instance.new("ImageLabel")
-        local UIAspectRatioConstraint_3 = Instance.new("UIAspectRatioConstraint")
-        local SETCOLOR = Instance.new("ImageButton")
-        local Upper = Instance.new("Frame")
-        local TEMPLATETITLE20202 = Instance.new("TextLabel")
-        local linedecoupper = Instance.new("Frame")
-        local RESETALL = Instance.new('ImageButton')
-        RESETALL.Name = "RESETALL"
-        RESETALL.Parent = S13
-        RESETALL.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-        RESETALL.BackgroundTransparency = 1.000
-        RESETALL.BorderSizePixel = 0
-        RESETALL.Position = UDim2.new(0.621510208, 0, 0.730036497, 0)
-        RESETALL.Size = UDim2.new(0, 15, 0, 15)
-        RESETALL.ZIndex = 23
-        RESETALL.Image = "rbxassetid://5640320478"
+    local TweenService = game:GetService("TweenService")
+    local UIS = game:GetService("UserInputService")
+    local GuiService = game:GetService("GuiService")
 
-        COLORPALLETE.Name = "COLORPALLETE"
-        COLORPALLETE.Parent = PCR_1
-        COLORPALLETE.AnchorPoint = Vector2.new(0.5, 0.5)
-        COLORPALLETE.BackgroundColor3 = Color3.fromRGB(33, 33, 33)
-        COLORPALLETE.BackgroundTransparency = 1.000
-        COLORPALLETE.BorderSizePixel = 0
-        COLORPALLETE.ClipsDescendants = true
-        COLORPALLETE.Position = UDim2.new(0.5, 0, 0.5, 0)
-        COLORPALLETE.Size = UDim2.new(0, 272, 0, 150)
-        COLORPALLETE.ZIndex = 2
-        COLORPALLETE.Visible = false
+    local COLORPALLETE = Instance.new("Frame")
+    local ANIMATEFRAME01 = Instance.new("Frame")
+    local Holder = Instance.new("Frame")
+    local BG = Instance.new("Frame")
+    local S12 = Instance.new("Frame")
+    local ColourWheel = Instance.new("ImageButton")
+    local UIAspectRatioConstraint = Instance.new("UIAspectRatioConstraint")
+    local Picker = Instance.new("ImageLabel")
+    local S523 = Instance.new("UICorner")
+    local DarknessPicker = Instance.new("ImageButton")
+    local UIGradient = Instance.new("UIGradient")
+    local Slider = Instance.new("ImageLabel")
+    local UIAspectRatioConstraint_2 = Instance.new("UIAspectRatioConstraint")
+    local S13 = Instance.new("Frame")
+    local SDFH = Instance.new("UICorner")
+    local ColourDisplayBIG = Instance.new("ImageLabel")
+    local UIAspectRatioConstraint_3 = Instance.new("UIAspectRatioConstraint")
+    local SETCOLOR = Instance.new("ImageButton")
+    local Upper = Instance.new("Frame")
+    local TEMPLATETITLE20202 = Instance.new("TextLabel")
+    local linedecoupper = Instance.new("Frame")
+    local RESETALL = Instance.new("ImageButton")
 
-        ANIMATEFRAME01.Name = "ANIMATEFRAME01"
-        ANIMATEFRAME01.Parent = COLORPALLETE
-        ANIMATEFRAME01.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-        ANIMATEFRAME01.Position = UDim2.new(-0.0257352963, 0, -0.00666669384, 0)
-        ANIMATEFRAME01.Size = UDim2.new(0, 285, 0, 159)
-        ANIMATEFRAME01.ZIndex = 99
-        ANIMATEFRAME01.BorderSizePixel = 0;
+    RESETALL.Name = "RESETALL"
+    RESETALL.Parent = S13
+    RESETALL.BackgroundTransparency = 1
+    RESETALL.Position = UDim2.new(0.621510208,0,0.730036497,0)
+    RESETALL.Size = UDim2.new(0,15,0,15)
+    RESETALL.ZIndex = 23
+    RESETALL.Image = "rbxassetid://5640320478"
 
-        Holder.Name = "Holder"
-        Holder.Parent = COLORPALLETE
-        Holder.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-        Holder.BackgroundTransparency = 1.000
-        Holder.BorderSizePixel = 0
-        Holder.Size = UDim2.new(0, 283, 0, 157)
+    COLORPALLETE.Name = "COLORPALLETE"
+    COLORPALLETE.Parent = PCR_1
+    COLORPALLETE.AnchorPoint = Vector2.new(0.5,0.5)
+    COLORPALLETE.BackgroundColor3 = Color3.fromRGB(33,33,33)
+    COLORPALLETE.BackgroundTransparency = 1
+    COLORPALLETE.BorderSizePixel = 0
+    COLORPALLETE.ClipsDescendants = true
+    COLORPALLETE.Position = UDim2.new(0.5,0,0.5,0)
+    COLORPALLETE.Size = UDim2.new(0,272,0,150)
+    COLORPALLETE.ZIndex = 2
+    COLORPALLETE.Visible = false
 
-        BG.Name = "BG"
-        BG.Parent = Holder
-        BG.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-        BG.BorderColor3 = Color3.fromRGB(91, 133, 197)
-        BG.BorderSizePixel = 0
-        BG.Position = UDim2.new(0, 0, 0.157927245, 0)
-        BG.Size = UDim2.new(0, 272, 0, 125)
+    ANIMATEFRAME01.Parent = COLORPALLETE
+    ANIMATEFRAME01.Size = UDim2.new(0,285,0,159)
+    ANIMATEFRAME01.ZIndex = 99
+    ANIMATEFRAME01.BorderSizePixel = 0
 
-        S12.Name = "S12"
-        S12.Parent = BG
-        S12.BackgroundColor3 = Color3.fromRGB(18, 18, 18)
-        S12.BorderSizePixel = 0
-        S12.Position = UDim2.new(0, 16, 0, 7)
-        S12.Size = UDim2.new(0, 156, 0, 107)
-        S12.ZIndex = 23
+    Holder.Parent = COLORPALLETE
+    Holder.BackgroundTransparency = 1
+    Holder.Size = UDim2.new(0,283,0,157)
 
-        ColourWheel.Name = "ColourWheel"
-        ColourWheel.Parent = S12
-        ColourWheel.Active = false
-        ColourWheel.AnchorPoint = Vector2.new(0.5, 0.5)
-        ColourWheel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-        ColourWheel.BackgroundTransparency = 1.000
-        ColourWheel.BorderSizePixel = 0
-        ColourWheel.Position = UDim2.new(0.418737918, 0, 0.491852999, 0)
-        ColourWheel.Selectable = false
-        ColourWheel.Size = UDim2.new(0.599832177, 0, 0.86683917, 0)
-        ColourWheel.ZIndex = 25
-        ColourWheel.Image = "http://www.roblox.com/asset/?id=6020299385"
+    BG.Parent = Holder
+    BG.BackgroundColor3 = Color3.fromRGB(25,25,25)
+    BG.Position = UDim2.new(0,0,0.1579,0)
+    BG.Size = UDim2.new(0,272,0,125)
 
-        UIAspectRatioConstraint.Parent = ColourWheel
-        UIAspectRatioConstraint.AspectRatio = 1.000
+    S12.Parent = BG
+    S12.BackgroundColor3 = Color3.fromRGB(18,18,18)
+    S12.Position = UDim2.new(0,16,0,7)
+    S12.Size = UDim2.new(0,156,0,107)
 
-        Picker.Name = "Picker"
-        Picker.Parent = ColourWheel
-        Picker.AnchorPoint = Vector2.new(0.5, 0.5)
-        Picker.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-        Picker.BackgroundTransparency = 1.000
-        Picker.BorderSizePixel = 0
-        Picker.Position = UDim2.new(0.5, 0, 0.5, 0)
-        Picker.Size = UDim2.new(0.0900257826, 0, 0.0900257975, 0)
-        Picker.Image = "http://www.roblox.com/asset/?id=3678860011"
+    ColourWheel.Parent = S12
+    ColourWheel.BackgroundTransparency = 1
+    ColourWheel.Position = UDim2.new(0.4187,0,0.4918,0)
+    ColourWheel.Size = UDim2.new(0.5998,0,0.8668,0)
+    ColourWheel.Image = "rbxassetid://6020299385"
 
-        S523.Name = "S523"
-        S523.Parent = S12
+    UIAspectRatioConstraint.Parent = ColourWheel
+    UIAspectRatioConstraint.AspectRatio = 1
 
-        DarknessPicker.Name = "DarknessPicker"
-        DarknessPicker.Parent = S12
-        DarknessPicker.Active = false
-        DarknessPicker.AnchorPoint = Vector2.new(0.5, 0.5)
-        DarknessPicker.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-        DarknessPicker.BackgroundTransparency = 1.000
-        DarknessPicker.BorderSizePixel = 0
-        DarknessPicker.Position = UDim2.new(0.854536772, 0, 0.554580271, 0)
-        DarknessPicker.Selectable = false
-        DarknessPicker.Size = UDim2.new(0.0943329856, 0, 0.88014394, 0)
-        DarknessPicker.ZIndex = 25
-        DarknessPicker.Image = "rbxassetid://3570695787"
-        DarknessPicker.ScaleType = Enum.ScaleType.Slice
-        DarknessPicker.SliceCenter = Rect.new(100, 100, 100, 100)
-        DarknessPicker.SliceScale = 0.120
+    Picker.Parent = ColourWheel
+    Picker.AnchorPoint = Vector2.new(0.5,0.5)
+    Picker.BackgroundTransparency = 1
+    Picker.Position = UDim2.new(0.5,0,0.5,0)
+    Picker.Size = UDim2.new(0.09,0,0.09,0)
+    Picker.Image = "rbxassetid://3678860011"
 
-        UIGradient.Color = ColorSequence.new{ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255, 255, 255)), ColorSequenceKeypoint.new(1.00, Color3.fromRGB(0, 0, 0))}
-        UIGradient.Rotation = 90
-        UIGradient.Parent = DarknessPicker
+    S523.Parent = S12
 
-        Slider.Name = "Slider"
-        Slider.Parent = DarknessPicker
-        Slider.AnchorPoint = Vector2.new(0.5, 0.5)
-        Slider.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-        Slider.BackgroundTransparency = 1.000
-        Slider.BorderSizePixel = 0
-        Slider.Position = UDim2.new(0.491197795, 0, 0.0733607039, 0)
-        Slider.Size = UDim2.new(1.28656352, 0, 0.0265010502, 0)
-        Slider.ZIndex = 2
-        Slider.Image = "rbxassetid://3570695787"
-        Slider.ImageColor3 = Color3.fromRGB(255, 74, 74)
-        Slider.ScaleType = Enum.ScaleType.Slice
-        Slider.SliceCenter = Rect.new(100, 100, 100, 100)
-        Slider.SliceScale = 0.120
+    DarknessPicker.Parent = S12
+    DarknessPicker.BackgroundTransparency = 1
+    DarknessPicker.Position = UDim2.new(0.8545,0,0.5545,0)
+    DarknessPicker.Size = UDim2.new(0.0943,0,0.8801,0)
+    DarknessPicker.Image = "rbxassetid://3570695787"
 
-        UIAspectRatioConstraint_2.Parent = DarknessPicker
-        UIAspectRatioConstraint_2.AspectRatio = 0.157
+    UIGradient.Parent = DarknessPicker
+    UIGradient.Color = ColorSequence.new{
+        ColorSequenceKeypoint.new(0,Color3.new(1,1,1)),
+        ColorSequenceKeypoint.new(1,Color3.new(0,0,0))
+    }
+    UIGradient.Rotation = 90
 
-        S13.Name = "S13"
-        S13.Parent = BG
-        S13.BackgroundColor3 = Color3.fromRGB(18, 18, 18)
-        S13.BorderSizePixel = 0
-        S13.Position = UDim2.new(0, 182, 0, 7)
-        S13.Size = UDim2.new(0, 79, 0, 109)
-        S13.ZIndex = 23
+    Slider.Parent = DarknessPicker
+    Slider.AnchorPoint = Vector2.new(0.5,0.5)
+    Slider.BackgroundTransparency = 1
+    Slider.Size = UDim2.new(1.28,0,0.026,0)
+    Slider.Image = "rbxassetid://3570695787"
 
-        SDFH.Name = "SDFH"
-        SDFH.Parent = S13
+    UIAspectRatioConstraint_2.Parent = DarknessPicker
+    UIAspectRatioConstraint_2.AspectRatio = 0.157
 
-        ColourDisplayBIG.Name = "ColourDisplayBIG"
-        ColourDisplayBIG.Parent = S13
-        ColourDisplayBIG.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-        ColourDisplayBIG.BackgroundTransparency = 1.000
-        ColourDisplayBIG.BorderSizePixel = 0
-        ColourDisplayBIG.Position = UDim2.new(0.255401969, 0, 0.159329623, 0)
-        ColourDisplayBIG.Size = UDim2.new(0.473250836, 0, 0.530204058, 0)
-        ColourDisplayBIG.ZIndex = 25
-        ColourDisplayBIG.Image = "rbxassetid://3570695787"
-        ColourDisplayBIG.ScaleType = Enum.ScaleType.Slice
-        ColourDisplayBIG.SliceCenter = Rect.new(100, 100, 100, 100)
-        ColourDisplayBIG.SliceScale = 0.120
+    S13.Parent = BG
+    S13.BackgroundColor3 = Color3.fromRGB(18,18,18)
+    S13.Position = UDim2.new(0,182,0,7)
+    S13.Size = UDim2.new(0,79,0,109)
 
-        UIAspectRatioConstraint_3.Parent = ColourDisplayBIG
+    ColourDisplayBIG.Parent = S13
+    ColourDisplayBIG.BackgroundTransparency = 1
+    ColourDisplayBIG.Position = UDim2.new(0.255,0,0.159,0)
+    ColourDisplayBIG.Size = UDim2.new(0.473,0,0.53,0)
+    ColourDisplayBIG.Image = "rbxassetid://3570695787"
 
+    UIAspectRatioConstraint_3.Parent = ColourDisplayBIG
 
-        SETCOLOR.Name = "SETCOLOR"
-        SETCOLOR.Parent = S13
-        SETCOLOR.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-        SETCOLOR.BackgroundTransparency = 1.000
-        SETCOLOR.BorderSizePixel = 0
-        SETCOLOR.Position = UDim2.new(0.231911927, 0, 0.730036736, 0)
-        SETCOLOR.Size = UDim2.new(0, 15, 0, 15)
-        SETCOLOR.ZIndex = 23
-        SETCOLOR.Image = "rbxassetid://1489284025"
+    SETCOLOR.Parent = S13
+    SETCOLOR.BackgroundTransparency = 1
+    SETCOLOR.Position = UDim2.new(0.231,0,0.73,0)
+    SETCOLOR.Size = UDim2.new(0,15,0,15)
+    SETCOLOR.Image = "rbxassetid://1489284025"
 
-        Upper.Name = "Upper"
-        Upper.Parent = Holder
-        Upper.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-        Upper.BackgroundTransparency = 1.000
-        Upper.BorderColor3 = Color3.fromRGB(91, 133, 197)
-        Upper.BorderSizePixel = 0
-        Upper.Position = UDim2.new(1.07835966e-07, 0, 0, 0)
-        Upper.Size = UDim2.new(0, 271, 0, 23)
-        Upper.ZIndex = 2
+    Upper.Parent = Holder
+    Upper.BackgroundTransparency = 1
+    Upper.Size = UDim2.new(0,271,0,23)
 
-        TEMPLATETITLE20202.Name = "TEMPLATETITLE20202"
-        TEMPLATETITLE20202.Parent = Upper
-        TEMPLATETITLE20202.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-        TEMPLATETITLE20202.BackgroundTransparency = 1.000
-        TEMPLATETITLE20202.BorderSizePixel = 0
-        TEMPLATETITLE20202.Position = UDim2.new(0.00999999978, 0, 0.217391297, 0)
-        TEMPLATETITLE20202.Size = UDim2.new(0, 258, 0, 13)
-        TEMPLATETITLE20202.ZIndex = 3
-        TEMPLATETITLE20202.Font = Enum.Font.SourceSansSemibold
-        TEMPLATETITLE20202.Text = text
-        TEMPLATETITLE20202.TextColor3 = Color3.fromRGB(197, 197, 197)
-        TEMPLATETITLE20202.TextSize = 16.000
-        TEMPLATETITLE20202.TextXAlignment = Enum.TextXAlignment.Left
+    TEMPLATETITLE20202.Parent = Upper
+    TEMPLATETITLE20202.BackgroundTransparency = 1
+    TEMPLATETITLE20202.Text = text
+    TEMPLATETITLE20202.TextColor3 = Color3.fromRGB(197,197,197)
+    TEMPLATETITLE20202.TextSize = 16
+    TEMPLATETITLE20202.Font = Enum.Font.SourceSansSemibold
 
-        linedecoupper.Name = "linedecoupper"
-        linedecoupper.Parent = Holder
-        linedecoupper.BackgroundColor3 = Color3.fromRGB(91, 133, 197)
-        linedecoupper.BorderColor3 = Color3.fromRGB(91, 133, 197)
-        linedecoupper.BorderSizePixel = 0
-        linedecoupper.Position = UDim2.new(0, 0, 0.150589287, 0)
-        linedecoupper.Size = UDim2.new(0.961130738, 0, 0, 1)
-        linedecoupper.ZIndex = 3
-        if COLORPALLETE.Visible == true then
-                ANIMATEFRAME01:TweenPosition(UDim2.new(-0.026,0,-0.007,0),'Out','Quint',0.2,true);
-                wait(.2)
-                COLORPALLETE.BackgroundTransparency = 1;
-                Holder.Visible = false
-                ANIMATEFRAME01:TweenPosition(UDim2.new(1.077,0,-0.007,0),'Out','Quint',0.2,true);
-                wait(.2)
-                COLORPALLETE.Visible = false
-                ANIMATEFRAME01.Visible = false
+    linedecoupper.Parent = Holder
+    linedecoupper.BackgroundColor3 = Color3.fromRGB(91,133,197)
+    linedecoupper.Size = UDim2.new(0.96,0,0,1)
+
+    -- ================= ANDROID + PC INPUT =================
+    local draggingWheel = false
+    local draggingSlider = false
+    local activeInput
+
+    local function update(pos)
+        local center = ColourWheel.AbsolutePosition + ColourWheel.AbsoluteSize/2
+        local rel = pos - center
+        local h = (math.atan2(rel.Y,rel.X)/(2*math.pi))%1
+        local s = math.clamp(rel.Magnitude/(ColourWheel.AbsoluteSize.X/2),0,1)
+        local v = 1-math.clamp((Slider.AbsolutePosition.Y-DarknessPicker.AbsolutePosition.Y)/DarknessPicker.AbsoluteSize.Y,0,1)
+        local col = Color3.fromHSV(h,s,v)
+        ColourDisplayBIG.ImageColor3 = col
+        UIGradient.Color = ColorSequence.new{
+            ColorSequenceKeypoint.new(0,col),
+            ColorSequenceKeypoint.new(1,Color3.new())
+        }
+    end
+
+    ColourWheel.InputBegan:Connect(function(i)
+        if i.UserInputType==Enum.UserInputType.MouseButton1 or i.UserInputType==Enum.UserInputType.Touch then
+            draggingWheel=true
+            activeInput=i
         end
-        local uis = game:GetService("UserInputService")
-        ANIMATEFRAME01.Visible =true
-        COLORPALLETE.Visible = true
-        ANIMATEFRAME01.Position = UDim2.new(-1.085,0,-0.013,0)
-        Holder.Visible = false
+    end)
 
-        ANIMATEFRAME01:TweenPosition(UDim2.new(-0.026,0,-0.007,0),'Out','Quint',0.2,true);
-        wait(.2)
-        COLORPALLETE.Visible = true
-        COLORPALLETE.BackgroundTransparency = 0;
-        Holder.Visible = true
-        ANIMATEFRAME01:TweenPosition(UDim2.new(1.077,0,-0.007,0),'Out','Quint',0.2,true);
-        wait(.2)
-        ANIMATEFRAME01.Position = UDim2.new(-1.085,0,-0.013,0)
-        local hsv;
-
-        SETCOLOR.MouseButton1Click:Connect(function()
-                ANIMATEFRAME01:TweenPosition(UDim2.new(-0.026,0,-0.007,0),'Out','Quint',0.2,true);
-                wait(.2)
-                COLORPALLETE.BackgroundTransparency = 1;
-                Holder.Visible = false
-                ANIMATEFRAME01:TweenPosition(UDim2.new(1.077,0,-0.007,0),'Out','Quint',0.2,true);
-                wait(.2)
-                ANIMATEFRAME01.Visible = false
-                ColourDisplay.ImageColor3 = ColourDisplayBIG.ImageColor3
-                COLORPALLETE.Visible = false
-
-                pcall(function()
-            Action( Color3.fromRGB(ColourDisplayBIG.ImageColor3.R * 200 ,ColourDisplayBIG.ImageColor3.G * 200 ,ColourDisplayBIG.ImageColor3.B* 200) )
-        end)
-
-        end)
-
-        RESETALL.MouseButton1Click:Connect(function()
-                ANIMATEFRAME01:TweenPosition(UDim2.new(-0.026,0,-0.007,0),'Out','Quint',0.2,true);
-                wait(.2)
-                COLORPALLETE.BackgroundTransparency = 1;
-                Holder.Visible = false
-                ANIMATEFRAME01:TweenPosition(UDim2.new(1.077,0,-0.007,0),'Out','Quint',0.2,true);
-                wait(.2)
-                COLORPALLETE.Visible = false
-
-                ANIMATEFRAME01.Visible = false
-
-        end)
-        local buttonDown = false
-        local movingSlider = false
-
-
-        local function updateColour(centreOfWheel)
-
-                local colourPickerCentre = Vector2.new(
-                        Picker.AbsolutePosition.X + (Picker.AbsoluteSize.X/2),
-                        Picker.AbsolutePosition.Y + (Picker.AbsoluteSize.Y/2)
-                )
-                local h = (math.pi - math.atan2(colourPickerCentre.Y - centreOfWheel.Y, colourPickerCentre.X - centreOfWheel.X)) / (math.pi * 2)
-
-                local s = (centreOfWheel - colourPickerCentre).Magnitude / (ColourWheel.AbsoluteSize.X/2)
-
-                local v = math.abs((Slider.AbsolutePosition.Y - DarknessPicker.AbsolutePosition.Y) / DarknessPicker.AbsoluteSize.Y - 1)
-
-
-                hsv = Color3.fromHSV(math.clamp(h, 0, 1), math.clamp(s, 0, 1), math.clamp(v, 0, 1))
-
-
-                ColourDisplayBIG.ImageColor3 = hsv
-                UIGradient.Color = ColorSequence.new{
-                        ColorSequenceKeypoint.new(0, hsv), 
-                        ColorSequenceKeypoint.new(1, Color3.new(0, 0, 0))
-                }
-
+    DarknessPicker.InputBegan:Connect(function(i)
+        if i.UserInputType==Enum.UserInputType.MouseButton1 or i.UserInputType==Enum.UserInputType.Touch then
+            draggingSlider=true
+            activeInput=i
         end
+    end)
 
+    UIS.InputChanged:Connect(function(i)
+        if i~=activeInput then return end
+        local pos=i.Position-Vector2.new(0,GuiService:GetGuiInset().Y)
+        if draggingWheel then
+            Picker.Position=UDim2.fromOffset(
+                pos.X-ColourWheel.AbsolutePosition.X,
+                pos.Y-ColourWheel.AbsolutePosition.Y
+            )
+        end
+        if draggingSlider then
+            Slider.Position=UDim2.new(0,0,0,math.clamp(
+                pos.Y-DarknessPicker.AbsolutePosition.Y,0,DarknessPicker.AbsoluteSize.Y))
+        end
+        update(pos)
+    end)
 
-        ColourWheel.MouseButton1Down:Connect(function()
-                buttonDown = true
-        end)
+    UIS.InputEnded:Connect(function(i)
+        if i==activeInput then
+            draggingWheel=false
+            draggingSlider=false
+            activeInput=nil
+        end
+    end)
 
-        DarknessPicker.MouseButton1Down:Connect(function()
-                movingSlider = true
-        end)
+    SETCOLOR.MouseButton1Click:Connect(function()
+        ColourDisplay.ImageColor3=ColourDisplayBIG.ImageColor3
+        pcall(function() Action(ColourDisplayBIG.ImageColor3) end)
+        COLORPALLETE.Visible=false
+    end)
 
+    RESETALL.MouseButton1Click:Connect(function()
+        COLORPALLETE.Visible=false
+    end)
 
-        uis.InputEnded:Connect(function(input)
-
-                if input.UserInputType ~= Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then return end
-
-                buttonDown = false
-                movingSlider = false
-        end)
-
-
-        uis.InputChanged:Connect(function(input)
-
-                if input.UserInputType ~= Enum.UserInputType.MouseMovement then return end
-
-
-                local mousePos = uis:GetMouseLocation() - Vector2.new(0, game:GetService("GuiService"):GetGuiInset().Y)
-
-                local centreOfWheel = Vector2.new(ColourWheel.AbsolutePosition.X + (ColourWheel.AbsoluteSize.X/2), ColourWheel.AbsolutePosition.Y + (ColourWheel.AbsoluteSize.Y/2))
-
-                local distanceFromWheel = (mousePos - centreOfWheel).Magnitude
-
-
-                if distanceFromWheel <= ColourWheel.AbsoluteSize.X/2 and buttonDown then
-
-                        Picker.Position = UDim2.new(0, mousePos.X - ColourWheel.AbsolutePosition.X, 0, mousePos.Y - ColourWheel.AbsolutePosition.Y)
-
-
-                elseif movingSlider then
-
-                        Slider.Position = UDim2.new(Slider.Position.X.Scale, 0, 0, 
-                                math.clamp(
-                                        mousePos.Y - DarknessPicker.AbsolutePosition.Y, 
-                                        0, 
-                                        DarknessPicker.AbsoluteSize.Y)
-                        )        
-                end
-
-                updateColour(centreOfWheel)
-
-        end)
-        draggable(COLORPALLETE)
+    draggable(COLORPALLETE)
 end
 
 
