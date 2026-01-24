@@ -122,7 +122,7 @@ local function draggable(obj,extern,parented)
         globals.morigin=nil
         obj.InputBegan:Connect(function(input)
 
-                if input.UserInputType == Enum.UserInputType.MouseButton1 and souid == false and obj.ZIndex >= index then
+                if input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch and souid == false and obj.ZIndex >= index then
                         souid = true
 
                         index = obj.ZIndex                                
@@ -148,7 +148,7 @@ local function draggable(obj,extern,parented)
                                 end
                         end)
                 else
-                        if input.UserInputType == Enum.UserInputType.MouseButton1 and souid==false and obj.ZIndex < index then
+                        if input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch and souid==false and obj.ZIndex < index then
                                 obj.Parent = PCR_1
                                 souid = true
                                 index = obj.ZIndex
@@ -496,7 +496,7 @@ function OpenedColor(text,ColourDisplay,Action,def)
 
         uis.InputEnded:Connect(function(input)
 
-                if input.UserInputType ~= Enum.UserInputType.MouseButton1 then return end
+                if input.UserInputType ~= Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then return end
 
                 buttonDown = false
                 movingSlider = false
@@ -1554,7 +1554,7 @@ function library:AddWindow(text)
                                         obj6.Size = UDim2.new(0, math.clamp(mouse.X - obj6.AbsolutePosition.X, 0, 244), 0, 13)
                                 end)
                                 releaseconnection = uis.InputEnded:Connect(function(Mouse)
-                                        if Mouse.UserInputType == Enum.UserInputType.MouseButton1 then
+                                        if Mouse.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
                                                 Value = ((((tonumber(Max) - tonumber(Min)) / 244) * obj6.AbsoluteSize.X) + tonumber(Min))
                                                 Value =(Value)
                                                 pcall(function()
