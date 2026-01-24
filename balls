@@ -2007,132 +2007,86 @@ end
                         _PARENT:TweenSize(UDim2.fromOffset(_PARENT.AbsoluteSize.X,  LIST.AbsoluteContentSize.Y + 15),Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0, true) 
                         UpdateMainSize(nil,true)
                 end
-                
-function inside:AddButton(Text, Callback)
-    Callback = Callback or function() end
-    Text = Text or "Not Defined"
+                function inside:AddButton(Text,Callback)
+                        Callback = Callback or function() end
+                        Text=Text or 'Not Defined'
+                        local TemplateButton = Instance.new("Frame")
+                        local TextLabel = Instance.new("TextLabel")
+                        local Interactive = Instance.new("TextButton")
+                        local UICorner = Instance.new("UICorner")
 
-    local UIS = game:GetService("UserInputService")
+                        TemplateButton.Name = "TemplateButton"
+                        TemplateButton.Parent = HOLDER_2
+                        TemplateButton.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+                        TemplateButton.BorderSizePixel = 0
+                        TemplateButton.Position = UDim2.new(0.0430313908, 0, 0, 0)
+                        TemplateButton.Size = UDim2.new(0, 243, 0, 21)
+                        TemplateButton.ZIndex = 14
+                        TemplateButton.ClipsDescendants = true
+                        TextLabel.Parent = TemplateButton
+                        TextLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+                        TextLabel.BackgroundTransparency = 1.000
+                        TextLabel.BorderSizePixel = 0
+                        TextLabel.Position = UDim2.new(0, 0, 0, 0)
+                        TextLabel.Size = UDim2.new(0,243,0,19)
+                        TextLabel.ZIndex = 15
+            TextLabel.Text=Text
+                        TextLabel.Font = Enum.Font.SourceSansBold
+                        TextLabel.TextColor3 = Color3.fromRGB(84, 84, 84)
+                        TextLabel.TextSize = 17.000
 
-    local TemplateButton = Instance.new("Frame")
-    local TextLabel = Instance.new("TextLabel")
-    local Interactive = Instance.new("TextButton")
-    local UICorner = Instance.new("UICorner")
-    local UIGradient = Instance.new("UIGradient")
-    local UIStroke = Instance.new("UIStroke")
+                        Interactive.Name = "Interactive"
+                        Interactive.Parent = TemplateButton
+                        Interactive.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+                        Interactive.BackgroundTransparency = 1.000
+                        Interactive.BorderSizePixel = 0
+                        Interactive.Position = UDim2.new(0, 0, 0, 0)
+                        Interactive.Size = UDim2.new(0,243,0,21)
+                        Interactive.ZIndex = 20
+                        Interactive.Font = Enum.Font.SourceSans
+                        Interactive.Text = ""
+                        Interactive.TextColor3 = Color3.fromRGB(0, 0, 0)
+                        Interactive.TextSize = 18.000
+                        --Interactive.ClipsDescendants = true
+                        UICorner.CornerRadius = UDim.new(0, 4)
+                        UICorner.Parent = TemplateButton
+                        local UIGradient = Instance.new("UIGradient");
+                        local UIStroke = Instance.new('UIStroke');
 
-    TemplateButton.Name = "TemplateButton"
-    TemplateButton.Parent = HOLDER_2
-    TemplateButton.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-    TemplateButton.BorderSizePixel = 0
-    TemplateButton.Position = UDim2.new(0.0430313908, 0, 0, 0)
-    TemplateButton.Size = UDim2.new(0, 243, 0, 21)
-    TemplateButton.ZIndex = 14
-    TemplateButton.ClipsDescendants = true
-    TemplateButton.Active = true -- 🔑 mobil için önemli
+                        UIStroke.Parent= TemplateButton;
+                        UIStroke.Color = Color3.fromRGB(52,52,52);
+                        UIStroke.LineJoinMode = Enum.LineJoinMode.Round;
+                        UIStroke.Thickness = 1;
+                        UIStroke.Transparency = 0;
+                        UIStroke.Name = 'UIStroke';
 
-    TextLabel.Parent = TemplateButton
-    TextLabel.BackgroundTransparency = 1
-    TextLabel.BorderSizePixel = 0
-    TextLabel.Position = UDim2.new(0, 0, 0, 0)
-    TextLabel.Size = UDim2.new(0, 243, 0, 19)
-    TextLabel.ZIndex = 15
-    TextLabel.Text = Text
-    TextLabel.Font = Enum.Font.SourceSansBold
-    TextLabel.TextColor3 = Color3.fromRGB(84, 84, 84)
-    TextLabel.TextSize = 17
+                        UIGradient.Color = ColorSequence.new{ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255, 255, 255)), ColorSequenceKeypoint.new(1.00, Color3.fromRGB(180, 180, 180))}
+                        UIGradient.Parent = UIStroke
 
-    Interactive.Name = "Interactive"
-    Interactive.Parent = TemplateButton
-    Interactive.BackgroundTransparency = 1
-    Interactive.BorderSizePixel = 0
-    Interactive.Position = UDim2.new(0, 0, 0, 0)
-    Interactive.Size = UDim2.new(1, 0, 1, 0)
-    Interactive.ZIndex = 20
-    Interactive.Text = ""
-    Interactive.AutoButtonColor = false
-    Interactive.Active = true -- 🔑 mobil
+                        Interactive.MouseButton1Click:Connect(function()
+                                spawn(function()
+                                        pcall(function()
+                                                Callback()
+                                        end)
+                                end)
+                        end)
+                        SECTIONHOLDER.Size = UDim2.fromOffset(SECTIONHOLDER.AbsoluteSize.X,  SECTION2UILIB.AbsoluteContentSize.Y + 8) + UDim2.new(0,0,0,23)
+                        _PARENT.Size = UDim2.new(_PARENT.Size.X.Scale, _PARENT.Size.X.Offset , 0 ,LIST.AbsoluteContentSize.Y + 15);
+                        SECTIONHOLDER:TweenSize(UDim2.fromOffset(SECTIONHOLDER.AbsoluteSize.X,  SECTION2UILIB.AbsoluteContentSize.Y + 42),Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0, true) 
+                        wait()
+                        _PARENT:TweenSize(UDim2.fromOffset(_PARENT.AbsoluteSize.X,  LIST.AbsoluteContentSize.Y + 15),Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0, true) 
+                        UpdateMainSize(nil,true)
+                end                        
+                AutoFit(SECTIONHOLDER,SECTION2UILIB)
+                _PARENT:TweenSize(UDim2.fromOffset(_PARENT.AbsoluteSize.X,  LIST.AbsoluteContentSize.Y + 15),Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0, true) 
 
-    UICorner.CornerRadius = UDim.new(0, 4)
-    UICorner.Parent = TemplateButton
-
-    UIStroke.Parent = TemplateButton
-    UIStroke.Color = Color3.fromRGB(52, 52, 52)
-    UIStroke.LineJoinMode = Enum.LineJoinMode.Round
-    UIStroke.Thickness = 1
-    UIStroke.Transparency = 0
-
-    UIGradient.Color = ColorSequence.new{
-        ColorSequenceKeypoint.new(0, Color3.fromRGB(255,255,255)),
-        ColorSequenceKeypoint.new(1, Color3.fromRGB(180,180,180))
-    }
-    UIGradient.Parent = UIStroke
-
-    -- ================= INPUT (PC + MOBIL) =================
-    local pressed = false
-
-    Interactive.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1
-        or input.UserInputType == Enum.UserInputType.Touch then
-
-            pressed = true
-            UIStroke.Color = Color3.fromRGB(115,115,115)
-
-            task.spawn(function()
-                pcall(Callback)
-            end)
+                return inside
         end
-    end)
 
-    Interactive.InputEnded:Connect(function(input)
-        if pressed then
-            pressed = false
-            UIStroke.Color = Color3.fromRGB(52,52,52)
-        end
-    end)
-
-    -- ================= AUTOFIT =================
-    SECTIONHOLDER.Size =
-        UDim2.fromOffset(
-            SECTIONHOLDER.AbsoluteSize.X,
-            SECTION2UILIB.AbsoluteContentSize.Y + 8
-        ) + UDim2.new(0,0,0,23)
-
-    _PARENT.Size =
-        UDim2.new(
-            _PARENT.Size.X.Scale,
-            _PARENT.Size.X.Offset,
-            0,
-            LIST.AbsoluteContentSize.Y + 15
-        )
-
-    SECTIONHOLDER:TweenSize(
-        UDim2.fromOffset(
-            SECTIONHOLDER.AbsoluteSize.X,
-            SECTION2UILIB.AbsoluteContentSize.Y + 42
-        ),
-        Enum.EasingDirection.Out,
-        Enum.EasingStyle.Quad,
-        0,
-        true
-    )
-
-    task.wait()
-
-    _PARENT:TweenSize(
-        UDim2.fromOffset(
-            _PARENT.AbsoluteSize.X,
-            LIST.AbsoluteContentSize.Y + 15
-        ),
-        Enum.EasingDirection.Out,
-        Enum.EasingStyle.Quad,
-        0,
-        true
-    )
-
-    UpdateMainSize(nil, true)
+        return sec
 end
-end
+
+
 
 
 draggable(MAIN)
