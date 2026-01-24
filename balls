@@ -2132,7 +2132,7 @@ function inside:AddButton(Text, Callback)
 
     UpdateMainSize(nil, true)
 end
-end)
+end
 
 
 draggable(MAIN)
