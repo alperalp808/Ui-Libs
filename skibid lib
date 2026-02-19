@@ -1,135 +1,116 @@
--- AquaUI Library (Mobile + PC compatible) -- Features: Tabs (left list), Sections, Button, Toggle, Slider, Dropdown, Colorpicker, Bind (key/button), Textbox, Label -- Draggable, Resizable (bottom-right), Scales with size, Aqua theme -- Usage: local Aqua = loadstring(game:HttpGet('URL'))() --        local Window = Aqua:CreateWindow({Name="Title"}) --        local Tab = Window:CreateTab({Name="Tab 1"}) --        local Section = Tab:CreateSection({Name="Section"}) --        Section:CreateButton({...}) etc.
+-- AquaUI Library (Mobile + PC compatible) -- Elements: Button, Toggle, Slider, Textbox, Dropdown, Label, Colorpicker, Bind (Key/Button mode) -- Draggable, Resizable, Aqua theme, Click animations everywhere
 
 local Aqua = {} Aqua.__index = Aqua
 
 --// Services local UIS = game:GetService("UserInputService") local TS = game:GetService("TweenService") local Players = game:GetService("Players") local LP = Players.LocalPlayer
 
---// Theme local Theme = { Aqua = Color3.fromRGB(0, 200, 200), Dark = Color3.fromRGB(25,25,25), Dark2 = Color3.fromRGB(35,35,35), Text = Color3.fromRGB(235,235,235) }
+--// Theme local Theme = { Aqua = Color3.fromRGB(0,200,200), Dark = Color3.fromRGB(25,25,25), Dark2 = Color3.fromRGB(35,35,35), Text = Color3.fromRGB(235,235,235) }
 
---// Utils local function Tween(obj, t, props) TS:Create(obj, TweenInfo.new(t, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), props):Play() end
+--// Utils local function Tween(o,t,p) TS:Create(o,TweenInfo.new(t,Enum.EasingStyle.Quad,Enum.EasingDirection.Out),p):Play() end
 
-local function MakeDraggable(frame, handle) handle = handle or frame local drag, dragInput, start, startPos handle.InputBegan:Connect(function(i) if i.UserInputType==Enum.UserInputType.MouseButton1 or i.UserInputType==Enum.UserInputType.Touch then drag=true; start=i.Position; startPos=frame.Position i.Changed:Connect(function() if i.UserInputState==Enum.UserInputState.End then drag=false end end) end end) handle.InputChanged:Connect(function(i) if i.UserInputType==Enum.UserInputType.MouseMovement or i.UserInputType==Enum.UserInputType.Touch then dragInput=i end end) UIS.InputChanged:Connect(function(i) if i==dragInput and drag then local delta=i.Position-start frame.Position=UDim2.new(startPos.X.Scale,startPos.X.Offset+delta.X,startPos.Y.Scale,startPos.Y.Offset+delta.Y) end end) end
+local function ClickAnim(b) b.AutoButtonColor=false b.MouseButton1Down:Connect(function() Tween(b,0.08,{BackgroundColor3=Theme.Aqua}) end) b.MouseButton1Up:Connect(function() Tween(b,0.08,{BackgroundColor3=Theme.Dark2}) end) end
 
-local function MakeResizable(frame) local grip = Instance.new("Frame") grip.Size = UDim2.new(0,16,0,16) grip.Position = UDim2.new(1,-16,1,-16) grip.BackgroundColor3 = Theme.Aqua grip.BorderSizePixel = 0 grip.Parent = frame
+local function MakeDraggable(frame,handle) handle=handle or frame local drag,dragInput,start,startPos handle.InputBegan:Connect(function(i) if i.UserInputType==Enum.UserInputType.MouseButton1 or i.UserInputType==Enum.UserInputType.Touch then drag=true; start=i.Position; startPos=frame.Position i.Changed:Connect(function() if i.UserInputState==Enum.UserInputState.End then drag=false end end) end end) handle.InputChanged:Connect(function(i) if i.UserInputType==Enum.UserInputType.MouseMovement or i.UserInputType==Enum.UserInputType.Touch then dragInput=i end end) UIS.InputChanged:Connect(function(i) if drag and i==dragInput then local d=i.Position-start frame.Position=UDim2.new(startPos.X.Scale,startPos.X.Offset+d.X,startPos.Y.Scale,startPos.Y.Offset+d.Y) end end) end
 
-local resizing, start, startSize
-grip.InputBegan:Connect(function(i)
-    if i.UserInputType==Enum.UserInputType.MouseButton1 or i.UserInputType==Enum.UserInputType.Touch then
-        resizing=true; start=i.Position; startSize=frame.Size
-        i.Changed:Connect(function() if i.UserInputState==Enum.UserInputState.End then resizing=false end end)
-    end
-end)
-UIS.InputChanged:Connect(function(i)
-    if resizing and (i.UserInputType==Enum.UserInputType.MouseMovement or i.UserInputType==Enum.UserInputType.Touch) then
-        local d=i.Position-start
-        frame.Size = UDim2.new(startSize.X.Scale, math.max(300,startSize.X.Offset+d.X), startSize.Y.Scale, math.max(200,startSize.Y.Offset+d.Y))
-    end
-end)
+local function MakeResizable(frame) local grip=Instance.new("Frame",frame) grip.Size=UDim2.new(0,16,0,16) grip.Position=UDim2.new(1,-16,1,-16) grip.BackgroundColor3=Theme.Aqua grip.BorderSizePixel=0 local resizing,start,startSize grip.InputBegan:Connect(function(i) if i.UserInputType==Enum.UserInputType.MouseButton1 or i.UserInputType==Enum.UserInputType.Touch then resizing=true; start=i.Position; startSize=frame.Size i.Changed:Connect(function() if i.UserInputState==Enum.UserInputState.End then resizing=false end end) end end) UIS.InputChanged:Connect(function(i) if resizing and (i.UserInputType==Enum.UserInputType.MouseMovement or i.UserInputType==Enum.UserInputType.Touch) then local d=i.Position-start frame.Size=UDim2.new(startSize.X.Scale,math.max(300,startSize.X.Offset+d.X),startSize.Y.Scale,math.max(200,startSize.Y.Offset+d.Y)) end end) end
 
-end
+--// Window function Aqua:CreateWindow(opts) local gui=Instance.new("ScreenGui") gui.Name="AquaUI" gui.ResetOnSpawn=false gui.Parent=LP:WaitForChild("PlayerGui")
 
---// Element Base local function ClickAnim(btn) btn.AutoButtonColor=false btn.MouseButton1Down:Connect(function() Tween(btn,0.08,{BackgroundColor3=Theme.Aqua}) end) btn.MouseButton1Up:Connect(function() Tween(btn,0.08,{BackgroundColor3=Theme.Dark2}) end) end
-
---// Window function Aqua:CreateWindow(opts) local gui = Instance.new("ScreenGui") gui.Name = "AquaUI" gui.ResetOnSpawn=false gui.Parent = LP:WaitForChild("PlayerGui")
-
-local main = Instance.new("Frame", gui)
-main.Size = UDim2.new(0,600,0,400)
-main.Position = UDim2.new(0.5,-300,0.5,-200)
-main.BackgroundColor3 = Theme.Dark
+local main=Instance.new("Frame",gui)
+main.Size=UDim2.new(0,600,0,400)
+main.Position=UDim2.new(0.5,-300,0.5,-200)
+main.BackgroundColor3=Theme.Dark
 main.BorderSizePixel=0
 
-local top = Instance.new("TextLabel", main)
-top.Size = UDim2.new(1,0,0,30)
-top.BackgroundColor3 = Theme.Aqua
+local top=Instance.new("TextLabel",main)
+top.Size=UDim2.new(1,0,0,30)
+top.BackgroundColor3=Theme.Aqua
 top.BorderSizePixel=0
-top.Text = opts.Name or "AquaUI"
-top.TextColor3 = Theme.Text
-top.Font = Enum.Font.GothamBold
-top.TextSize = 14
+top.Text=opts.Name or "AquaUI"
+top.TextColor3=Theme.Text
+top.Font=Enum.Font.GothamBold
+top.TextSize=14
 
-local tabsList = Instance.new("Frame", main)
-tabsList.Size = UDim2.new(0,140,1,-30)
-tabsList.Position = UDim2.new(0,0,0,30)
-tabsList.BackgroundColor3 = Theme.Dark2
+local tabsList=Instance.new("Frame",main)
+tabsList.Size=UDim2.new(0,140,1,-30)
+tabsList.Position=UDim2.new(0,0,0,30)
+tabsList.BackgroundColor3=Theme.Dark2
 tabsList.BorderSizePixel=0
+local listLay=Instance.new("UIListLayout",tabsList)
 
-local pages = Instance.new("Frame", main)
-pages.Size = UDim2.new(1,-140,1,-30)
-pages.Position = UDim2.new(0,140,0,30)
+local pages=Instance.new("Frame",main)
+pages.Size=UDim2.new(1,-140,1,-30)
+pages.Position=UDim2.new(0,140,0,30)
 pages.BackgroundTransparency=1
 
-local UIList = Instance.new("UIListLayout", tabsList)
-UIList.SortOrder=Enum.SortOrder.LayoutOrder
-
-MakeDraggable(main, top)
+MakeDraggable(main,top)
 MakeResizable(main)
 
-local Window = {Tabs={}, _pages=pages, _list=tabsList}
+local Window={}
 Window.__index=Window
 
 function Window:CreateTab(t)
-    local btn = Instance.new("TextButton", tabsList)
-    btn.Size = UDim2.new(1,0,0,36)
-    btn.BackgroundColor3 = Theme.Dark2
+    local btn=Instance.new("TextButton",tabsList)
+    btn.Size=UDim2.new(1,0,0,36)
+    btn.BackgroundColor3=Theme.Dark2
     btn.BorderSizePixel=0
-    btn.Text = t.Name or "Tab"
-    btn.TextColor3 = Theme.Text
-    btn.Font = Enum.Font.Gotham
-    btn.TextSize = 13
+    btn.Text=t.Name or "Tab"
+    btn.TextColor3=Theme.Text
+    btn.Font=Enum.Font.Gotham
+    btn.TextSize=13
     ClickAnim(btn)
 
-    local page = Instance.new("ScrollingFrame", pages)
-    page.Size = UDim2.new(1,0,1,0)
-    page.CanvasSize = UDim2.new(0,0,0,0)
+    local page=Instance.new("ScrollingFrame",pages)
+    page.Size=UDim2.new(1,0,1,0)
+    page.CanvasSize=UDim2.new(0,0,0,0)
     page.ScrollBarThickness=4
     page.Visible=false
     page.BackgroundTransparency=1
-    local lay = Instance.new("UIListLayout", page)
+    local lay=Instance.new("UIListLayout",page)
     lay.Padding=UDim.new(0,6)
-    lay.SortOrder=Enum.SortOrder.LayoutOrder
 
     btn.MouseButton1Click:Connect(function()
         for _,p in ipairs(pages:GetChildren()) do if p:IsA("ScrollingFrame") then p.Visible=false end end
         page.Visible=true
     end)
 
-    local Tab = {_page=page}
+    local Tab={}
     Tab.__index=Tab
 
     function Tab:CreateSection(s)
-        local sec = Instance.new("Frame", page)
-        sec.BackgroundColor3 = Theme.Dark2
+        local sec=Instance.new("Frame",page)
+        sec.BackgroundColor3=Theme.Dark2
         sec.BorderSizePixel=0
-        sec.Size = UDim2.new(1,-10,0,30)
+        sec.Size=UDim2.new(1,-10,0,30)
 
-        local title = Instance.new("TextLabel", sec)
-        title.Size = UDim2.new(1,0,0,24)
+        local title=Instance.new("TextLabel",sec)
+        title.Size=UDim2.new(1,0,0,24)
         title.BackgroundTransparency=1
-        title.Text = s.Name or "Section"
+        title.Text=s.Name or "Section"
         title.TextColor3=Theme.Text
         title.Font=Enum.Font.GothamBold
         title.TextSize=13
 
-        local holder = Instance.new("Frame", sec)
-        holder.Position = UDim2.new(0,0,0,24)
-        holder.Size = UDim2.new(1,0,0,0)
+        local holder=Instance.new("Frame",sec)
+        holder.Position=UDim2.new(0,0,0,24)
+        holder.Size=UDim2.new(1,0,0,0)
         holder.BackgroundTransparency=1
-        local list = Instance.new("UIListLayout", holder)
+        local list=Instance.new("UIListLayout",holder)
         list.Padding=UDim.new(0,4)
-        list.SortOrder=Enum.SortOrder.LayoutOrder
 
         local function Resize()
-            holder.Size = UDim2.new(1,0,0,list.AbsoluteContentSize.Y)
-            sec.Size = UDim2.new(1,-10,0,24+list.AbsoluteContentSize.Y+6)
-            page.CanvasSize = UDim2.new(0,0,0,lay.AbsoluteContentSize.Y+10)
+            holder.Size=UDim2.new(1,0,0,list.AbsoluteContentSize.Y)
+            sec.Size=UDim2.new(1,-10,0,24+list.AbsoluteContentSize.Y+6)
+            page.CanvasSize=UDim2.new(0,0,0,lay.AbsoluteContentSize.Y+10)
         end
         list:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(Resize)
 
         local Section={}
         Section.__index=Section
 
+        -- Label
         function Section:CreateLabel(text)
-            local l=Instance.new("TextLabel", holder)
+            local l=Instance.new("TextLabel",holder)
             l.Size=UDim2.new(1,0,0,20)
             l.BackgroundTransparency=1
             l.Text=text
@@ -139,8 +120,9 @@ function Window:CreateTab(t)
             return l
         end
 
+        -- Button
         function Section:CreateButton(o)
-            local b=Instance.new("TextButton", holder)
+            local b=Instance.new("TextButton",holder)
             b.Size=UDim2.new(1,0,0,26)
             b.BackgroundColor3=Theme.Dark2
             b.BorderSizePixel=0
@@ -153,63 +135,73 @@ function Window:CreateTab(t)
             return b
         end
 
+        -- Toggle
         function Section:CreateToggle(o)
-            local tgl=false
-            local c=Instance.new("TextButton", holder)
-            c.Size=UDim2.new(1,0,0,26)
-            c.BackgroundColor3=Theme.Dark2
-            c.BorderSizePixel=0
-            c.Text=(o.Name or "Toggle")..": OFF"
-            c.TextColor3=Theme.Text
-            c.Font=Enum.Font.Gotham
-            c.TextSize=12
-            ClickAnim(c)
-            local function Set(v)
-                tgl=v
-                c.Text=(o.Name or "Toggle")..": "..(tgl and "ON" or "OFF")
-                if o.Callback then o.Callback(tgl) end
+            local state=o.Default or false
+            local b=Instance.new("TextButton",holder)
+            b.Size=UDim2.new(1,0,0,26)
+            b.BackgroundColor3=Theme.Dark2
+            b.BorderSizePixel=0
+            b.TextColor3=Theme.Text
+            b.Font=Enum.Font.Gotham
+            b.TextSize=12
+            local function refresh()
+                b.Text=(o.Name or "Toggle")..": "..(state and "ON" or "OFF")
             end
-            c.MouseButton1Click:Connect(function() Set(not tgl) end)
-            if o.Default then Set(o.Default) end
+            ClickAnim(b)
+            local function Set(v)
+                state=v; refresh()
+                if o.Callback then o.Callback(state) end
+            end
+            b.MouseButton1Click:Connect(function() Set(not state) end)
+            refresh()
             return {Set=Set}
         end
 
+        -- Slider
         function Section:CreateSlider(o)
             local val=o.Default or o.Min or 0
-            local frame=Instance.new("Frame", holder)
-            frame.Size=UDim2.new(1,0,0,36)
-            frame.BackgroundTransparency=1
-            local txt=Instance.new("TextLabel", frame)
+            local f=Instance.new("Frame",holder)
+            f.Size=UDim2.new(1,0,0,36)
+            f.BackgroundTransparency=1
+            local txt=Instance.new("TextLabel",f)
             txt.Size=UDim2.new(1,0,0,16)
             txt.BackgroundTransparency=1
             txt.Text=o.Name..": "..val
             txt.TextColor3=Theme.Text
             txt.Font=Enum.Font.Gotham
             txt.TextSize=12
-            local bar=Instance.new("Frame", frame)
+            local bar=Instance.new("Frame",f)
             bar.Position=UDim2.new(0,0,0,20)
             bar.Size=UDim2.new(1,0,0,10)
             bar.BackgroundColor3=Theme.Dark2
-            local fill=Instance.new("Frame", bar)
-            fill.Size=UDim2.new((val-o.Min)/(o.Max-o.Min),0,1,0)
+            local fill=Instance.new("Frame",bar)
             fill.BackgroundColor3=Theme.Aqua
             local dragging=false
+            local function setVal(v)
+                val=math.clamp(v,o.Min,o.Max)
+                local pct=(val-o.Min)/(o.Max-o.Min)
+                fill.Size=UDim2.new(pct,0,1,0)
+                txt.Text=o.Name..": "..val
+                if o.Callback then o.Callback(val) end
+            end
             bar.InputBegan:Connect(function(i) if i.UserInputType==Enum.UserInputType.MouseButton1 or i.UserInputType==Enum.UserInputType.Touch then dragging=true end end)
             UIS.InputEnded:Connect(function(i) if i.UserInputType==Enum.UserInputType.MouseButton1 or i.UserInputType==Enum.UserInputType.Touch then dragging=false end end)
             UIS.InputChanged:Connect(function(i)
                 if dragging and (i.UserInputType==Enum.UserInputType.MouseMovement or i.UserInputType==Enum.UserInputType.Touch) then
                     local pct=math.clamp((i.Position.X-bar.AbsolutePosition.X)/bar.AbsoluteSize.X,0,1)
-                    val=math.floor((o.Min+(o.Max-o.Min)*pct)/ (o.Increment or 1))*(o.Increment or 1)
-                    fill.Size=UDim2.new(pct,0,1,0)
-                    txt.Text=o.Name..": "..val
-                    if o.Callback then o.Callback(val) end
+                    local v=o.Min+(o.Max-o.Min)*pct
+                    v=math.floor(v/(o.Increment or 1))*(o.Increment or 1)
+                    setVal(v)
                 end
             end)
-            return {Set=function(v) val=v end}
+            setVal(val)
+            return {Set=setVal}
         end
 
+        -- Textbox
         function Section:CreateTextbox(o)
-            local box=Instance.new("TextBox", holder)
+            local box=Instance.new("TextBox",holder)
             box.Size=UDim2.new(1,0,0,26)
             box.BackgroundColor3=Theme.Dark2
             box.BorderSizePixel=0
@@ -222,29 +214,30 @@ function Window:CreateTab(t)
             return box
         end
 
+        -- Dropdown
         function Section:CreateDropdown(o)
             local current=o.Default or (o.Options and o.Options[1])
-            local main=Instance.new("TextButton", holder)
+            local main=Instance.new("TextButton",holder)
             main.Size=UDim2.new(1,0,0,26)
             main.BackgroundColor3=Theme.Dark2
             main.BorderSizePixel=0
-            main.Text=(o.Name or "Dropdown")..": "..tostring(current)
             main.TextColor3=Theme.Text
             main.Font=Enum.Font.Gotham
             main.TextSize=12
             ClickAnim(main)
-            local list=Instance.new("Frame", holder)
-            list.Size=UDim2.new(1,0,0,0)
-            list.ClipsDescendants=true
-            list.BackgroundColor3=Theme.Dark2
-            local lay=Instance.new("UIListLayout", list)
+            local listFrame=Instance.new("Frame",holder)
+            listFrame.Size=UDim2.new(1,0,0,0)
+            listFrame.ClipsDescendants=true
+            listFrame.BackgroundColor3=Theme.Dark2
+            local lay=Instance.new("UIListLayout",listFrame)
             local open=false
-            local function Refresh()
-                list.Size=UDim2.new(1,0,0, open and (#o.Options*24) or 0)
+            local function refresh()
+                main.Text=(o.Name or "Dropdown")..": "..tostring(current)
+                listFrame.Size=UDim2.new(1,0,0,open and (#o.Options*24) or 0)
             end
-            main.MouseButton1Click:Connect(function() open=not open; Refresh() end)
+            main.MouseButton1Click:Connect(function() open=not open; refresh() end)
             for _,opt in ipairs(o.Options or {}) do
-                local b=Instance.new("TextButton", list)
+                local b=Instance.new("TextButton",listFrame)
                 b.Size=UDim2.new(1,0,0,24)
                 b.BackgroundTransparency=1
                 b.Text=tostring(opt)
@@ -252,23 +245,113 @@ function Window:CreateTab(t)
                 b.Font=Enum.Font.Gotham
                 b.TextSize=12
                 b.MouseButton1Click:Connect(function()
-                    current=opt
-                    main.Text=(o.Name or "Dropdown")..": "..tostring(current)
-                    open=false; Refresh()
+                    current=opt; open=false; refresh()
                     if o.Callback then o.Callback(current) end
                 end)
             end
-            return {Set=function(v) current=v end}
+            refresh()
+            return {Set=function(v) current=v; refresh() end}
         end
 
-        return setmetatable(Section, Section)
+        -- Colorpicker
+        function Section:CreateColorpicker(o)
+            local color=o.Default or Color3.new(1,1,1)
+            local btn=Instance.new("TextButton",holder)
+            btn.Size=UDim2.new(1,0,0,26)
+            btn.BackgroundColor3=Theme.Dark2
+            btn.BorderSizePixel=0
+            btn.TextColor3=Theme.Text
+            btn.Font=Enum.Font.Gotham
+            btn.TextSize=12
+            ClickAnim(btn)
+
+            local palette=Instance.new("Frame",holder)
+            palette.Size=UDim2.new(1,0,0,0)
+            palette.ClipsDescendants=true
+            palette.BackgroundColor3=Theme.Dark2
+
+            local hue=Instance.new("ImageLabel",palette)
+            hue.Size=UDim2.new(1,0,0,80)
+            hue.Image="rbxassetid://4155801252"
+            hue.BackgroundTransparency=1
+
+            local open=false
+            local function set(c)
+                color=c
+                btn.Text=(o.Name or "Color")
+                btn.BackgroundColor3=c
+                if o.Callback then o.Callback(color) end
+            end
+            btn.MouseButton1Click:Connect(function()
+                open=not open
+                palette.Size=UDim2.new(1,0,0,open and 80 or 0)
+            end)
+            hue.InputBegan:Connect(function(i)
+                if i.UserInputType==Enum.UserInputType.MouseButton1 or i.UserInputType==Enum.UserInputType.Touch then
+                    local x=(i.Position.X-hue.AbsolutePosition.X)/hue.AbsoluteSize.X
+                    local y=(i.Position.Y-hue.AbsolutePosition.Y)/hue.AbsoluteSize.Y
+                    set(Color3.fromHSV(x,1,1-y))
+                end
+            end)
+            set(color)
+            return {Set=set}
+        end
+
+        -- Bind (Key/Button)
+        function Section:CreateBind(o)
+            local mode=o.Mode or "Key"
+            local key=o.Default or Enum.KeyCode.E
+            local b=Instance.new("TextButton",holder)
+            b.Size=UDim2.new(1,0,0,26)
+            b.BackgroundColor3=Theme.Dark2
+            b.BorderSizePixel=0
+            b.TextColor3=Theme.Text
+            b.Font=Enum.Font.Gotham
+            b.TextSize=12
+            ClickAnim(b)
+
+            local waiting=false
+            local function refresh()
+                if mode=="Key" then
+                    b.Text=(o.Name or "Bind")..": "..key.Name
+                else
+                    b.Text=(o.Name or "Bind")..": Button"
+                end
+            end
+
+            b.MouseButton1Click:Connect(function()
+                if mode=="Button" then
+                    if o.Callback then o.Callback() end
+                else
+                    waiting=true
+                    b.Text="Press key..."
+                end
+            end)
+
+            UIS.InputBegan:Connect(function(i,gp)
+                if gp then return end
+                if waiting then
+                    if i.KeyCode~=Enum.KeyCode.Unknown then
+                        key=i.KeyCode
+                        waiting=false
+                        refresh()
+                    end
+                elseif mode=="Key" and i.KeyCode==key then
+                    if o.Callback then o.Callback() end
+                end
+            end)
+            refresh()
+            return {Set=function(k) key=k; refresh() end}
+        end
+
+        return setmetatable(Section,Section)
     end
 
-    return setmetatable(Tab, Tab)
+    return setmetatable(Tab,Tab)
 end
 
-return setmetatable(Window, Window)
+return setmetatable(Window,Window)
 
 end
 
-return setmetatable({}, Aqua)
+return setmetatable({},Aqua)
