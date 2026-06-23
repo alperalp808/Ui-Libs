@@ -215,8 +215,8 @@ function Menu:CreateWindow(title, keyName, showButton)
 
 	local TabBar = Instance.new("Frame")
 	TabBar.Name = "TabBar"
-	TabBar.Size = UDim2.new(1, -244, 0, 34)
-	TabBar.Position = UDim2.new(0, 232, 0, 48)
+	TabBar.Size = UDim2.new(1, -314, 0, 34)
+	TabBar.Position = UDim2.new(0, 302, 0, 48)
 	TabBar.BackgroundColor3 = Color3.fromRGB(10, 14, 18)
 	TabBar.BackgroundTransparency = 0.5
 	TabBar.Parent = MainFrame
@@ -235,8 +235,8 @@ function Menu:CreateWindow(title, keyName, showButton)
 	TabPadding.Parent = TabBar
 	
 	local Container = Instance.new("Frame")
-	Container.Size = UDim2.new(1, -244, 1, -98)
-	Container.Position = UDim2.new(0, 232, 0, 88)
+	Container.Size = UDim2.new(1, -314, 1, -98)
+	Container.Position = UDim2.new(0, 302, 0, 88)
 	Container.BackgroundTransparency = 1
 	Container.Parent = MainFrame
 	self.Container = Container
@@ -254,7 +254,7 @@ function Menu:CreateWindow(title, keyName, showButton)
 	
 	local DiagnosticFrame = Instance.new("Frame")
 	DiagnosticFrame.Name = "Hardcoded_DiagnosticsPanel"
-	DiagnosticFrame.Size = UDim2.new(0, 208, 1, -52)
+	DiagnosticFrame.Size = UDim2.new(0, 278, 1, -52)
 	DiagnosticFrame.Position = UDim2.new(0, 12, 0, 48)
 	DiagnosticFrame.BackgroundColor3 = Color3.fromRGB(15, 20, 26)
 	DiagnosticFrame.BackgroundTransparency = 0.4
@@ -264,7 +264,7 @@ function Menu:CreateWindow(title, keyName, showButton)
 	
 	local AvatarImage = Instance.new("ImageLabel")
 	AvatarImage.Size = UDim2.new(0, 46, 0, 46)
-	AvatarImage.Position = UDim2.new(0, 10, 0, 10)
+	AvatarImage.Position = UDim2.new(0, 14, 0, 10)
 	AvatarImage.BackgroundColor3 = Color3.fromRGB(24, 30, 38)
 	AvatarImage.Parent = DiagnosticFrame
 	addCorner(AvatarImage, 23)
@@ -287,8 +287,8 @@ function Menu:CreateWindow(title, keyName, showButton)
 	end)
 	
 	local DisplayNameLabel = Instance.new("TextLabel")
-	DisplayNameLabel.Size = UDim2.new(1, -70, 0, 18)
-	DisplayNameLabel.Position = UDim2.new(0, 62, 0, 12)
+	DisplayNameLabel.Size = UDim2.new(1, -78, 0, 18)
+	DisplayNameLabel.Position = UDim2.new(0, 72, 0, 12)
 	DisplayNameLabel.BackgroundTransparency = 1
 	DisplayNameLabel.Text = LocalPlayer.DisplayName
 	DisplayNameLabel.Font = Enum.Font.SourceSansBold
@@ -298,8 +298,8 @@ function Menu:CreateWindow(title, keyName, showButton)
 	DisplayNameLabel.Parent = DiagnosticFrame
 	
 	local UserIdLabel = Instance.new("TextLabel")
-	UserIdLabel.Size = UDim2.new(1, -70, 0, 14)
-	UserIdLabel.Position = UDim2.new(0, 62, 0, 28)
+	UserIdLabel.Size = UDim2.new(1, -78, 0, 14)
+	UserIdLabel.Position = UDim2.new(0, 72, 0, 28)
 	UserIdLabel.BackgroundTransparency = 1
 	UserIdLabel.Text = "ID: " .. LocalPlayer.UserId
 	UserIdLabel.Font = Enum.Font.SourceSansItalic
@@ -309,8 +309,8 @@ function Menu:CreateWindow(title, keyName, showButton)
 	UserIdLabel.Parent = DiagnosticFrame
 
 	local ServerInfoFrame = Instance.new("Frame")
-	ServerInfoFrame.Size = UDim2.new(1, -20, 0, 75)
-	ServerInfoFrame.Position = UDim2.new(0, 10, 0, 62)
+	ServerInfoFrame.Size = UDim2.new(1, -24, 0, 75)
+	ServerInfoFrame.Position = UDim2.new(0, 12, 0, 62)
 	ServerInfoFrame.BackgroundColor3 = Color3.fromRGB(10, 14, 18)
 	ServerInfoFrame.BackgroundTransparency = 0.5
 	ServerInfoFrame.Parent = DiagnosticFrame
@@ -380,8 +380,8 @@ function Menu:CreateWindow(title, keyName, showButton)
 	PingLabel.Parent = MiniPerformanceFrame
 
 	local CopyScroll = Instance.new("ScrollingFrame")
-	CopyScroll.Size = UDim2.new(1, -20, 0, 80)
-	CopyScroll.Position = UDim2.new(0, 10, 0, 142)
+	CopyScroll.Size = UDim2.new(1, -24, 0, 80)
+	CopyScroll.Position = UDim2.new(0, 12, 0, 142)
 	CopyScroll.BackgroundTransparency = 1
 	CopyScroll.ScrollBarThickness = 2
 	CopyScroll.ScrollBarImageColor3 = Color3.fromRGB(0, 200, 255)
@@ -424,8 +424,8 @@ function Menu:CreateWindow(title, keyName, showButton)
 	createClipboardButton("Vector Position", function() return tostring(LocalPlayer.Character and LocalPlayer.Character:GetPivot().Position or Vector3.zero) end)
 
 	local RadarLabel = Instance.new("TextLabel")
-	RadarLabel.Size = UDim2.new(1, -20, 0, 16)
-	RadarLabel.Position = UDim2.new(0, 10, 0, 228)
+	RadarLabel.Size = UDim2.new(1, -24, 0, 16)
+	RadarLabel.Position = UDim2.new(0, 12, 0, 228)
 	RadarLabel.BackgroundTransparency = 1
 	RadarLabel.Text = "RADAR LIST (1/1)"
 	RadarLabel.Font = Enum.Font.SourceSansBold
@@ -435,8 +435,8 @@ function Menu:CreateWindow(title, keyName, showButton)
 	RadarLabel.Parent = DiagnosticFrame
 	
 	local RadarScroll = Instance.new("ScrollingFrame")
-	RadarScroll.Size = UDim2.new(1, -20, 1, -250)
-	RadarScroll.Position = UDim2.new(0, 10, 0, 244)
+	RadarScroll.Size = UDim2.new(1, -24, 1, -250)
+	RadarScroll.Position = UDim2.new(0, 12, 0, 244)
 	RadarScroll.BackgroundColor3 = Color3.fromRGB(10, 14, 18)
 	RadarScroll.BackgroundTransparency = 0.6
 	RadarScroll.ScrollBarThickness = 2
@@ -888,7 +888,7 @@ function Menu:AddSection(tabData, side, title)
 			playSound(SFX.Hover, 0.2)
 			TweenService:Create(Btn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(36, 46, 58), TextColor3 = Color3.fromRGB(255,255,255)}):Play()
 		end)
-		btn.MouseLeave:Connect(function()
+		Btn.MouseLeave:Connect(function()
 			TweenService:Create(Btn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(26, 34, 42), TextColor3 = Color3.fromRGB(220, 225, 230)}):Play()
 		end)
 		Btn.MouseButton1Click:Connect(function()
