@@ -1,16 +1,11 @@
--- =============================================================================
--- PREMIUM AQUA UI LIBRARY v6.0 (Ultimate Enterprise System Diagnostics Edition)
--- Fully Optimized for PC & Mobile | Live Performance Telemetry & Security Panel
--- =============================================================================
-
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local Stats = game:GetService("Stats")
+local ContentProvider = game:GetService("ContentProvider")
 local LocalPlayer = Players.LocalPlayer
 
--- Audio Framework
 local function playSound(soundId, volume, pitch)
 	local sound = Instance.new("Sound")
 	sound.SoundId = "rbxassetid://" .. tostring(soundId)
@@ -51,7 +46,6 @@ local function addStroke(parent, color, thickness, transparency)
 	return stroke
 end
 
--- PREMIUM NOTIFICATION SYSTEM
 function Menu:Notify(title, description, duration)
 	duration = duration or 5
 	local NotificationGui = LocalPlayer:WaitForChild("PlayerGui"):FindFirstChild("Aqua_NotificationGui")
@@ -129,7 +123,6 @@ function Menu:Notify(title, description, duration)
 	end)
 end
 
--- WINDOW CONSTRUCTOR
 function Menu:CreateWindow(title)
 	local self = setmetatable({}, Menu)
 	
@@ -143,10 +136,9 @@ function Menu:CreateWindow(title)
 	ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 	self.ScreenGui = ScreenGui
 	
-	-- MAIN FRAME (Expanded for Dashboard Layout Integration)
 	local MainFrame = Instance.new("Frame")
 	MainFrame.Name = "MainFrame"
-	MainFrame.Size = UDim2.new(0, 790, 0, 460) -- Width scaled up to accommodate systemic telemetry layout
+	MainFrame.Size = UDim2.new(0, 790, 0, 460)
 	MainFrame.Position = UDim2.new(0.5, -395, 0.5, -230)
 	MainFrame.BackgroundColor3 = Color3.fromRGB(12, 16, 20)
 	MainFrame.BackgroundTransparency = 0.25
@@ -214,7 +206,6 @@ function Menu:CreateWindow(title)
 	CloseBtn.Parent = Controls
 	addCorner(CloseBtn, 6)
 
-	-- TAB BAR (Shifted horizontally to adapt for the new dashboard integration)
 	local TabBar = Instance.new("Frame")
 	TabBar.Name = "TabBar"
 	TabBar.Size = UDim2.new(1, -244, 0, 34)
@@ -254,9 +245,6 @@ function Menu:CreateWindow(title)
 
 	self:SetupDragAndResize(Header, ResizeGrip)
 	
-	-- =========================================================================
-	-- UNREMOVABLE UNTOUCHABLE SYSTEMIC DIAGNOSTICS DASHBOARD (HARDCODED SECTION)
-	-- =========================================================================
 	local DiagnosticFrame = Instance.new("Frame")
 	DiagnosticFrame.Name = "Hardcoded_DiagnosticsPanel"
 	DiagnosticFrame.Size = UDim2.new(0, 208, 1, -52)
@@ -267,17 +255,30 @@ function Menu:CreateWindow(title)
 	addCorner(DiagnosticFrame, 8)
 	addStroke(DiagnosticFrame, Color3.fromRGB(0, 200, 255), 1, 0.7)
 	
-	-- Profile Avatar Headshot Image Frame
 	local AvatarImage = Instance.new("ImageLabel")
 	AvatarImage.Size = UDim2.new(0, 46, 0, 46)
 	AvatarImage.Position = UDim2.new(0, 10, 0, 10)
 	AvatarImage.BackgroundColor3 = Color3.fromRGB(24, 30, 38)
-	AvatarImage.Image = "rbxthumb://type=AvatarHeadShot&id=" .. LocalPlayer.UserId .. "&x=150&y=150"
 	AvatarImage.Parent = DiagnosticFrame
 	addCorner(AvatarImage, 23)
 	addStroke(AvatarImage, Color3.fromRGB(0, 200, 255), 1, 0.5)
 	
-	-- Identity Processing Labels
+	local thumbType = Enum.ThumbnailType.HeadShot
+	local thumbSize = Enum.ThumbnailSize.Size150x150
+	local content, isReady = Players:GetUserThumbnailAsync(LocalPlayer.UserId, thumbType, thumbSize)
+	
+	if isReady then
+		AvatarImage.Image = content
+	else
+		AvatarImage.Image = "rbxthumb://type=AvatarHeadShot&id=" .. tostring(LocalPlayer.UserId) .. "&x=150&y=150"
+	end
+	
+	task.spawn(function()
+		pcall(function()
+			ContentProvider:PreloadAsync({AvatarImage})
+		end)
+	end)
+	
 	local DisplayNameLabel = Instance.new("TextLabel")
 	DisplayNameLabel.Size = UDim2.new(1, -70, 0, 18)
 	DisplayNameLabel.Position = UDim2.new(0, 62, 0, 12)
@@ -300,7 +301,6 @@ function Menu:CreateWindow(title)
 	UserIdLabel.TextXAlignment = Enum.TextXAlignment.Left
 	UserIdLabel.Parent = DiagnosticFrame
 
-	-- Realtime Telemetry Framework (Live Ping & FPS Monitoring)
 	local PerformanceFrame = Instance.new("Frame")
 	PerformanceFrame.Size = UDim2.new(1, -20, 0, 40)
 	PerformanceFrame.Position = UDim2.new(0, 10, 0, 66)
@@ -328,7 +328,6 @@ function Menu:CreateWindow(title)
 	PingLabel.TextColor3 = Color3.fromRGB(0, 200, 255)
 	PingLabel.Parent = PerformanceFrame
 
-	-- HWID & Vector Matrix Teleport Copy System
 	local CopyScroll = Instance.new("ScrollingFrame")
 	CopyScroll.Size = UDim2.new(1, -20, 0, 120)
 	CopyScroll.Position = UDim2.new(0, 10, 0, 114)
@@ -378,7 +377,6 @@ function Menu:CreateWindow(title)
 		return tostring(LocalPlayer.Character and LocalPlayer.Character:GetPivot() or CFrame.identity) 
 	end)
 
-	-- Automated Live Player-Radar (Active Player Monitor)
 	local RadarLabel = Instance.new("TextLabel")
 	RadarLabel.Size = UDim2.new(1, -20, 0, 16)
 	RadarLabel.Position = UDim2.new(0, 10, 0, 242)
@@ -425,7 +423,6 @@ function Menu:CreateWindow(title)
 	Players.PlayerRemoving:Connect(updateRadar)
 	updateRadar()
 
-	-- Telemetry Multi-Threaded Engine Loop (Highly Reliable FPS/Ping Computing)
 	local lastIteration, frameCount = os.clock(), 0
 	RunService.RenderStepped:Connect(function()
 		frameCount = frameCount + 1
@@ -435,12 +432,10 @@ function Menu:CreateWindow(title)
 			frameCount = 0
 			lastIteration = currentTime
 			
-			-- Safeguarded Ping Resolver
 			local pingValue = math.floor(Stats.Network.ServerStatsItem["Data Ping"]:GetValue())
 			PingLabel.Text = "PING: " .. pingValue .. " ms"
 		end
 	end)
-	-- =========================================================================
 
 	playSound(SFX.Open, 0.6)
 	MainFrame.Size = UDim2.new(0, 790, 0, 0)
@@ -527,7 +522,6 @@ function Menu:SetupDragAndResize(dragFrame, resizeGrip)
 	end)
 end
 
--- TAB SYSTEM
 function Menu:AddTab(name)
 	local TabButton = Instance.new("TextButton")
 	TabButton.Size = UDim2.new(0, 110, 0, 26)
@@ -607,7 +601,6 @@ function Menu:AddTab(name)
 	return tabData
 end
 
--- SECTION BUILDER
 function Menu:AddSection(tabData, side, title)
 	local parentZone = (side == "Right") and tabData.Right or tabData.Left
 	
@@ -705,7 +698,6 @@ function Menu:AddSection(tabData, side, title)
 		return BindBtn
 	end
 
-	-- 1. LABEL ELEMENT (Requested)
 	function elements:AddLabel(text, customColor)
 		local LabelFrame = Instance.new("Frame")
 		LabelFrame.Size = UDim2.new(0.94, 0, 0, 24)
@@ -732,7 +724,6 @@ function Menu:AddSection(tabData, side, title)
 		return labelObject
 	end
 
-	-- 2. BUTTON ELEMENT
 	function elements:AddButton(name, callback)
 		local Btn = Instance.new("TextButton")
 		Btn.Size = UDim2.new(0.94, 0, 0, 30)
@@ -750,7 +741,7 @@ function Menu:AddSection(tabData, side, title)
 			playSound(SFX.Hover, 0.2)
 			TweenService:Create(Btn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(36, 46, 58), TextColor3 = Color3.fromRGB(255,255,255)}):Play()
 		end)
-		Btn.MouseLeave:Connect(function()
+		btn.MouseLeave:Connect(function()
 			TweenService:Create(Btn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(26, 34, 42), TextColor3 = Color3.fromRGB(220, 225, 230)}):Play()
 		end)
 		Btn.MouseButton1Click:Connect(function()
@@ -761,7 +752,6 @@ function Menu:AddSection(tabData, side, title)
 		end)
 	end
 	
-	-- 3. TOGGLE ELEMENT
 	function elements:AddToggle(name, default, callback)
 		local state = default or false
 		local ToggleFrame = Instance.new("TextButton")
@@ -823,7 +813,6 @@ function Menu:AddSection(tabData, side, title)
 		return toggleObject
 	end
 	
-	-- 4. SLIDER ELEMENT
 	function elements:AddSlider(name, min, max, default, callback)
 		local SliderFrame = Instance.new("Frame")
 		SliderFrame.Size = UDim2.new(0.94, 0, 0, 42)
@@ -911,7 +900,6 @@ function Menu:AddSection(tabData, side, title)
 		end)
 	end
 	
-	-- 5. INDEPENDENT KEYBIND ELEMENT
 	function elements:AddKeybind(name, defaultKey, callback)
 		local BindFrame = Instance.new("Frame")
 		BindFrame.Size = UDim2.new(0.94, 0, 0, 30)
@@ -931,7 +919,6 @@ function Menu:AddSection(tabData, side, title)
 		createKeybindEngine(BindFrame, name, defaultKey, callback)
 	end
 	
-	-- 6. DROPDOWN ELEMENT
 	function elements:AddDropdown(name, list, isMulti, callback)
 		local dropped = false
 		local selectedItems = {}
@@ -1046,7 +1033,6 @@ function Menu:AddSection(tabData, side, title)
 		end
 	end
 	
-	-- 7. RGB COLORPICKER ELEMENT
 	function elements:AddColorpicker(name, defaultColor, callback)
 		local opened = false
 		local color = defaultColor or Color3.fromRGB(0, 200, 255)
