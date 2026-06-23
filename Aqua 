@@ -599,6 +599,7 @@ function Menu:AddTab(name)
 	LeftZone.ScrollBarThickness = 3
 	LeftZone.ScrollBarImageColor3 = Color3.fromRGB(0, 200, 255)
 	LeftZone.ScrollBarImageTransparency = 0.4
+	LeftZone.ClipsDescendants = false
 	LeftZone.Parent = TabPage
 	
 	local RightZone = LeftZone:Clone()
@@ -659,6 +660,8 @@ function Menu:AddSection(tabData, side, title)
 	SectionFrame.Size = UDim2.new(1, -6, 0, 50)
 	SectionFrame.BackgroundColor3 = Color3.fromRGB(16, 22, 28)
 	SectionFrame.BackgroundTransparency = 0.4
+	SectionFrame.ClipsDescendants = false
+	SectionFrame.ZIndex = 2
 	SectionFrame.Parent = parentZone
 	addCorner(SectionFrame, 8)
 	addStroke(SectionFrame, Color3.fromRGB(255,255,255), 1, 0.94)
@@ -978,6 +981,7 @@ function Menu:AddSection(tabData, side, title)
 		local DropFrame = Instance.new("Frame")
 		DropFrame.Size = UDim2.new(0.94, 0, 0, 48)
 		DropFrame.BackgroundTransparency = 1
+		DropFrame.ZIndex = 5
 		DropFrame.Parent = SectionFrame
 		
 		local Label = Instance.new("TextLabel")
@@ -1000,6 +1004,7 @@ function Menu:AddSection(tabData, side, title)
 		ActionBtn.TextSize = 13
 		ActionBtn.TextXAlignment = Enum.TextXAlignment.Left
 		ActionBtn.AutoButtonColor = false
+		ActionBtn.ZIndex = 6
 		ActionBtn.Parent = DropFrame
 		addCorner(ActionBtn, 5)
 		addStroke(ActionBtn, Color3.fromRGB(255,255,255), 1, 0.94)
@@ -1012,6 +1017,7 @@ function Menu:AddSection(tabData, side, title)
 		Arrow.TextColor3 = Color3.fromRGB(120, 125, 130)
 		Arrow.Font = Enum.Font.SourceSansBold
 		Arrow.TextSize = 10
+		Arrow.ZIndex = 7
 		Arrow.Parent = ActionBtn
 		
 		local ListContainer = Instance.new("Frame")
@@ -1019,7 +1025,7 @@ function Menu:AddSection(tabData, side, title)
 		ListContainer.Position = UDim2.new(0, 0, 1, 2)
 		ListContainer.BackgroundColor3 = Color3.fromRGB(16, 20, 26)
 		ListContainer.ClipsDescendants = true
-		ListContainer.ZIndex = 8
+		ListContainer.ZIndex = 50
 		ListContainer.Parent = ActionBtn
 		addCorner(ListContainer, 5)
 		addStroke(ListContainer, Color3.fromRGB(0, 200, 255), 1, 0.7)
@@ -1031,6 +1037,23 @@ function Menu:AddSection(tabData, side, title)
 		local function toggleDropdown()
 			dropped = not dropped
 			playSound(SFX.Click, 0.4)
+			
+			if dropped then
+				parentZone.ZIndex = 10
+				SectionFrame.ZIndex = 10
+				DropFrame.ZIndex = 10
+				ActionBtn.ZIndex = 11
+			else
+				task.delay(0.25, function()
+					if not dropped then
+						parentZone.ZIndex = 1
+						SectionFrame.ZIndex = 2
+						DropFrame.ZIndex = 5
+						ActionBtn.ZIndex = 6
+					end
+				end)
+			end
+			
 			local targetHeight = dropped and math.clamp(#list * 24, 0, 160) or 0
 			TweenService:Create(ListContainer, TweenInfo.new(0.25, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {Size = UDim2.new(1, 0, 0, targetHeight)}):Play()
 			TweenService:Create(Arrow, TweenInfo.new(0.2), {Rotation = dropped and 180 or 0, TextColor3 = dropped and Color3.fromRGB(0, 200, 255) or Color3.fromRGB(120, 125, 130)}):Play()
@@ -1048,7 +1071,7 @@ function Menu:AddSection(tabData, side, title)
 			ItemBtn.Font = Enum.Font.SourceSans
 			ItemBtn.TextSize = 13
 			ItemBtn.TextXAlignment = Enum.TextXAlignment.Left
-			ItemBtn.ZIndex = 9
+			ItemBtn.ZIndex = 55
 			ItemBtn.AutoButtonColor = false
 			ItemBtn.Parent = ListContainer
 			
