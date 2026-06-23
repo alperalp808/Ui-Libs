@@ -130,7 +130,7 @@ function Menu:Notify(title, description, duration)
 	end)
 end
 
-function Menu:CreateWindow(title)
+function Menu:CreateWindow(title, keyName, showButton)
 	local self = setmetatable({}, Menu)
 	
 	local existing = LocalPlayer:WaitForChild("PlayerGui"):FindFirstChild("AquaCSGO_PremiumMenu")
@@ -526,6 +526,10 @@ function Menu:CreateWindow(title)
 	self.GlobalToggleKey = Enum.KeyCode.RightShift
 	self.MenuVisible = true
 	
+	if keyName ~= nil or showButton ~= nil then
+		self:SetupGlobalToggle(keyName, showButton)
+	end
+	
 	return self
 end
 
@@ -662,26 +666,12 @@ function Menu:SetupGlobalToggle(keyName, showButton)
 	end
 end
 
-function Menu:AddTab(name, key, hideButton)
-	local actualName = name
-	local toggleKey = key
-	local showBtn = hideButton
-
-	if type(name) == "table" then
-		actualName = name.name or "Tab"
-		toggleKey = name.key
-		showBtn = name.HideButton
-	end
-
-	if toggleKey ~= nil or showBtn ~= nil then
-		self:SetupGlobalToggle(toggleKey, showBtn)
-	end
-
+function Menu:AddTab(name)
 	local TabButton = Instance.new("TextButton")
 	TabButton.Size = UDim2.new(0, 110, 0, 26)
 	TabButton.BackgroundColor3 = Color3.fromRGB(20, 26, 32)
 	TabButton.BackgroundTransparency = 0.4
-	TabButton.Text = actualName
+	TabButton.Text = name
 	TabButton.Font = Enum.Font.SourceSansBold
 	TabButton.TextSize = 13
 	TabButton.TextColor3 = Color3.fromRGB(140, 145, 150)
@@ -898,7 +888,7 @@ function Menu:AddSection(tabData, side, title)
 			playSound(SFX.Hover, 0.2)
 			TweenService:Create(Btn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(36, 46, 58), TextColor3 = Color3.fromRGB(255,255,255)}):Play()
 		end)
-		Btn.MouseLeave:Connect(function()
+		btn.MouseLeave:Connect(function()
 			TweenService:Create(Btn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(26, 34, 42), TextColor3 = Color3.fromRGB(220, 225, 230)}):Play()
 		end)
 		Btn.MouseButton1Click:Connect(function()
