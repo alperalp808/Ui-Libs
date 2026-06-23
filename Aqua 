@@ -523,6 +523,9 @@ function Menu:CreateWindow(title)
 	end)
 	
 	self.Tabs = {}
+	self.GlobalToggleKey = Enum.KeyCode.RightShift
+	self.MenuVisible = true
+	
 	return self
 end
 
@@ -573,12 +576,112 @@ function Menu:SetupDragAndResize(dragFrame, resizeGrip)
 	end)
 end
 
-function Menu:AddTab(name)
+function Menu:SetupGlobalToggle(keyName, showButton)
+	if keyName then
+		pcall(function()
+			self.GlobalToggleKey = Enum.KeyCode[keyName]
+		end)
+	end
+
+	local function setVisibility(state)
+		self.MenuVisible = state
+		self.MainFrame.Visible = state
+		if state then playSound(SFX.Open, 0.45) else playSound(SFX.Close, 0.45) end
+	end
+
+	if not self.ToggleConnection then
+		self.ToggleConnection = UserInputService.InputBegan:Connect(function(input, gpe)
+			if gpe then return end
+			if input.KeyCode == self.GlobalToggleKey then
+				setVisibility(not self.MenuVisible)
+			end
+		end)
+	end
+
+	if showButton and not self.PersistentButton then
+		local TargetGui = LocalPlayer:WaitForChild("PlayerGui"):FindFirstChild("Aqua_PersistentControls")
+		if not TargetGui then
+			TargetGui = Instance.new("ScreenGui")
+			TargetGui.Name = "Aqua_PersistentControls"
+			TargetGui.ResetOnSpawn = false
+			TargetGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+			TargetGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+		end
+
+		local PButton = Instance.new("TextButton")
+		PButton.Size = UDim2.new(0, 36, 0, 36)
+		PButton.Position = UDim2.new(0, 15, 0, 120)
+		PButton.BackgroundColor3 = Color3.fromRGB(12, 16, 20)
+		PButton.BackgroundTransparency = 0.4
+		PButton.Text = "👁"
+		PButton.TextColor3 = Color3.fromRGB(0, 200, 255)
+		PButton.Font = Enum.Font.SourceSansBold
+		PButton.TextSize = 18
+		PButton.AutoButtonColor = false
+		PButton.ZIndex = 999
+		PButton.Parent = TargetGui
+		self.PersistentButton = PButton
+
+		addCorner(PButton, 18)
+		addStroke(PButton, Color3.fromRGB(0, 200, 255), 1.2, 0.5)
+
+		PButton.MouseEnter:Connect(function()
+			playSound(SFX.Hover, 0.2)
+			TweenService:Create(PButton, TweenInfo.new(0.2), {BackgroundTransparency = 0.1, TextColor3 = Color3.fromRGB(255, 255, 255)}):Play()
+		end)
+		PButton.MouseLeave:Connect(function()
+			TweenService:Create(PButton, TweenInfo.new(0.2), {BackgroundTransparency = 0.4, TextColor3 = Color3.fromRGB(0, 200, 255)}):Play()
+		end)
+
+		PButton.MouseButton1Click:Connect(function()
+			setVisibility(not self.MenuVisible)
+		end)
+
+		local btnDragging, btnDragInput, btnDragStart, btnStartPos
+		PButton.InputBegan:Connect(function(input)
+			if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+				btnDragging = true
+				btnDragStart = input.Position
+				btnStartPos = PButton.Position
+				input.Changed:Connect(function()
+					if input.UserInputState == Enum.UserInputState.End then btnDragging = false end
+				end)
+			end
+		end)
+		PButton.InputChanged:Connect(function(input)
+			if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+				btnDragInput = input
+			end
+		end)
+		UserInputService.InputChanged:Connect(function(input)
+			if btnDragging and input == btnDragInput then
+				local delta = input.Position - btnDragStart
+				PButton.Position = UDim2.new(btnStartPos.X.Scale, btnStartPos.X.Offset + delta.X, btnStartPos.Y.Scale, btnStartPos.Y.Offset + delta.Y)
+			end
+		end)
+	end
+end
+
+function Menu:AddTab(name, key, hideButton)
+	local actualName = name
+	local toggleKey = key
+	local showBtn = hideButton
+
+	if type(name) == "table" then
+		actualName = name.name or "Tab"
+		toggleKey = name.key
+		showBtn = name.HideButton
+	end
+
+	if toggleKey ~= nil or showBtn ~= nil then
+		self:SetupGlobalToggle(toggleKey, showBtn)
+	end
+
 	local TabButton = Instance.new("TextButton")
 	TabButton.Size = UDim2.new(0, 110, 0, 26)
 	TabButton.BackgroundColor3 = Color3.fromRGB(20, 26, 32)
 	TabButton.BackgroundTransparency = 0.4
-	TabButton.Text = name
+	TabButton.Text = actualName
 	TabButton.Font = Enum.Font.SourceSansBold
 	TabButton.TextSize = 13
 	TabButton.TextColor3 = Color3.fromRGB(140, 145, 150)
