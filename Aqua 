@@ -4,12 +4,12 @@ local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local Stats = game:GetService("Stats")
 local ContentProvider = game:GetService("ContentProvider")
-local MarketPlaceService = game:GetService("MarketplaceService")
+local MarketplaceService = game:GetService("MarketplaceService")
 local LocalPlayer = Players.LocalPlayer
 
 local PlaceName = "Bilinmeyen Oyun"
 pcall(function()
-	local success, info = pcall(function() return MarketPlaceService:GetProductInfo(game.PlaceId) end)
+	local success, info = pcall(function() return MarketplaceService:GetProductInfo(game.PlaceId) end)
 	if success and info then PlaceName = info.Name end
 end)
 
@@ -533,7 +533,10 @@ function Menu:CreateWindow(title, keyName, showButton)
 		playSound(SFX.Close, 0.6)
 		local tw = TweenService:Create(CanvasGroup, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {Size = UDim2.new(0, 790, 0, 0), GroupTransparency = 1})
 		tw:Play()
-		tw.Completed:Connect(function() ScreenGui:Destroy() end)
+		tw.Completed:Connect(function() 
+			if self.PersistentGui then self.PersistentGui:Destroy() end
+			ScreenGui:Destroy() 
+		end)
 	end)
 	
 	local minimized = false
@@ -657,13 +660,14 @@ function Menu:SetupGlobalToggle(keyName, showButton)
 			TargetGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 			TargetGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 		end
+		self.PersistentGui = TargetGui
 
 		local PButton = Instance.new("TextButton")
 		PButton.Size = UDim2.new(0, 36, 0, 36)
 		PButton.Position = UDim2.new(0, 15, 0, 120)
 		PButton.BackgroundColor3 = Color3.fromRGB(12, 16, 20)
 		PButton.BackgroundTransparency = 0.4
-		PButton.Text = "👁"
+		PButton.Text = "🌊"
 		PButton.TextColor3 = Color3.fromRGB(0, 200, 255)
 		PButton.Font = Enum.Font.SourceSansBold
 		PButton.TextSize = 18
@@ -934,7 +938,7 @@ function Menu:AddSection(tabData, side, title)
 			playSound(SFX.Hover, 0.2)
 			TweenService:Create(Btn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(36, 46, 58), TextColor3 = Color3.fromRGB(255,255,255)}):Play()
 		end)
-		btn.MouseLeave:Connect(function()
+		Btn.MouseLeave:Connect(function()
 			TweenService:Create(Btn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(26, 34, 42), TextColor3 = Color3.fromRGB(220, 225, 230)}):Play()
 		end)
 		Btn.MouseButton1Click:Connect(function()
