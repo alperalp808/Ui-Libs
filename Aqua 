@@ -81,16 +81,18 @@ function Menu:Notify(title, description, duration)
 	local Box = Instance.new("Frame")
 	Box.Size = UDim2.new(1, 0, 0, 65)
 	Box.BackgroundColor3 = Color3.fromRGB(14, 18, 24)
-	Box.BackgroundTransparency = 0.2
+	Box.BackgroundTransparency = 1
 	Box.Position = UDim2.new(1, 320, 0, 0)
 	Box.Parent = NotifContainer
 	addCorner(Box, 6)
-	addStroke(Box, Color3.fromRGB(0, 200, 255), 1.2, 0.4)
+	
+	local MainStroke = addStroke(Box, Color3.fromRGB(0, 200, 255), 1.2, 1)
 	
 	local GlowLine = Instance.new("Frame")
 	GlowLine.Size = UDim2.new(1, 0, 0, 2)
 	GlowLine.Position = UDim2.new(0, 0, 1, -2)
 	GlowLine.BackgroundColor3 = Color3.fromRGB(0, 200, 255)
+	GlowLine.BackgroundTransparency = 1
 	GlowLine.BorderSizePixel = 0
 	GlowLine.Parent = Box
 	addCorner(GlowLine, 2)
@@ -103,6 +105,7 @@ function Menu:Notify(title, description, duration)
 	Tl.Font = Enum.Font.RobotoMono
 	Tl.TextSize = 13
 	Tl.TextColor3 = Color3.fromRGB(255, 255, 255)
+	Tl.TextTransparency = 1
 	Tl.TextXAlignment = Enum.TextXAlignment.Left
 	Tl.Parent = Box
 	
@@ -114,19 +117,31 @@ function Menu:Notify(title, description, duration)
 	Dl.Font = Enum.Font.SourceSans
 	Dl.TextSize = 13
 	Dl.TextColor3 = Color3.fromRGB(180, 185, 190)
+	Dl.TextTransparency = 1
 	Dl.TextXAlignment = Enum.TextXAlignment.Left
 	Dl.TextYAlignment = Enum.TextYAlignment.Top
 	Dl.TextWrapped = true
 	Dl.Parent = Box
 	
 	playSound(SFX.Notify, 0.5)
-	TweenService:Create(Box, TweenInfo.new(0.35, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Position = UDim2.new(0, 0, 0, 0)}):Play()
+	
+	TweenService:Create(Box, TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Position = UDim2.new(0, 0, 0, 0), BackgroundTransparency = 0.2}):Play()
+	TweenService:Create(MainStroke, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Transparency = 0.4}):Play()
+	TweenService:Create(GlowLine, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {BackgroundTransparency = 0}):Play()
+	TweenService:Create(Tl, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {TextTransparency = 0}):Play()
+	TweenService:Create(Dl, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {TextTransparency = 0}):Play()
+	
 	TweenService:Create(GlowLine, TweenInfo.new(duration, Enum.EasingStyle.Linear), {Size = UDim2.new(0, 0, 0, 2)}):Play()
 	
 	task.delay(duration, function()
-		local tw = TweenService:Create(Box, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {Position = UDim2.new(1, 320, 0, 0), BackgroundTransparency = 1})
-		tw:Play()
-		tw.Completed:Connect(function() Box:Destroy() end)
+		local info = TweenInfo.new(0.35, Enum.EasingStyle.Quad, Enum.EasingDirection.In)
+		TweenService:Create(Box, info, {Position = UDim2.new(1, 320, 0, 0), BackgroundTransparency = 1}):Play()
+		TweenService:Create(MainStroke, info, {Transparency = 1}):Play()
+		TweenService:Create(GlowLine, info, {BackgroundTransparency = 1}):Play()
+		TweenService:Create(Tl, info, {TextTransparency = 1}):Play()
+		local finalTw = TweenService:Create(Dl, info, {TextTransparency = 1})
+		finalTw:Play()
+		finalTw.Completed:Connect(function() Box:Destroy() end)
 	end)
 end
 
@@ -143,17 +158,26 @@ function Menu:CreateWindow(title, keyName, showButton)
 	ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 	self.ScreenGui = ScreenGui
 	
+	local CanvasGroup = Instance.new("CanvasGroup")
+	CanvasGroup.Name = "MainCanvas"
+	CanvasGroup.Size = UDim2.new(0, 790, 0, 460)
+	CanvasGroup.Position = UDim2.new(0.5, -395, 0.5, -230)
+	CanvasGroup.BackgroundTransparency = 1
+	CanvasGroup.GroupTransparency = 0
+	CanvasGroup.Parent = ScreenGui
+	self.CanvasGroup = CanvasGroup
+	
 	local MainFrame = Instance.new("Frame")
 	MainFrame.Name = "MainFrame"
-	MainFrame.Size = UDim2.new(0, 790, 0, 460)
-	MainFrame.Position = UDim2.new(0.5, -395, 0.5, -230)
+	MainFrame.Size = UDim2.new(1, 0, 1, 0)
+	MainFrame.Position = UDim2.new(0, 0, 0, 0)
 	MainFrame.BackgroundColor3 = Color3.fromRGB(12, 16, 20)
 	MainFrame.BackgroundTransparency = 0.25
-	MainFrame.Parent = ScreenGui
+	MainFrame.Parent = CanvasGroup
 	self.MainFrame = MainFrame
 	
 	addCorner(MainFrame, 10)
-	addStroke(MainFrame, Color3.fromRGB(0, 200, 255), 1.2, 0.4)
+	local FrameStroke = addStroke(MainFrame, Color3.fromRGB(0, 200, 255), 1.2, 0.4)
 	
 	local Header = Instance.new("Frame")
 	Header.Size = UDim2.new(1, 0, 0, 40)
@@ -489,8 +513,9 @@ function Menu:CreateWindow(title, keyName, showButton)
 	end)
 
 	playSound(SFX.Open, 0.6)
-	MainFrame.Size = UDim2.new(0, 790, 0, 0)
-	TweenService:Create(MainFrame, TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Size = UDim2.new(0, 790, 0, 460)}):Play()
+	CanvasGroup.Size = UDim2.new(0, 790, 0, 0)
+	CanvasGroup.GroupTransparency = 1
+	TweenService:Create(CanvasGroup, TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Size = UDim2.new(0, 790, 0, 460), GroupTransparency = 0}):Play()
 	
 	local function setHeaderBtnAnims(btn, hoverBg, leaveBg, hoverCol, leaveCol)
 		btn.MouseEnter:Connect(function()
@@ -506,7 +531,7 @@ function Menu:CreateWindow(title, keyName, showButton)
 
 	CloseBtn.MouseButton1Click:Connect(function()
 		playSound(SFX.Close, 0.6)
-		local tw = TweenService:Create(MainFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {Size = UDim2.new(0, 790, 0, 0), BackgroundTransparency = 1})
+		local tw = TweenService:Create(CanvasGroup, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {Size = UDim2.new(0, 790, 0, 0), GroupTransparency = 1})
 		tw:Play()
 		tw.Completed:Connect(function() ScreenGui:Destroy() end)
 	end)
@@ -516,7 +541,7 @@ function Menu:CreateWindow(title, keyName, showButton)
 		playSound(SFX.Click, 0.5)
 		minimized = not minimized
 		local targetSize = minimized and UDim2.new(0, 790, 0, 40) or UDim2.new(0, 790, 0, 460)
-		TweenService:Create(MainFrame, TweenInfo.new(0.4, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {Size = targetSize}):Play()
+		TweenService:Create(CanvasGroup, TweenInfo.new(0.4, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {Size = targetSize}):Play()
 		Container.Visible = not minimized
 		TabBar.Visible = not minimized
 		DiagnosticFrame.Visible = not minimized
@@ -525,6 +550,7 @@ function Menu:CreateWindow(title, keyName, showButton)
 	self.Tabs = {}
 	self.GlobalToggleKey = Enum.KeyCode.RightShift
 	self.MenuVisible = true
+	self.IsTweeningVisibility = false
 	
 	if keyName ~= nil or showButton ~= nil then
 		self:SetupGlobalToggle(keyName, showButton)
@@ -534,7 +560,7 @@ function Menu:CreateWindow(title, keyName, showButton)
 end
 
 function Menu:SetupDragAndResize(dragFrame, resizeGrip)
-	local main = self.MainFrame
+	local main = self.CanvasGroup
 	local dragging, dragInput, dragStart, startPos
 	
 	dragFrame.InputBegan:Connect(function(input)
@@ -587,17 +613,37 @@ function Menu:SetupGlobalToggle(keyName, showButton)
 		end)
 	end
 
-	local function setVisibility(state)
+	local function setVisibilityAnimated(state)
+		if self.IsTweeningVisibility then return end
+		self.IsTweeningVisibility = true
 		self.MenuVisible = state
-		self.MainFrame.Visible = state
-		if state then playSound(SFX.Open, 0.45) else playSound(SFX.Close, 0.45) end
+		
+		local info = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+		
+		if state then
+			self.CanvasGroup.Visible = true
+			playSound(SFX.Open, 0.45)
+			local tw = TweenService:Create(self.CanvasGroup, info, {GroupTransparency = 0})
+			tw:Play()
+			tw.Completed:Connect(function()
+				self.IsTweeningVisibility = false
+			end)
+		else
+			playSound(SFX.Close, 0.45)
+			local tw = TweenService:Create(self.CanvasGroup, info, {GroupTransparency = 1})
+			tw:Play()
+			tw.Completed:Connect(function()
+				self.CanvasGroup.Visible = false
+				self.IsTweeningVisibility = false
+			end)
+		end
 	end
 
 	if not self.ToggleConnection then
 		self.ToggleConnection = UserInputService.InputBegan:Connect(function(input, gpe)
 			if gpe then return end
 			if input.KeyCode == self.GlobalToggleKey then
-				setVisibility(not self.MenuVisible)
+				setVisibilityAnimated(not self.MenuVisible)
 			end
 		end)
 	end
@@ -638,7 +684,7 @@ function Menu:SetupGlobalToggle(keyName, showButton)
 		end)
 
 		PButton.MouseButton1Click:Connect(function()
-			setVisibility(not self.MenuVisible)
+			setVisibilityAnimated(not self.MenuVisible)
 		end)
 
 		local btnDragging, btnDragInput, btnDragStart, btnStartPos
@@ -888,7 +934,7 @@ function Menu:AddSection(tabData, side, title)
 			playSound(SFX.Hover, 0.2)
 			TweenService:Create(Btn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(36, 46, 58), TextColor3 = Color3.fromRGB(255,255,255)}):Play()
 		end)
-		Btn.MouseLeave:Connect(function()
+		btn.MouseLeave:Connect(function()
 			TweenService:Create(Btn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(26, 34, 42), TextColor3 = Color3.fromRGB(220, 225, 230)}):Play()
 		end)
 		Btn.MouseButton1Click:Connect(function()
