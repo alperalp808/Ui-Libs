@@ -4,7 +4,14 @@ local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local Stats = game:GetService("Stats")
 local ContentProvider = game:GetService("ContentProvider")
+local MarketPlaceService = game:GetService("MarketplaceService")
 local LocalPlayer = Players.LocalPlayer
+
+local PlaceName = "Bilinmeyen Oyun"
+pcall(function()
+	local success, info = pcall(function() return MarketPlaceService:GetProductInfo(game.PlaceId) end)
+	if success and info then PlaceName = info.Name end
+end)
 
 local function playSound(soundId, volume, pitch)
 	local sound = Instance.new("Sound")
@@ -301,22 +308,65 @@ function Menu:CreateWindow(title)
 	UserIdLabel.TextXAlignment = Enum.TextXAlignment.Left
 	UserIdLabel.Parent = DiagnosticFrame
 
-	local PerformanceFrame = Instance.new("Frame")
-	PerformanceFrame.Size = UDim2.new(1, -20, 0, 40)
-	PerformanceFrame.Position = UDim2.new(0, 10, 0, 66)
-	PerformanceFrame.BackgroundColor3 = Color3.fromRGB(10, 14, 18)
-	PerformanceFrame.BackgroundTransparency = 0.5
-	PerformanceFrame.Parent = DiagnosticFrame
-	addCorner(PerformanceFrame, 6)
-	
+	local ServerInfoFrame = Instance.new("Frame")
+	ServerInfoFrame.Size = UDim2.new(1, -20, 0, 75)
+	ServerInfoFrame.Position = UDim2.new(0, 10, 0, 62)
+	ServerInfoFrame.BackgroundColor3 = Color3.fromRGB(10, 14, 18)
+	ServerInfoFrame.BackgroundTransparency = 0.5
+	ServerInfoFrame.Parent = DiagnosticFrame
+	addCorner(ServerInfoFrame, 6)
+	addStroke(ServerInfoFrame, Color3.fromRGB(255, 255, 255), 1, 0.95)
+
+	local GameNameLabel = Instance.new("TextLabel")
+	GameNameLabel.Size = UDim2.new(1, -12, 0, 18)
+	GameNameLabel.Position = UDim2.new(0, 6, 0, 4)
+	GameNameLabel.BackgroundTransparency = 1
+	GameNameLabel.Text = "Game: " .. PlaceName
+	GameNameLabel.Font = Enum.Font.SourceSansBold
+	GameNameLabel.TextSize = 11
+	GameNameLabel.TextColor3 = Color3.fromRGB(240, 240, 240)
+	GameNameLabel.TextXAlignment = Enum.TextXAlignment.Left
+	GameNameLabel.ClipsDescendants = true
+	GameNameLabel.Parent = ServerInfoFrame
+
+	local PlaceIdLabel = Instance.new("TextLabel")
+	PlaceIdLabel.Size = UDim2.new(1, -12, 0, 16)
+	PlaceIdLabel.Position = UDim2.new(0, 6, 0, 22)
+	PlaceIdLabel.BackgroundTransparency = 1
+	PlaceIdLabel.Text = "Place ID: " .. tostring(game.PlaceId)
+	PlaceIdLabel.Font = Enum.Font.RobotoMono
+	PlaceIdLabel.TextSize = 11
+	PlaceIdLabel.TextColor3 = Color3.fromRGB(0, 200, 255)
+	PlaceIdLabel.TextXAlignment = Enum.TextXAlignment.Left
+	PlaceIdLabel.Parent = ServerInfoFrame
+
+	local JobIdLabel = Instance.new("TextLabel")
+	JobIdLabel.Size = UDim2.new(1, -12, 0, 16)
+	JobIdLabel.Position = UDim2.new(0, 6, 0, 38)
+	JobIdLabel.BackgroundTransparency = 1
+	JobIdLabel.Text = "Server ID: " .. (game.JobId ~= "" and game.JobId or "Studio_Session")
+	JobIdLabel.Font = Enum.Font.RobotoMono
+	JobIdLabel.TextSize = 10
+	JobIdLabel.TextColor3 = Color3.fromRGB(150, 155, 160)
+	JobIdLabel.TextXAlignment = Enum.TextXAlignment.Left
+	JobIdLabel.ClipsDescendants = true
+	JobIdLabel.Parent = ServerInfoFrame
+
+	local MiniPerformanceFrame = Instance.new("Frame")
+	MiniPerformanceFrame.Size = UDim2.new(1, -12, 0, 16)
+	MiniPerformanceFrame.Position = UDim2.new(0, 6, 0, 54)
+	MiniPerformanceFrame.BackgroundTransparency = 1
+	MiniPerformanceFrame.Parent = ServerInfoFrame
+
 	local FpsLabel = Instance.new("TextLabel")
 	FpsLabel.Size = UDim2.new(0.5, 0, 1, 0)
 	FpsLabel.BackgroundTransparency = 1
 	FpsLabel.Text = "FPS: --"
 	FpsLabel.Font = Enum.Font.RobotoMono
-	FpsLabel.TextSize = 12
+	FpsLabel.TextSize = 11
 	FpsLabel.TextColor3 = Color3.fromRGB(0, 255, 150)
-	FpsLabel.Parent = PerformanceFrame
+	FpsLabel.TextXAlignment = Enum.TextXAlignment.Left
+	FpsLabel.Parent = MiniPerformanceFrame
 	
 	local PingLabel = Instance.new("TextLabel")
 	PingLabel.Size = UDim2.new(0.5, 0, 1, 0)
@@ -324,13 +374,14 @@ function Menu:CreateWindow(title)
 	PingLabel.BackgroundTransparency = 1
 	PingLabel.Text = "PING: -- ms"
 	PingLabel.Font = Enum.Font.RobotoMono
-	PingLabel.TextSize = 12
+	PingLabel.TextSize = 11
 	PingLabel.TextColor3 = Color3.fromRGB(0, 200, 255)
-	PingLabel.Parent = PerformanceFrame
+	PingLabel.TextXAlignment = Enum.TextXAlignment.Right
+	PingLabel.Parent = MiniPerformanceFrame
 
 	local CopyScroll = Instance.new("ScrollingFrame")
-	CopyScroll.Size = UDim2.new(1, -20, 0, 120)
-	CopyScroll.Position = UDim2.new(0, 10, 0, 114)
+	CopyScroll.Size = UDim2.new(1, -20, 0, 80)
+	CopyScroll.Position = UDim2.new(0, 10, 0, 142)
 	CopyScroll.BackgroundTransparency = 1
 	CopyScroll.ScrollBarThickness = 2
 	CopyScroll.ScrollBarImageColor3 = Color3.fromRGB(0, 200, 255)
@@ -338,17 +389,17 @@ function Menu:CreateWindow(title)
 	
 	local CSLayout = Instance.new("UIListLayout")
 	CSLayout.SortOrder = Enum.SortOrder.LayoutOrder
-	CSLayout.Padding = UDim.new(0, 6)
+	CSLayout.Padding = UDim.new(0, 5)
 	CSLayout.Parent = CopyScroll
 
 	local function createClipboardButton(titleText, valueCallback)
 		local Btn = Instance.new("TextButton")
-		Btn.Size = UDim2.new(1, -4, 0, 24)
+		Btn.Size = UDim2.new(1, -4, 0, 22)
 		Btn.BackgroundColor3 = Color3.fromRGB(24, 30, 38)
 		Btn.Text = "  Copy " .. titleText
 		Btn.TextColor3 = Color3.fromRGB(190, 195, 200)
 		Btn.Font = Enum.Font.SourceSans
-		Btn.TextSize = 13
+		Btn.TextSize = 12
 		Btn.TextXAlignment = Enum.TextXAlignment.Left
 		Btn.AutoButtonColor = false
 		Btn.Parent = CopyScroll
@@ -367,21 +418,16 @@ function Menu:CreateWindow(title)
 		end)
 	end
 
-	createClipboardButton("HWID Matrix", function() 
-		return game:GetService("RbxAnalyticsService"):GetClientId() or "Unknown_Hardware_Identifier" 
-	end)
-	createClipboardButton("Vector Position", function() 
-		return tostring(LocalPlayer.Character and LocalPlayer.Character:GetPivot().Position or Vector3.zero) 
-	end)
-	createClipboardButton("Coordinate CFrame", function() 
-		return tostring(LocalPlayer.Character and LocalPlayer.Character:GetPivot() or CFrame.identity) 
-	end)
+	createClipboardButton("Server Job ID", function() return game.JobId ~= "" and game.JobId or "Studio_Session" end)
+	createClipboardButton("Place Identifier", function() return tostring(game.PlaceId) end)
+	createClipboardButton("HWID Matrix", function() return game:GetService("RbxAnalyticsService"):GetClientId() or "Unknown_Hardware_Identifier" end)
+	createClipboardButton("Vector Position", function() return tostring(LocalPlayer.Character and LocalPlayer.Character:GetPivot().Position or Vector3.zero) end)
 
 	local RadarLabel = Instance.new("TextLabel")
 	RadarLabel.Size = UDim2.new(1, -20, 0, 16)
-	RadarLabel.Position = UDim2.new(0, 10, 0, 242)
+	RadarLabel.Position = UDim2.new(0, 10, 0, 228)
 	RadarLabel.BackgroundTransparency = 1
-	RadarLabel.Text = "ACTIVE TARGET RADAR"
+	RadarLabel.Text = "RADAR LIST (1/1)"
 	RadarLabel.Font = Enum.Font.SourceSansBold
 	RadarLabel.TextSize = 11
 	RadarLabel.TextColor3 = Color3.fromRGB(0, 200, 255)
@@ -389,8 +435,8 @@ function Menu:CreateWindow(title)
 	RadarLabel.Parent = DiagnosticFrame
 	
 	local RadarScroll = Instance.new("ScrollingFrame")
-	RadarScroll.Size = UDim2.new(1, -20, 1, -266)
-	RadarScroll.Position = UDim2.new(0, 10, 0, 258)
+	RadarScroll.Size = UDim2.new(1, -20, 1, -250)
+	RadarScroll.Position = UDim2.new(0, 10, 0, 244)
 	RadarScroll.BackgroundColor3 = Color3.fromRGB(10, 14, 18)
 	RadarScroll.BackgroundTransparency = 0.6
 	RadarScroll.ScrollBarThickness = 2
@@ -404,7 +450,12 @@ function Menu:CreateWindow(title)
 	
 	local function updateRadar()
 		for _, v in pairs(RadarScroll:GetChildren()) do if v:IsA("TextLabel") then v:Destroy() end end
-		for _, p in pairs(Players:GetPlayers()) do
+		local activePlayers = Players:GetPlayers()
+		local count = #activePlayers
+		local maxPlayers = Players.MaxPlayers
+		RadarLabel.Text = "RADAR LIST (" .. tostring(count) .. "/" .. tostring(maxPlayers) .. ")"
+		
+		for _, p in pairs(activePlayers) do
 			if p ~= LocalPlayer then
 				local PLabel = Instance.new("TextLabel")
 				PLabel.Size = UDim2.new(1, 0, 0, 18)
@@ -741,7 +792,7 @@ function Menu:AddSection(tabData, side, title)
 			playSound(SFX.Hover, 0.2)
 			TweenService:Create(Btn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(36, 46, 58), TextColor3 = Color3.fromRGB(255,255,255)}):Play()
 		end)
-		btn.MouseLeave:Connect(function()
+		Btn.MouseLeave:Connect(function()
 			TweenService:Create(Btn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(26, 34, 42), TextColor3 = Color3.fromRGB(220, 225, 230)}):Play()
 		end)
 		Btn.MouseButton1Click:Connect(function()
