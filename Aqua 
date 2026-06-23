@@ -1,0 +1,614 @@
+-- CS:GO Style Aqua Premium UI Library
+-- Optimized for PC & Mobile (Touch Support)
+-- Elements: Window, Tab, Section, Button, Toggle, Slider, Dropdown, Keybind
+
+local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+-- UI Sounds (CS:GO Click & Hover Effects)
+local function playSound(soundId, volume)
+	local sound = Instance.new("Sound")
+	sound.SoundId = "rbxassetid://" .. tostring(soundId)
+	sound.Volume = volume or 0.5
+	sound.Parent = game:GetService("SoundService")
+	sound:Play()
+	sound.Ended:Connect(function() sound:Destroy() end)
+end
+
+local Sounds = {
+	Click = 6895079853,
+	Hover = 6895079656,
+	ToggleOn = 8594301550,
+	ToggleOff = 8594301720
+}
+
+local Menu = {}
+Menu.__index = Menu
+
+-- MAIN MENU CREATION
+function Menu:CreateWindow(title)
+	local self = setmetatable({}, Menu)
+	
+	-- Core ScreenGui
+	local ScreenGui = Instance.new("ScreenGui")
+	ScreenGui.Name = "AquaCSGO_Menu"
+	ScreenGui.ResetOnSpawn = false
+	ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+	ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+	self.ScreenGui = ScreenGui
+	
+	-- Main Frame
+	local MainFrame = Instance.new("Frame")
+	MainFrame.Name = "MainFrame"
+	MainFrame.Size = UDim2.new(0, 550, 0, 400)
+	MainFrame.Position = UDim2.new(0.5, -275, 0.5, -200)
+	MainFrame.BackgroundColor3 = Color3.fromRGB(20, 24, 28)
+	MainFrame.BorderSizePixel = 0
+	MainFrame.ClipsDescendants = true
+	MainFrame.Parent = ScreenGui
+	self.MainFrame = MainFrame
+	
+	-- Top Bar (Glow Effect)
+	local TopBarGlow = Instance.new("Frame")
+	TopBarGlow.Size = UDim2.new(1, 0, 0, 3)
+	TopBarGlow.BackgroundColor3 = Color3.fromRGB(0, 200, 255) -- Aqua Line
+	TopBarGlow.BorderSizePixel = 0
+	TopBarGlow.Parent = MainFrame
+	
+	-- Header
+	local Header = Instance.new("Frame")
+	Header.Size = UDim2.new(1, 0, 0, 35)
+	Header.Position = UDim2.new(0, 0, 0, 3)
+	Header.BackgroundColor3 = Color3.fromRGB(25, 30, 36)
+	Header.BorderSizePixel = 0
+	Header.Parent = MainFrame
+	
+	local TitleLabel = Instance.new("TextLabel")
+	TitleLabel.Size = UDim2.new(0, 200, 1, 0)
+	TitleLabel.Position = UDim2.new(0, 15, 0, 0)
+	TitleLabel.BackgroundTransparency = 1
+	TitleLabel.Text = string.upper(title or "SIGMA")
+	TitleLabel.Font = Enum.Font.RobotoMono
+	TitleLabel.TextSize = 16
+	TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+	TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
+	TitleLabel.Parent = Header
+	
+	-- Window Controls (Minimize & Close)
+	local Controls = Instance.new("Frame")
+	Controls.Size = UDim2.new(0, 80, 1, 0)
+	Controls.Position = UDim2.new(1, -80, 0, 0)
+	Controls.BackgroundTransparency = 1
+	Controls.Parent = Header
+	
+	local MinBtn = Instance.new("TextButton")
+	MinBtn.Size = UDim2.new(0, 35, 0, 25)
+	MinBtn.Position = UDim2.new(0, 5, 0.5, -12)
+	MinBtn.BackgroundColor3 = Color3.fromRGB(35, 40, 48)
+	MinBtn.Text = "-"
+	MinBtn.TextColor3 = Color3.fromRGB(200, 200, 200)
+	MinBtn.Font = Enum.Font.SourceSansBold
+	MinBtn.TextSize = 16
+	MinBtn.Parent = Controls
+	
+	local CloseBtn = Instance.new("TextButton")
+	CloseBtn.Size = UDim2.new(0, 35, 0, 25)
+	CloseBtn.Position = UDim2.new(0, 42, 0.5, -12)
+	CloseBtn.BackgroundColor3 = Color3.fromRGB(45, 25, 25)
+	CloseBtn.Text = "X"
+	CloseBtn.TextColor3 = Color3.fromRGB(255, 100, 100)
+	CloseBtn.Font = Enum.Font.SourceSansBold
+	CloseBtn.TextSize = 14
+	CloseBtn.Parent = Controls
+
+	-- Tabs Navigation Bar
+	local TabBar = Instance.new("Frame")
+	TabBar.Size = UDim2.new(1, -20, 0, 30)
+	TabBar.Position = UDim2.new(0, 10, 0, 42)
+	TabBar.BackgroundColor3 = Color3.fromRGB(15, 18, 22)
+	TabBar.Parent = MainFrame
+	
+	local TabList = Instance.new("UIListLayout")
+	TabList.FillDirection = Enum.FillDirection.Horizontal
+	TabList.SortOrder = Enum.SortOrder.LayoutOrder
+	TabList.Padding = UDim.new(0, 5)
+	TabList.Parent = TabBar
+	
+	-- Container for Pages
+	local Container = Instance.new("Frame")
+	Container.Size = UDim2.new(1, -20, 1, -85)
+	Container.Position = UDim2.new(0, 10, 0, 77)
+	Container.BackgroundTransparency = 1
+	Container.Parent = MainFrame
+	self.Container = Container
+	
+	-- Resize Grip (Right-Bottom Corner)
+	local ResizeGrip = Instance.new("ImageButton")
+	ResizeGrip.Size = UDim2.new(0, 15, 0, 15)
+	ResizeGrip.Position = UDim2.new(1, -15, 1, -15)
+	ResizeGrip.BackgroundTransparency = 1
+	ResizeGrip.Image = "rbxassetid://3858618954"
+	ResizeGrip.ImageColor3 = Color3.fromRGB(0, 200, 255)
+	ResizeGrip.ZIndex = 10
+	ResizeGrip.Parent = MainFrame
+
+	-- Setup Dragging & Resizing (PC & Mobile Safe)
+	self:SetupDragAndResize(Header, ResizeGrip)
+	
+	-- Interactions for Close & Minimize
+	CloseBtn.MouseButton1Click:Connect(function()
+		playSound(Sounds.Click, 0.6)
+		TweenService:Create(MainFrame, LinearVelocity, {Size = UDim2.new(0, 550, 0, 0), Position = MainFrame.Position + UDim2.new(0,0,0,200)}, 0.25, Enum.EasingStyle.Quad):Play()
+		task.wait(0.25)
+		ScreenGui:Destroy()
+	end)
+	
+	local minimized = false
+	MinBtn.MouseButton1Click:Connect(function()
+		playSound(Sounds.Click, 0.5)
+		minimized = not minimized
+		local targetSize = minimized and UDim2.new(0, 550, 0, 38) or UDim2.new(0, 550, 0, 400)
+		TweenService:Create(MainFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Size = targetSize}, true):Play()
+	end)
+	
+	self.Tabs = {}
+	self.FirstTab = nil
+	return self
+end
+
+-- SMOOTH DRAG & RESIZE IMPLEMENTATION
+function Menu:SetupDragAndResize(dragFrame, resizeGrip)
+	local main = self.MainFrame
+	
+	-- Dragging Logic
+	local dragging, dragInput, dragStart, startPos
+	local function updateDrag(input)
+		local delta = input.Position - dragStart
+		TweenService:Create(main, TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+			Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+		}):Play()
+	end
+	
+	dragFrame.InputBegan:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+			dragging = true
+			dragStart = input.Position
+			startPos = main.Position
+			input.Changed:Connect(function()
+				if input.UserInputState == Enum.UserInputState.End then dragging = false end
+			end)
+		end
+	end)
+	
+	dragFrame.InputChanged:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+			dragInput = input
+		end
+	end)
+	
+	-- Resizing Logic
+	local resizing, resizeStart, startSize
+	local function updateResize(input)
+		local delta = input.Position - resizeStart
+		local newX = math.clamp(startSize.X + delta.X, 400, 1000)
+		local newY = math.clamp(startSize.Y + delta.Y, 300, 700)
+		main.Size = UDim2.new(0, newX, 0, newY)
+	end
+	
+	resizeGrip.InputBegan:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+			resizing = true
+			resizeStart = input.Position
+			startSize = Vector2.new(main.Size.X.Offset, main.Size.Y.Offset)
+			input.Changed:Connect(function()
+				if input.UserInputState == Enum.UserInputState.End then resizing = false end
+			end)
+		end
+	end)
+	
+	UserInputService.InputChanged:Connect(function(input)
+		if dragging and input == dragInput then
+			updateDrag(input)
+		elseif resizing and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+			updateResize(input)
+		end
+	end)
+end
+
+-- TAB SYSTEM
+function Menu:AddTab(name)
+	local TabButton = Instance.new("TextButton")
+	TabButton.Size = UDim2.new(0, 100, 1, 0)
+	TabButton.BackgroundColor3 = Color3.fromRGB(22, 26, 32)
+	TabButton.BorderSizePixel = 0
+	TabButton.Text = name
+	TabButton.Font = Enum.Font.SourceSans
+	TabButton.TextSize = 14
+	TabButton.TextColor3 = Color3.fromRGB(150, 150, 150)
+	TabButton.Parent = self.MainFrame.TabBar
+	
+	local TabPage = Instance.new("Frame")
+	TabPage.Size = UDim2.new(1, 0, 1, 0)
+	TabPage.BackgroundTransparency = 1
+	TabPage.Visible = false
+	TabPage.Parent = self.Container
+	
+	-- Left & Right Section Masters
+	local LeftZone = Instance.new("ScrollingFrame")
+	LeftZone.Size = UDim2.new(0.5, -5, 1, 0)
+	LeftZone.BackgroundTransparency = 1
+	LeftZone.ScrollBarThickness = 2
+	LeftZone.ScrollBarImageColor3 = Color3.fromRGB(0, 200, 255)
+	LeftZone.Parent = TabPage
+	
+	local RightZone = LeftZone:Clone()
+	RightZone.Position = UDim2.new(0.5, 5, 0, 0)
+	RightZone.Parent = TabPage
+	
+	local LList = Instance.new("UIListLayout")
+	LList.SortOrder = Enum.SortOrder.LayoutOrder
+	LList.Padding = UDim.new(0, 10)
+	LList.Parent = LeftZone
+	
+	local RList = LList:Clone()
+	RList.Parent = RightZone
+	
+	-- Auto Canvas Size adjustment
+	LList:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function() LeftZone.CanvasSize = UDim2.new(0,0,0, LList.AbsoluteContentSize.Y + 10) end)
+	RList:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function() RightZone.CanvasSize = UDim2.new(0,0,0, RList.AbsoluteContentSize.Y + 10) end)
+
+	local tabData = {Left = LeftZone, Right = RightZone, Button = TabButton, Page = TabPage}
+	
+	TabButton.MouseButton1Click:Connect(function()
+		playSound(Sounds.Click, 0.4)
+		for _, t in pairs(self.Tabs) do
+			t.Page.Visible = false
+			t.Button.TextColor3 = Color3.fromRGB(150, 150, 150)
+			t.Button.BackgroundColor3 = Color3.fromRGB(22, 26, 32)
+		end
+		TabPage.Visible = true
+		TabButton.TextColor3 = Color3.fromRGB(0, 200, 255)
+		TabButton.BackgroundColor3 = Color3.fromRGB(28, 34, 42)
+	end)
+	
+	TabButton.MouseEnter:Connect(function() playSound(Sounds.Hover, 0.2) end)
+	
+	table.insert(self.Tabs, tabData)
+	if #self.Tabs == 1 then
+		TabPage.Visible = true
+		TabButton.TextColor3 = Color3.fromRGB(0, 200, 255)
+		TabButton.BackgroundColor3 = Color3.fromRGB(28, 34, 42)
+	end
+	
+	return tabData
+end
+
+-- SECTION SYSTEM (CS:GO Styled Boxes)
+function Menu:AddSection(tabData, side, title)
+	local parentZone = (side == "Right") and tabData.Right or tabData.Left
+	
+	local SectionFrame = Instance.new("Frame")
+	SectionFrame.Size = UDim2.new(1, -5, 0, 40) -- Dynamically sized later
+	SectionFrame.BackgroundColor3 = Color3.fromRGB(25, 30, 36)
+	SectionFrame.BorderSizePixel = 1
+	SectionFrame.BorderColor3 = Color3.fromRGB(35, 42, 50)
+	SectionFrame.Parent = parentZone
+	
+	local SecLayout = Instance.new("UIListLayout")
+	SecLayout.SortOrder = Enum.SortOrder.LayoutOrder
+	SecLayout.Padding = UDim.new(0, 8)
+	SecLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+	SecLayout.Parent = SectionFrame
+	
+	local SecPadding = Instance.new("UIPadding")
+	SecPadding.PaddingTop = UDim.new(0, 25)
+	SecPadding.PaddingBottom = UDim.new(0, 10)
+	SecPadding.Parent = SectionFrame
+	
+	local SecTitle = Instance.new("TextLabel")
+	SecTitle.Size = UDim2.new(1, -16, 0, 15)
+	SecTitle.Position = UDim2.new(0, 8, 0, -20)
+	SecTitle.BackgroundTransparency = 1
+	SecTitle.Text = string.upper(title)
+	SecTitle.Font = Enum.Font.SourceSansBold
+	SecTitle.TextSize = 13
+	SecTitle.TextColor3 = Color3.fromRGB(0, 200, 255)
+	SecTitle.TextXAlignment = Enum.TextXAlignment.Left
+	SecTitle.Parent = SectionFrame
+	
+	SecLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+		SectionFrame.Size = UDim2.new(1, -5, 0, SecLayout.AbsoluteContentSize.Y + 35)
+	end)
+	
+	local elements = {}
+	elements.ParentSection = SectionFrame
+	
+	-- BUTTON CONSTRUCTOR
+	function elements:AddButton(name, callback)
+		local Btn = Instance.new("TextButton")
+		Btn.Size = UDim2.new(0.92, 0, 0, 28)
+		Btn.BackgroundColor3 = Color3.fromRGB(32, 38, 46)
+		Btn.BorderSizePixel = 0
+		Btn.Text = name
+		Btn.TextColor3 = Color3.fromRGB(230, 230, 230)
+		Btn.Font = Enum.Font.SourceSans
+		Btn.TextSize = 14
+		Btn.Parent = SectionFrame
+		
+		Btn.MouseEnter:Connect(function()
+			playSound(Sounds.Hover, 0.2)
+			TweenService:Create(Btn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(40, 48, 58)}):Play()
+		end)
+		Btn.MouseLeave:Connect(function()
+			TweenService:Create(Btn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(32, 38, 46)}):Play()
+		end)
+		Btn.MouseButton1Click:Connect(function()
+			playSound(Sounds.Click, 0.5)
+			-- Click Animation (Ripple/Pulse effect)
+			Btn.TextSize = 12
+			TweenService:Create(Btn, TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {TextSize = 14}):Play()
+			callback()
+		end)
+	end
+	
+	-- TOGGLE CONSTRUCTOR
+	function elements:AddToggle(name, default, callback)
+		local state = default or false
+		local ToggleFrame = Instance.new("TextButton")
+		ToggleFrame.Size = UDim2.new(0.92, 0, 0, 26)
+		ToggleFrame.BackgroundTransparency = 1
+		ToggleFrame.Text = ""
+		ToggleFrame.Parent = SectionFrame
+		
+		local Indicator = Instance.new("Frame")
+		Indicator.Size = UDim2.new(0, 14, 0, 14)
+		Indicator.Position = UDim2.new(0, 2, 0.5, -7)
+		Indicator.BackgroundColor3 = state and Color3.fromRGB(0, 200, 255) or Color3.fromRGB(45, 52, 60)
+		Indicator.BorderSizePixel = 0
+		Indicator.Parent = ToggleFrame
+		
+		local Label = Instance.new("TextLabel")
+		Label.Size = UDim2.new(1, -25, 1, 0)
+		Label.Position = UDim2.new(0, 25, 0, 0)
+		Label.BackgroundTransparency = 1
+		Label.Text = name
+		Label.TextColor3 = state and Color3.fromRGB(255,255,255) or Color3.fromRGB(170,170,170)
+		Label.Font = Enum.Font.SourceSans
+		Label.TextSize = 14
+		Label.TextXAlignment = Enum.TextXAlignment.Left
+		Label.Parent = ToggleFrame
+		
+		ToggleFrame.MouseButton1Click:Connect(function()
+			state = not state
+			if state then playSound(Sounds.ToggleOn, 0.5) else playSound(Sounds.ToggleOff, 0.5) end
+			
+			TweenService:Create(Indicator, TweenInfo.new(0.15), {BackgroundColor3 = state and Color3.fromRGB(0, 200, 255) or Color3.fromRGB(45, 52, 60)}):Play()
+			TweenService:Create(Label, TweenInfo.new(0.15), {TextColor3 = state and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(170, 170, 170)}):Play()
+			callback(state)
+		end)
+	end
+	
+	-- SLIDER CONSTRUCTOR (Fully fluid for mobile touch)
+	function elements:AddSlider(name, min, max, default, callback)
+		local SliderFrame = Instance.new("Frame")
+		SliderFrame.Size = UDim2.new(0.92, 0, 0, 38)
+		SliderFrame.BackgroundTransparency = 1
+		SliderFrame.Parent = SectionFrame
+		
+		local Label = Instance.new("TextLabel")
+		Label.Size = UDim2.new(1, 0, 0, 15)
+		Label.BackgroundTransparency = 1
+		Label.Text = name
+		Label.TextColor3 = Color3.fromRGB(180, 180, 180)
+		Label.Font = Enum.Font.SourceSans
+		Label.TextSize = 13
+		Label.TextXAlignment = Enum.TextXAlignment.Left
+		Label.Parent = SliderFrame
+		
+		local ValueLabel = Instance.new("TextLabel")
+		ValueLabel.Size = UDim2.new(1, 0, 0, 15)
+		ValueLabel.BackgroundTransparency = 1
+		ValueLabel.Text = tostring(default or min)
+		ValueLabel.TextColor3 = Color3.fromRGB(0, 200, 255)
+		ValueLabel.Font = Enum.Font.SourceSansBold
+		ValueLabel.TextSize = 13
+		ValueLabel.TextXAlignment = Enum.TextXAlignment.Right
+		ValueLabel.Parent = SliderFrame
+		
+		local Track = Instance.new("TextButton")
+		Track.Size = UDim2.new(1, 0, 0, 6)
+		Track.Position = UDim2.new(0, 0, 0, 24)
+		Track.BackgroundColor3 = Color3.fromRGB(40, 48, 56)
+		Track.Text = ""
+		Track.AutoButtonColor = false
+		Track.Parent = SliderFrame
+		
+		local Fill = Instance.new("Frame")
+		Fill.Size = UDim2.new(((default or min) - min) / (max - min), 0, 1, 0)
+		Fill.BackgroundColor3 = Color3.fromRGB(0, 200, 255)
+		Fill.BorderSizePixel = 0
+		Fill.Parent = Track
+		
+		-- Slide Handler (PC + Mobile Smooth Tracking)
+		local function processSlide(input)
+			local absWidth = Track.AbsoluteSize.X
+			local absPos = Track.AbsolutePosition.X
+			local relX = math.clamp(input.Position.X - absPos, 0, absWidth)
+			local percent = relX / absWidth
+			local rawVal = min + (percent * (max - min))
+			local finalVal = math.floor(rawVal * 100) / 100 -- 2 decimal places max
+			
+			TweenService:Create(Fill, TweenInfo.new(0.08, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Size = UDim2.new(percent, 0, 1, 0)}):Play()
+			ValueLabel.Text = tostring(finalVal)
+			callback(finalVal)
+		end
+		
+		local sliding = false
+		Track.InputBegan:Connect(function(input)
+			if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+				sliding = true
+				playSound(Sounds.Click, 0.3)
+				processSlide(input)
+			end
+		end)
+		
+		UserInputService.InputChanged:Connect(function(input)
+			if sliding and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+				processSlide(input)
+			end
+		end)
+		
+		UserInputService.InputEnded:Connect(function(input)
+			if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+				sliding = false
+			end
+		end)
+	end
+	
+	-- DROPDOWN CONSTRUCTOR
+	function elements:AddDropdown(name, list, callback)
+		local dropped = false
+		local DropFrame = Instance.new("Frame")
+		DropFrame.Size = UDim2.new(0.92, 0, 0, 45)
+		DropFrame.BackgroundTransparency = 1
+		DropFrame.Parent = SectionFrame
+		
+		local Label = Instance.new("TextLabel")
+		Label.Size = UDim2.new(1, 0, 0, 15)
+		Label.BackgroundTransparency = 1
+		Label.Text = name
+		Label.TextColor3 = Color3.fromRGB(160, 160, 160)
+		Label.Font = Enum.Font.SourceSans
+		Label.TextSize = 13
+		Label.TextXAlignment = Enum.TextXAlignment.Left
+		Label.Parent = DropFrame
+		
+		local ActionBtn = Instance.new("TextButton")
+		ActionBtn.Size = UDim2.new(1, 0, 0, 24)
+		ActionBtn.Position = UDim2.new(0, 0, 0, 18)
+		ActionBtn.BackgroundColor3 = Color3.fromRGB(30, 36, 44)
+		ActionBtn.BorderSizePixel = 0
+		ActionBtn.Text = "  " .. (list[1] or "None")
+		ActionBtn.TextColor3 = Color3.fromRGB(220, 220, 220)
+		ActionBtn.Font = Enum.Font.SourceSans
+		ActionBtn.TextSize = 13
+		ActionBtn.TextXAlignment = Enum.TextXAlignment.Left
+		ActionBtn.Parent = DropFrame
+		
+		local Arrow = Instance.new("TextLabel")
+		Arrow.Size = UDim2.new(0, 20, 1, 0)
+		Arrow.Position = UDim2.new(1, -20, 0, 0)
+		Arrow.BackgroundTransparency = 1
+		Arrow.Text = "v"
+		Arrow.TextColor3 = Color3.fromRGB(140, 140, 140)
+		Arrow.Font = Enum.Font.SourceSansBold
+		Arrow.TextSize = 12
+		Arrow.Parent = ActionBtn
+		
+		local ListContainer = Instance.new("Frame")
+		ListContainer.Size = UDim2.new(1, 0, 0, 0)
+		ListContainer.Position = UDim2.new(0, 0, 1, 0)
+		ListContainer.BackgroundColor3 = Color3.fromRGB(24, 28, 34)
+		ListContainer.BorderSizePixel = 1
+		ListContainer.BorderColor3 = Color3.fromRGB(40, 48, 56)
+		ListContainer.ClipsDescendants = true
+		ListContainer.ZIndex = 5
+		ListContainer.Parent = ActionBtn
+		
+		local ListLayout = Instance.new("UIListLayout")
+		ListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+		ListLayout.Parent = ListContainer
+		
+		local function toggleDrop()
+			dropped = not dropped
+			playSound(Sounds.Click, 0.4)
+			local targetHeight = dropped and math.clamp(#list * 22, 0, 150) or 0
+			TweenService:Create(ListContainer, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {Size = UDim2.new(1, 0, 0, targetHeight)}):Play()
+			Arrow.Text = dropped and "^" or "v"
+		end
+		
+		ActionBtn.MouseButton1Click:Connect(toggleDrop)
+		
+		for _, item in pairs(list) do
+			local ItemBtn = Instance.new("TextButton")
+			ItemBtn.Size = UDim2.new(1, 0, 0, 22)
+			ItemBtn.BackgroundTransparency = 1
+			ItemBtn.Text = "  " .. tostring(item)
+			ItemBtn.TextColor3 = Color3.fromRGB(180, 180, 180)
+			ItemBtn.Font = Enum.Font.SourceSans
+			ItemBtn.TextSize = 13
+			ItemBtn.TextXAlignment = Enum.TextXAlignment.Left
+			ItemBtn.ZIndex = 6
+			ItemBtn.Parent = ListContainer
+			
+			ItemBtn.MouseEnter:Connect(function() ItemBtn.BackgroundTransparency = 0 ItemBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 255) ItemBtn.TextColor3 = Color3.fromRGB(0,0,0) end)
+			ItemBtn.MouseLeave:Connect(function() ItemBtn.BackgroundTransparency = 1 ItemBtn.TextColor3 = Color3.fromRGB(180, 180, 180) end)
+			
+			ItemBtn.MouseButton1Click:Connect(function()
+				ActionBtn.Text = "  " .. tostring(item)
+				toggleDrop()
+				callback(item)
+			end)
+		end
+	end
+	
+	-- KEYBIND CONSTRUCTOR (Supports Toggle/Button dual functionality)
+	function elements:AddKeybind(name, defaultKey, callback)
+		local currentKey = defaultKey or Enum.KeyCode.E
+		local binding = false
+		
+		local BindFrame = Instance.new("Frame")
+		BindFrame.Size = UDim2.new(0.92, 0, 0, 28)
+		BindFrame.BackgroundTransparency = 1
+		BindFrame.Parent = SectionFrame
+		
+		local Label = Instance.new("TextLabel")
+		Label.Size = UDim2.new(0.6, 0, 1, 0)
+		Label.BackgroundTransparency = 1
+		Label.Text = name
+		Label.TextColor3 = Color3.fromRGB(180, 180, 180)
+		Label.Font = Enum.Font.SourceSans
+		Label.TextSize = 14
+		Label.TextXAlignment = Enum.TextXAlignment.Left
+		Label.Parent = BindFrame
+		
+		local BindBtn = Instance.new("TextButton")
+		BindBtn.Size = UDim2.new(0, 70, 0, 20)
+		BindBtn.Position = UDim2.new(1, -70, 0.5, -10)
+		BindBtn.BackgroundColor3 = Color3.fromRGB(35, 42, 50)
+		BindBtn.Text = currentKey.Name
+		BindBtn.TextColor3 = Color3.fromRGB(0, 200, 255)
+		BindBtn.Font = Enum.Font.SourceSansBold
+		BindBtn.TextSize = 12
+		BindBtn.Parent = BindFrame
+		
+		BindBtn.MouseButton1Click:Connect(function()
+			binding = true
+			BindBtn.Text = "..."
+			playSound(Sounds.Click, 0.4)
+		end)
+		
+		UserInputService.InputBegan:Connect(function(input, gpe)
+			if gpe then return end
+			if binding then
+				if input.UserInputType == Enum.UserInputType.Keyboard then
+					currentKey = input.KeyCode
+					BindBtn.Text = currentKey.Name
+					binding = false
+					playSound(Sounds.ToggleOn, 0.4)
+				end
+			else
+				if input.KeyCode == currentKey then
+					playSound(Sounds.Click, 0.4)
+					callback()
+				end
+			end
+		end)
+	end
+	
+	return elements
+end
+
+return Menu
