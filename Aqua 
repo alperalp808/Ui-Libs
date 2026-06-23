@@ -1115,6 +1115,49 @@ function Menu:AddSection(tabData, side, title)
 		
 		createKeybindEngine(BindFrame, name, defaultKey, callback)
 	end
+
+	function elements:AddTextbox(name, placeholder, callback)
+		local BoxFrame = Instance.new("Frame")
+		BoxFrame.Size = UDim2.new(0.94, 0, 0, 48)
+		BoxFrame.BackgroundTransparency = 1
+		BoxFrame.Parent = SectionFrame
+
+		local Label = Instance.new("TextLabel")
+		Label.Size = UDim2.new(1, 0, 0, 16)
+		Label.BackgroundTransparency = 1
+		Label.Text = name
+		Label.TextColor3 = Color3.fromRGB(150, 155, 160)
+		Label.Font = Enum.Font.SourceSans
+		Label.TextSize = 13
+		Label.TextXAlignment = Enum.TextXAlignment.Left
+		Label.Parent = BoxFrame
+
+		local InputBox = Instance.new("TextBox")
+		InputBox.Size = UDim2.new(1, 0, 0, 26)
+		InputBox.Position = UDim2.new(0, 0, 0, 20)
+		InputBox.BackgroundColor3 = Color3.fromRGB(24, 30, 38)
+		InputBox.Text = ""
+		InputBox.PlaceholderText = placeholder or "Type here..."
+		InputBox.PlaceholderColor3 = Color3.fromRGB(90, 95, 100)
+		InputBox.TextColor3 = Color3.fromRGB(240, 245, 250)
+		InputBox.Font = Enum.Font.SourceSans
+		InputBox.TextSize = 13
+		InputBox.ClearTextOnFocus = false
+		InputBox.Parent = BoxFrame
+		addCorner(InputBox, 5)
+		local BoxStroke = addStroke(InputBox, Color3.fromRGB(255,255,255), 1, 0.94)
+
+		InputBox.Focused:Connect(function()
+			playSound(SFX.Hover, 0.2)
+			TweenService:Create(BoxStroke, TweenInfo.new(0.2), {Color = Color3.fromRGB(0, 200, 255), Transparency = 0.4}):Play()
+		end)
+
+		InputBox.FocusLost:Connect(function(enterPressed)
+			TweenService:Create(BoxStroke, TweenInfo.new(0.2), {Color = Color3.fromRGB(255, 255, 255), Transparency = 0.94}):Play()
+			playSound(SFX.Click, 0.4)
+			callback(InputBox.Text, enterPressed)
+		end)
+	end
 	
 	function elements:AddDropdown(name, list, isMulti, callback)
 		local dropped = false
