@@ -60,6 +60,8 @@ function Menu:Notify(title, description, duration)
 		NotificationGui = Instance.new("ScreenGui")
 		NotificationGui.Name = "Aqua_NotificationGui"
 		NotificationGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+		NotificationGui.DisplayOrder = 9999
+		NotificationGui.IgnoreGuiInset = true
 		NotificationGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 	end
 	
@@ -155,6 +157,9 @@ function Menu:CreateWindow(title, keyName, showButton)
 	ScreenGui.Name = "AquaCSGO_PremiumMenu"
 	ScreenGui.ResetOnSpawn = false
 	ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+	-- Her şeyin üzerinde görünmesi için maksimum DisplayOrder
+	ScreenGui.DisplayOrder = 9999
+	ScreenGui.IgnoreGuiInset = true
 	ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 	self.ScreenGui = ScreenGui
 	
@@ -173,6 +178,8 @@ function Menu:CreateWindow(title, keyName, showButton)
 	MainFrame.Position = UDim2.new(0, 0, 0, 0)
 	MainFrame.BackgroundColor3 = Color3.fromRGB(12, 16, 20)
 	MainFrame.BackgroundTransparency = 0.25
+	-- FIX: ClipsDescendants = true ile section'ların taşması engellendi
+	MainFrame.ClipsDescendants = true
 	MainFrame.Parent = CanvasGroup
 	self.MainFrame = MainFrame
 	
@@ -184,6 +191,8 @@ function Menu:CreateWindow(title, keyName, showButton)
 	Header.BackgroundColor3 = Color3.fromRGB(18, 24, 30)
 	Header.BackgroundTransparency = 0.3
 	Header.BorderSizePixel = 0
+	-- FIX: Header ZIndex yüksek tutuldu, her zaman üstte kalır
+	Header.ZIndex = 10
 	Header.Parent = MainFrame
 	addCorner(Header, 10)
 	
@@ -192,6 +201,7 @@ function Menu:CreateWindow(title, keyName, showButton)
 	HeaderFix.Position = UDim2.new(0, 0, 1, -10)
 	HeaderFix.BackgroundColor3 = Color3.fromRGB(18, 24, 30)
 	HeaderFix.BackgroundTransparency = 0.3
+	HeaderFix.ZIndex = 10
 	HeaderFix.Parent = Header
 	
 	local TitleLabel = Instance.new("TextLabel")
@@ -203,12 +213,14 @@ function Menu:CreateWindow(title, keyName, showButton)
 	TitleLabel.TextSize = 15
 	TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 	TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
+	TitleLabel.ZIndex = 10
 	TitleLabel.Parent = Header
 	
 	local Controls = Instance.new("Frame")
 	Controls.Size = UDim2.new(0, 90, 1, 0)
 	Controls.Position = UDim2.new(1, -95, 0, 0)
 	Controls.BackgroundTransparency = 1
+	Controls.ZIndex = 10
 	Controls.Parent = Header
 	
 	local MinBtn = Instance.new("TextButton")
@@ -221,6 +233,7 @@ function Menu:CreateWindow(title, keyName, showButton)
 	MinBtn.Font = Enum.Font.SourceSansBold
 	MinBtn.TextSize = 16
 	MinBtn.AutoButtonColor = false
+	MinBtn.ZIndex = 10
 	MinBtn.Parent = Controls
 	addCorner(MinBtn, 6)
 	
@@ -234,17 +247,33 @@ function Menu:CreateWindow(title, keyName, showButton)
 	CloseBtn.Font = Enum.Font.SourceSansBold
 	CloseBtn.TextSize = 13
 	CloseBtn.AutoButtonColor = false
+	CloseBtn.ZIndex = 10
 	CloseBtn.Parent = Controls
 	addCorner(CloseBtn, 6)
 
-	local TabBar = Instance.new("Frame")
+	-- FIX: TabBar wrapper — yatay kaydırma için ScrollingFrame kullanıldı
+	local TabBarWrapper = Instance.new("Frame")
+	TabBarWrapper.Name = "TabBarWrapper"
+	TabBarWrapper.Size = UDim2.new(1, -314, 0, 34)
+	TabBarWrapper.Position = UDim2.new(0, 302, 0, 48)
+	TabBarWrapper.BackgroundColor3 = Color3.fromRGB(10, 14, 18)
+	TabBarWrapper.BackgroundTransparency = 0.5
+	TabBarWrapper.ClipsDescendants = true
+	TabBarWrapper.ZIndex = 5
+	TabBarWrapper.Parent = MainFrame
+	addCorner(TabBarWrapper, 6)
+
+	-- FIX: Gerçek tab içerikleri bu ScrollingFrame içine eklendi (yatay kaydırılabilir)
+	local TabBar = Instance.new("ScrollingFrame")
 	TabBar.Name = "TabBar"
-	TabBar.Size = UDim2.new(1, -314, 0, 34)
-	TabBar.Position = UDim2.new(0, 302, 0, 48)
-	TabBar.BackgroundColor3 = Color3.fromRGB(10, 14, 18)
-	TabBar.BackgroundTransparency = 0.5
-	TabBar.Parent = MainFrame
-	addCorner(TabBar, 6)
+	TabBar.Size = UDim2.new(1, 0, 1, 0)
+	TabBar.Position = UDim2.new(0, 0, 0, 0)
+	TabBar.BackgroundTransparency = 1
+	TabBar.ScrollBarThickness = 0          -- scrollbar gizli, parmakla kaydırılır
+	TabBar.ScrollingDirection = Enum.ScrollingDirection.X
+	TabBar.CanvasSize = UDim2.new(0, 0, 0, 0) -- dinamik güncellenecek
+	TabBar.ZIndex = 5
+	TabBar.Parent = TabBarWrapper
 	self.TabBar = TabBar
 	
 	local TabList = Instance.new("UIListLayout")
@@ -252,16 +281,24 @@ function Menu:CreateWindow(title, keyName, showButton)
 	TabList.SortOrder = Enum.SortOrder.LayoutOrder
 	TabList.Padding = UDim.new(0, 6)
 	TabList.Parent = TabBar
+	self.TabList = TabList
 	
 	local TabPadding = Instance.new("UIPadding")
 	TabPadding.PaddingLeft = UDim.new(0, 6)
 	TabPadding.PaddingTop = UDim.new(0, 4)
 	TabPadding.Parent = TabBar
+
+	-- FIX: TabList içerik genişliği değişince CanvasSize otomatik güncellenir
+	TabList:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+		TabBar.CanvasSize = UDim2.new(0, TabList.AbsoluteContentSize.X + 12, 0, 0)
+	end)
 	
 	local Container = Instance.new("Frame")
 	Container.Size = UDim2.new(1, -314, 1, -98)
 	Container.Position = UDim2.new(0, 302, 0, 88)
 	Container.BackgroundTransparency = 1
+	-- FIX: Container ClipsDescendants = true — section'lar dışarı taşamaz
+	Container.ClipsDescendants = true
 	Container.Parent = MainFrame
 	self.Container = Container
 	
@@ -316,7 +353,7 @@ function Menu:CreateWindow(title, keyName, showButton)
 	DisplayNameLabel.BackgroundTransparency = 1
 	DisplayNameLabel.Text = LocalPlayer.DisplayName
 	DisplayNameLabel.Font = Enum.Font.SourceSansBold
-	DisplayNameLabel.TextSize = 14
+	DisplayNameLabel.TextSize = 16
 	DisplayNameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 	DisplayNameLabel.TextXAlignment = Enum.TextXAlignment.Left
 	DisplayNameLabel.Parent = DiagnosticFrame
@@ -327,7 +364,7 @@ function Menu:CreateWindow(title, keyName, showButton)
 	UserIdLabel.BackgroundTransparency = 1
 	UserIdLabel.Text = "ID: " .. LocalPlayer.UserId
 	UserIdLabel.Font = Enum.Font.SourceSansItalic
-	UserIdLabel.TextSize = 12
+	UserIdLabel.TextSize = 14
 	UserIdLabel.TextColor3 = Color3.fromRGB(140, 145, 150)
 	UserIdLabel.TextXAlignment = Enum.TextXAlignment.Left
 	UserIdLabel.Parent = DiagnosticFrame
@@ -347,7 +384,7 @@ function Menu:CreateWindow(title, keyName, showButton)
 	GameNameLabel.BackgroundTransparency = 1
 	GameNameLabel.Text = "Game: " .. PlaceName
 	GameNameLabel.Font = Enum.Font.SourceSansBold
-	GameNameLabel.TextSize = 11
+	GameNameLabel.TextSize = 13
 	GameNameLabel.TextColor3 = Color3.fromRGB(240, 240, 240)
 	GameNameLabel.TextXAlignment = Enum.TextXAlignment.Left
 	GameNameLabel.ClipsDescendants = true
@@ -359,7 +396,7 @@ function Menu:CreateWindow(title, keyName, showButton)
 	PlaceIdLabel.BackgroundTransparency = 1
 	PlaceIdLabel.Text = "Place ID: " .. tostring(game.PlaceId)
 	PlaceIdLabel.Font = Enum.Font.RobotoMono
-	PlaceIdLabel.TextSize = 11
+	PlaceIdLabel.TextSize = 13
 	PlaceIdLabel.TextColor3 = Color3.fromRGB(0, 200, 255)
 	PlaceIdLabel.TextXAlignment = Enum.TextXAlignment.Left
 	PlaceIdLabel.Parent = ServerInfoFrame
@@ -370,7 +407,7 @@ function Menu:CreateWindow(title, keyName, showButton)
 	JobIdLabel.BackgroundTransparency = 1
 	JobIdLabel.Text = "Server ID: " .. (game.JobId ~= "" and game.JobId or "Studio_Session")
 	JobIdLabel.Font = Enum.Font.RobotoMono
-	JobIdLabel.TextSize = 10
+	JobIdLabel.TextSize = 12
 	JobIdLabel.TextColor3 = Color3.fromRGB(150, 155, 160)
 	JobIdLabel.TextXAlignment = Enum.TextXAlignment.Left
 	JobIdLabel.ClipsDescendants = true
@@ -387,7 +424,7 @@ function Menu:CreateWindow(title, keyName, showButton)
 	FpsLabel.BackgroundTransparency = 1
 	FpsLabel.Text = "FPS: --"
 	FpsLabel.Font = Enum.Font.RobotoMono
-	FpsLabel.TextSize = 11
+	FpsLabel.TextSize = 13
 	FpsLabel.TextColor3 = Color3.fromRGB(0, 255, 150)
 	FpsLabel.TextXAlignment = Enum.TextXAlignment.Left
 	FpsLabel.Parent = MiniPerformanceFrame
@@ -398,7 +435,7 @@ function Menu:CreateWindow(title, keyName, showButton)
 	PingLabel.BackgroundTransparency = 1
 	PingLabel.Text = "PING: -- ms"
 	PingLabel.Font = Enum.Font.RobotoMono
-	PingLabel.TextSize = 11
+	PingLabel.TextSize = 13
 	PingLabel.TextColor3 = Color3.fromRGB(0, 200, 255)
 	PingLabel.TextXAlignment = Enum.TextXAlignment.Right
 	PingLabel.Parent = MiniPerformanceFrame
@@ -423,7 +460,7 @@ function Menu:CreateWindow(title, keyName, showButton)
 		Btn.Text = "  Copy " .. titleText
 		Btn.TextColor3 = Color3.fromRGB(190, 195, 200)
 		Btn.Font = Enum.Font.SourceSans
-		Btn.TextSize = 12
+		Btn.TextSize = 14
 		Btn.TextXAlignment = Enum.TextXAlignment.Left
 		Btn.AutoButtonColor = false
 		Btn.Parent = CopyScroll
@@ -453,7 +490,7 @@ function Menu:CreateWindow(title, keyName, showButton)
 	RadarLabel.BackgroundTransparency = 1
 	RadarLabel.Text = "RADAR LIST (1/1)"
 	RadarLabel.Font = Enum.Font.SourceSansBold
-	RadarLabel.TextSize = 11
+	RadarLabel.TextSize = 13
 	RadarLabel.TextColor3 = Color3.fromRGB(0, 200, 255)
 	RadarLabel.TextXAlignment = Enum.TextXAlignment.Left
 	RadarLabel.Parent = DiagnosticFrame
@@ -486,7 +523,7 @@ function Menu:CreateWindow(title, keyName, showButton)
 				PLabel.BackgroundTransparency = 1
 				PLabel.Text = " » " .. p.DisplayName .. " (@" .. p.Name .. ")"
 				PLabel.Font = Enum.Font.SourceSans
-				PLabel.TextSize = 12
+				PLabel.TextSize = 14
 				PLabel.TextColor3 = Color3.fromRGB(210, 215, 220)
 				PLabel.TextXAlignment = Enum.TextXAlignment.Left
 				PLabel.Parent = RadarScroll
@@ -546,7 +583,7 @@ function Menu:CreateWindow(title, keyName, showButton)
 		local targetSize = minimized and UDim2.new(0, 790, 0, 40) or UDim2.new(0, 790, 0, 460)
 		TweenService:Create(CanvasGroup, TweenInfo.new(0.4, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {Size = targetSize}):Play()
 		Container.Visible = not minimized
-		TabBar.Visible = not minimized
+		TabBarWrapper.Visible = not minimized
 		DiagnosticFrame.Visible = not minimized
 	end)
 	
@@ -658,6 +695,8 @@ function Menu:SetupGlobalToggle(keyName, showButton)
 			TargetGui.Name = "Aqua_PersistentControls"
 			TargetGui.ResetOnSpawn = false
 			TargetGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+			TargetGui.DisplayOrder = 9999
+			TargetGui.IgnoreGuiInset = true
 			TargetGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 		end
 		self.PersistentGui = TargetGui
@@ -735,18 +774,28 @@ function Menu:AddTab(name)
 	TabPage.BackgroundTransparency = 1
 	TabPage.Visible = false
 	TabPage.Parent = self.Container
-	
+
+	-- FIX: Sol ve sağ zone artık ClipsDescendants = true
+	-- Section'lar scroll edildiğinde TabBar veya Header üstüne taşımaz
 	local LeftZone = Instance.new("ScrollingFrame")
 	LeftZone.Size = UDim2.new(0.5, -6, 1, 0)
 	LeftZone.BackgroundTransparency = 1
 	LeftZone.ScrollBarThickness = 3
 	LeftZone.ScrollBarImageColor3 = Color3.fromRGB(0, 200, 255)
 	LeftZone.ScrollBarImageTransparency = 0.4
-	LeftZone.ClipsDescendants = false
+	-- FIX: false yerine true — içerik dışarı taşmaz
+	LeftZone.ClipsDescendants = true
 	LeftZone.Parent = TabPage
 	
-	local RightZone = LeftZone:Clone()
+	local RightZone = Instance.new("ScrollingFrame")
+	RightZone.Size = UDim2.new(0.5, -6, 1, 0)
 	RightZone.Position = UDim2.new(0.5, 6, 0, 0)
+	RightZone.BackgroundTransparency = 1
+	RightZone.ScrollBarThickness = 3
+	RightZone.ScrollBarImageColor3 = Color3.fromRGB(0, 200, 255)
+	RightZone.ScrollBarImageTransparency = 0.4
+	-- FIX: false yerine true
+	RightZone.ClipsDescendants = true
 	RightZone.Parent = TabPage
 	
 	local LList = Instance.new("UIListLayout")
@@ -754,7 +803,9 @@ function Menu:AddTab(name)
 	LList.Padding = UDim.new(0, 12)
 	LList.Parent = LeftZone
 	
-	local RList = LList:Clone()
+	local RList = Instance.new("UIListLayout")
+	RList.SortOrder = Enum.SortOrder.LayoutOrder
+	RList.Padding = UDim.new(0, 12)
 	RList.Parent = RightZone
 	
 	LList:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function() LeftZone.CanvasSize = UDim2.new(0,0,0, LList.AbsoluteContentSize.Y + 15) end)
@@ -803,7 +854,8 @@ function Menu:AddSection(tabData, side, title)
 	SectionFrame.Size = UDim2.new(1, -6, 0, 50)
 	SectionFrame.BackgroundColor3 = Color3.fromRGB(16, 22, 28)
 	SectionFrame.BackgroundTransparency = 0.4
-	SectionFrame.ClipsDescendants = false
+	-- FIX: ClipsDescendants = true — section içeriği dışarı taşmaz
+	SectionFrame.ClipsDescendants = true
 	SectionFrame.ZIndex = 2
 	SectionFrame.Parent = parentZone
 	addCorner(SectionFrame, 8)
@@ -822,13 +874,15 @@ function Menu:AddSection(tabData, side, title)
 	
 	local SecTitle = Instance.new("TextLabel")
 	SecTitle.Size = UDim2.new(1, -20, 0, 16)
-	SecTitle.Position = UDim2.new(0, 10, 0, -22)
+	SecTitle.Position = UDim2.new(0, 10, 0, 6)
 	SecTitle.BackgroundTransparency = 1
 	SecTitle.Text = string.upper(title)
 	SecTitle.Font = Enum.Font.SourceSansBold
 	SecTitle.TextSize = 12
 	SecTitle.TextColor3 = Color3.fromRGB(0, 200, 255)
 	SecTitle.TextXAlignment = Enum.TextXAlignment.Left
+	-- FIX: ZIndex yükseltildi, başlık her zaman görünür
+	SecTitle.ZIndex = 3
 	SecTitle.Parent = SectionFrame
 	
 	SecLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
