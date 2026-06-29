@@ -60,6 +60,8 @@ function Menu:Notify(title, description, duration)
 		NotificationGui = Instance.new("ScreenGui")
 		NotificationGui.Name = "Aqua_NotificationGui"
 		NotificationGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+		NotificationGui.DisplayOrder = 9999
+		NotificationGui.IgnoreGuiInset = true
 		NotificationGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 	end
 	
@@ -155,6 +157,9 @@ function Menu:CreateWindow(title, keyName, showButton)
 	ScreenGui.Name = "AquaCSGO_PremiumMenu"
 	ScreenGui.ResetOnSpawn = false
 	ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+	-- Her şeyin üzerinde görünmesi için maksimum DisplayOrder
+	ScreenGui.DisplayOrder = 9999
+	ScreenGui.IgnoreGuiInset = true
 	ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 	self.ScreenGui = ScreenGui
 	
@@ -348,7 +353,7 @@ function Menu:CreateWindow(title, keyName, showButton)
 	DisplayNameLabel.BackgroundTransparency = 1
 	DisplayNameLabel.Text = LocalPlayer.DisplayName
 	DisplayNameLabel.Font = Enum.Font.SourceSansBold
-	DisplayNameLabel.TextSize = 14
+	DisplayNameLabel.TextSize = 16
 	DisplayNameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 	DisplayNameLabel.TextXAlignment = Enum.TextXAlignment.Left
 	DisplayNameLabel.Parent = DiagnosticFrame
@@ -359,7 +364,7 @@ function Menu:CreateWindow(title, keyName, showButton)
 	UserIdLabel.BackgroundTransparency = 1
 	UserIdLabel.Text = "ID: " .. LocalPlayer.UserId
 	UserIdLabel.Font = Enum.Font.SourceSansItalic
-	UserIdLabel.TextSize = 12
+	UserIdLabel.TextSize = 14
 	UserIdLabel.TextColor3 = Color3.fromRGB(140, 145, 150)
 	UserIdLabel.TextXAlignment = Enum.TextXAlignment.Left
 	UserIdLabel.Parent = DiagnosticFrame
@@ -379,7 +384,7 @@ function Menu:CreateWindow(title, keyName, showButton)
 	GameNameLabel.BackgroundTransparency = 1
 	GameNameLabel.Text = "Game: " .. PlaceName
 	GameNameLabel.Font = Enum.Font.SourceSansBold
-	GameNameLabel.TextSize = 11
+	GameNameLabel.TextSize = 13
 	GameNameLabel.TextColor3 = Color3.fromRGB(240, 240, 240)
 	GameNameLabel.TextXAlignment = Enum.TextXAlignment.Left
 	GameNameLabel.ClipsDescendants = true
@@ -391,7 +396,7 @@ function Menu:CreateWindow(title, keyName, showButton)
 	PlaceIdLabel.BackgroundTransparency = 1
 	PlaceIdLabel.Text = "Place ID: " .. tostring(game.PlaceId)
 	PlaceIdLabel.Font = Enum.Font.RobotoMono
-	PlaceIdLabel.TextSize = 11
+	PlaceIdLabel.TextSize = 13
 	PlaceIdLabel.TextColor3 = Color3.fromRGB(0, 200, 255)
 	PlaceIdLabel.TextXAlignment = Enum.TextXAlignment.Left
 	PlaceIdLabel.Parent = ServerInfoFrame
@@ -402,7 +407,7 @@ function Menu:CreateWindow(title, keyName, showButton)
 	JobIdLabel.BackgroundTransparency = 1
 	JobIdLabel.Text = "Server ID: " .. (game.JobId ~= "" and game.JobId or "Studio_Session")
 	JobIdLabel.Font = Enum.Font.RobotoMono
-	JobIdLabel.TextSize = 10
+	JobIdLabel.TextSize = 12
 	JobIdLabel.TextColor3 = Color3.fromRGB(150, 155, 160)
 	JobIdLabel.TextXAlignment = Enum.TextXAlignment.Left
 	JobIdLabel.ClipsDescendants = true
@@ -419,7 +424,7 @@ function Menu:CreateWindow(title, keyName, showButton)
 	FpsLabel.BackgroundTransparency = 1
 	FpsLabel.Text = "FPS: --"
 	FpsLabel.Font = Enum.Font.RobotoMono
-	FpsLabel.TextSize = 11
+	FpsLabel.TextSize = 13
 	FpsLabel.TextColor3 = Color3.fromRGB(0, 255, 150)
 	FpsLabel.TextXAlignment = Enum.TextXAlignment.Left
 	FpsLabel.Parent = MiniPerformanceFrame
@@ -430,7 +435,7 @@ function Menu:CreateWindow(title, keyName, showButton)
 	PingLabel.BackgroundTransparency = 1
 	PingLabel.Text = "PING: -- ms"
 	PingLabel.Font = Enum.Font.RobotoMono
-	PingLabel.TextSize = 11
+	PingLabel.TextSize = 13
 	PingLabel.TextColor3 = Color3.fromRGB(0, 200, 255)
 	PingLabel.TextXAlignment = Enum.TextXAlignment.Right
 	PingLabel.Parent = MiniPerformanceFrame
@@ -455,7 +460,7 @@ function Menu:CreateWindow(title, keyName, showButton)
 		Btn.Text = "  Copy " .. titleText
 		Btn.TextColor3 = Color3.fromRGB(190, 195, 200)
 		Btn.Font = Enum.Font.SourceSans
-		Btn.TextSize = 12
+		Btn.TextSize = 14
 		Btn.TextXAlignment = Enum.TextXAlignment.Left
 		Btn.AutoButtonColor = false
 		Btn.Parent = CopyScroll
@@ -485,7 +490,7 @@ function Menu:CreateWindow(title, keyName, showButton)
 	RadarLabel.BackgroundTransparency = 1
 	RadarLabel.Text = "RADAR LIST (1/1)"
 	RadarLabel.Font = Enum.Font.SourceSansBold
-	RadarLabel.TextSize = 11
+	RadarLabel.TextSize = 13
 	RadarLabel.TextColor3 = Color3.fromRGB(0, 200, 255)
 	RadarLabel.TextXAlignment = Enum.TextXAlignment.Left
 	RadarLabel.Parent = DiagnosticFrame
@@ -518,7 +523,7 @@ function Menu:CreateWindow(title, keyName, showButton)
 				PLabel.BackgroundTransparency = 1
 				PLabel.Text = " » " .. p.DisplayName .. " (@" .. p.Name .. ")"
 				PLabel.Font = Enum.Font.SourceSans
-				PLabel.TextSize = 12
+				PLabel.TextSize = 14
 				PLabel.TextColor3 = Color3.fromRGB(210, 215, 220)
 				PLabel.TextXAlignment = Enum.TextXAlignment.Left
 				PLabel.Parent = RadarScroll
@@ -690,6 +695,8 @@ function Menu:SetupGlobalToggle(keyName, showButton)
 			TargetGui.Name = "Aqua_PersistentControls"
 			TargetGui.ResetOnSpawn = false
 			TargetGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+			TargetGui.DisplayOrder = 9999
+			TargetGui.IgnoreGuiInset = true
 			TargetGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 		end
 		self.PersistentGui = TargetGui
