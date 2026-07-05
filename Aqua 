@@ -64,7 +64,7 @@ function Menu:Notify(title, description, duration)
 		NotificationGui.IgnoreGuiInset = true
 		NotificationGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 	end
-	
+
 	local NotifContainer = NotificationGui:FindFirstChild("Container")
 	if not NotifContainer then
 		NotifContainer = Instance.new("Frame")
@@ -79,7 +79,7 @@ function Menu:Notify(title, description, duration)
 		layout.Padding = UDim.new(0, 10)
 		layout.Parent = NotifContainer
 	end
-	
+
 	local Box = Instance.new("Frame")
 	Box.Size = UDim2.new(1, 0, 0, 65)
 	Box.BackgroundColor3 = Color3.fromRGB(14, 18, 24)
@@ -87,9 +87,9 @@ function Menu:Notify(title, description, duration)
 	Box.Position = UDim2.new(1, 320, 0, 0)
 	Box.Parent = NotifContainer
 	addCorner(Box, 6)
-	
+
 	local MainStroke = addStroke(Box, Color3.fromRGB(0, 200, 255), 1.2, 1)
-	
+
 	local GlowLine = Instance.new("Frame")
 	GlowLine.Size = UDim2.new(1, 0, 0, 2)
 	GlowLine.Position = UDim2.new(0, 0, 1, -2)
@@ -98,7 +98,7 @@ function Menu:Notify(title, description, duration)
 	GlowLine.BorderSizePixel = 0
 	GlowLine.Parent = Box
 	addCorner(GlowLine, 2)
-	
+
 	local Tl = Instance.new("TextLabel")
 	Tl.Size = UDim2.new(1, -20, 0, 20)
 	Tl.Position = UDim2.new(0, 10, 0, 8)
@@ -110,7 +110,7 @@ function Menu:Notify(title, description, duration)
 	Tl.TextTransparency = 1
 	Tl.TextXAlignment = Enum.TextXAlignment.Left
 	Tl.Parent = Box
-	
+
 	local Dl = Instance.new("TextLabel")
 	Dl.Size = UDim2.new(1, -20, 0, 30)
 	Dl.Position = UDim2.new(0, 10, 0, 24)
@@ -124,17 +124,17 @@ function Menu:Notify(title, description, duration)
 	Dl.TextYAlignment = Enum.TextYAlignment.Top
 	Dl.TextWrapped = true
 	Dl.Parent = Box
-	
+
 	playSound(SFX.Notify, 0.5)
-	
+
 	TweenService:Create(Box, TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Position = UDim2.new(0, 0, 0, 0), BackgroundTransparency = 0.2}):Play()
 	TweenService:Create(MainStroke, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Transparency = 0.4}):Play()
 	TweenService:Create(GlowLine, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {BackgroundTransparency = 0}):Play()
 	TweenService:Create(Tl, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {TextTransparency = 0}):Play()
 	TweenService:Create(Dl, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {TextTransparency = 0}):Play()
-	
+
 	TweenService:Create(GlowLine, TweenInfo.new(duration, Enum.EasingStyle.Linear), {Size = UDim2.new(0, 0, 0, 2)}):Play()
-	
+
 	task.delay(duration, function()
 		local info = TweenInfo.new(0.35, Enum.EasingStyle.Quad, Enum.EasingDirection.In)
 		TweenService:Create(Box, info, {Position = UDim2.new(1, 320, 0, 0), BackgroundTransparency = 1}):Play()
@@ -149,20 +149,20 @@ end
 
 function Menu:CreateWindow(title, keyName, showButton)
 	local self = setmetatable({}, Menu)
-	
+
 	local existing = LocalPlayer:WaitForChild("PlayerGui"):FindFirstChild("AquaCSGO_PremiumMenu")
 	if existing then existing:Destroy() end
-	
+
 	local ScreenGui = Instance.new("ScreenGui")
 	ScreenGui.Name = "AquaCSGO_PremiumMenu"
 	ScreenGui.ResetOnSpawn = false
 	ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-	-- Her şeyin üzerinde görünmesi için maksimum DisplayOrder
+	-- Her ÅŸeyin Ã¼zerinde gÃ¶rÃ¼nmesi iÃ§in maksimum DisplayOrder
 	ScreenGui.DisplayOrder = 9999
 	ScreenGui.IgnoreGuiInset = true
 	ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 	self.ScreenGui = ScreenGui
-	
+
 	local CanvasGroup = Instance.new("CanvasGroup")
 	CanvasGroup.Name = "MainCanvas"
 	CanvasGroup.Size = UDim2.new(0, 790, 0, 460)
@@ -171,31 +171,31 @@ function Menu:CreateWindow(title, keyName, showButton)
 	CanvasGroup.GroupTransparency = 0
 	CanvasGroup.Parent = ScreenGui
 	self.CanvasGroup = CanvasGroup
-	
+
 	local MainFrame = Instance.new("Frame")
 	MainFrame.Name = "MainFrame"
 	MainFrame.Size = UDim2.new(1, 0, 1, 0)
 	MainFrame.Position = UDim2.new(0, 0, 0, 0)
 	MainFrame.BackgroundColor3 = Color3.fromRGB(12, 16, 20)
 	MainFrame.BackgroundTransparency = 0.25
-	-- FIX: ClipsDescendants = true ile section'ların taşması engellendi
+	-- FIX: ClipsDescendants = true ile section'larÄ±n taÅŸmasÄ± engellendi
 	MainFrame.ClipsDescendants = true
 	MainFrame.Parent = CanvasGroup
 	self.MainFrame = MainFrame
-	
+
 	addCorner(MainFrame, 10)
 	local FrameStroke = addStroke(MainFrame, Color3.fromRGB(0, 200, 255), 1.2, 0.4)
-	
+
 	local Header = Instance.new("Frame")
 	Header.Size = UDim2.new(1, 0, 0, 40)
 	Header.BackgroundColor3 = Color3.fromRGB(18, 24, 30)
 	Header.BackgroundTransparency = 0.3
 	Header.BorderSizePixel = 0
-	-- FIX: Header ZIndex yüksek tutuldu, her zaman üstte kalır
+	-- FIX: Header ZIndex yÃ¼ksek tutuldu, her zaman Ã¼stte kalÄ±r
 	Header.ZIndex = 10
 	Header.Parent = MainFrame
 	addCorner(Header, 10)
-	
+
 	local HeaderFix = Instance.new("Frame")
 	HeaderFix.Size = UDim2.new(1, 0, 0, 10)
 	HeaderFix.Position = UDim2.new(0, 0, 1, -10)
@@ -203,7 +203,7 @@ function Menu:CreateWindow(title, keyName, showButton)
 	HeaderFix.BackgroundTransparency = 0.3
 	HeaderFix.ZIndex = 10
 	HeaderFix.Parent = Header
-	
+
 	local TitleLabel = Instance.new("TextLabel")
 	TitleLabel.Size = UDim2.new(0, 250, 1, 0)
 	TitleLabel.Position = UDim2.new(0, 18, 0, 0)
@@ -215,14 +215,14 @@ function Menu:CreateWindow(title, keyName, showButton)
 	TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
 	TitleLabel.ZIndex = 10
 	TitleLabel.Parent = Header
-	
+
 	local Controls = Instance.new("Frame")
 	Controls.Size = UDim2.new(0, 90, 1, 0)
 	Controls.Position = UDim2.new(1, -95, 0, 0)
 	Controls.BackgroundTransparency = 1
 	Controls.ZIndex = 10
 	Controls.Parent = Header
-	
+
 	local MinBtn = Instance.new("TextButton")
 	MinBtn.Size = UDim2.new(0, 32, 0, 24)
 	MinBtn.Position = UDim2.new(0, 5, 0.5, -12)
@@ -236,7 +236,7 @@ function Menu:CreateWindow(title, keyName, showButton)
 	MinBtn.ZIndex = 10
 	MinBtn.Parent = Controls
 	addCorner(MinBtn, 6)
-	
+
 	local CloseBtn = Instance.new("TextButton")
 	CloseBtn.Size = UDim2.new(0, 32, 0, 24)
 	CloseBtn.Position = UDim2.new(0, 42, 0.5, -12)
@@ -251,7 +251,7 @@ function Menu:CreateWindow(title, keyName, showButton)
 	CloseBtn.Parent = Controls
 	addCorner(CloseBtn, 6)
 
-	-- FIX: TabBar wrapper — yatay kaydırma için ScrollingFrame kullanıldı
+	-- FIX: TabBar wrapper â€” yatay kaydÄ±rma iÃ§in ScrollingFrame kullanÄ±ldÄ±
 	local TabBarWrapper = Instance.new("Frame")
 	TabBarWrapper.Name = "TabBarWrapper"
 	TabBarWrapper.Size = UDim2.new(1, -314, 0, 34)
@@ -263,45 +263,45 @@ function Menu:CreateWindow(title, keyName, showButton)
 	TabBarWrapper.Parent = MainFrame
 	addCorner(TabBarWrapper, 6)
 
-	-- FIX: Gerçek tab içerikleri bu ScrollingFrame içine eklendi (yatay kaydırılabilir)
+	-- FIX: GerÃ§ek tab iÃ§erikleri bu ScrollingFrame iÃ§ine eklendi (yatay kaydÄ±rÄ±labilir)
 	local TabBar = Instance.new("ScrollingFrame")
 	TabBar.Name = "TabBar"
 	TabBar.Size = UDim2.new(1, 0, 1, 0)
 	TabBar.Position = UDim2.new(0, 0, 0, 0)
 	TabBar.BackgroundTransparency = 1
-	TabBar.ScrollBarThickness = 0          -- scrollbar gizli, parmakla kaydırılır
+	TabBar.ScrollBarThickness = 0          -- scrollbar gizli, parmakla kaydÄ±rÄ±lÄ±r
 	TabBar.ScrollingDirection = Enum.ScrollingDirection.X
-	TabBar.CanvasSize = UDim2.new(0, 0, 0, 0) -- dinamik güncellenecek
+	TabBar.CanvasSize = UDim2.new(0, 0, 0, 0) -- dinamik gÃ¼ncellenecek
 	TabBar.ZIndex = 5
 	TabBar.Parent = TabBarWrapper
 	self.TabBar = TabBar
-	
+
 	local TabList = Instance.new("UIListLayout")
 	TabList.FillDirection = Enum.FillDirection.Horizontal
 	TabList.SortOrder = Enum.SortOrder.LayoutOrder
 	TabList.Padding = UDim.new(0, 6)
 	TabList.Parent = TabBar
 	self.TabList = TabList
-	
+
 	local TabPadding = Instance.new("UIPadding")
 	TabPadding.PaddingLeft = UDim.new(0, 6)
 	TabPadding.PaddingTop = UDim.new(0, 4)
 	TabPadding.Parent = TabBar
 
-	-- FIX: TabList içerik genişliği değişince CanvasSize otomatik güncellenir
+	-- FIX: TabList iÃ§erik geniÅŸliÄŸi deÄŸiÅŸince CanvasSize otomatik gÃ¼ncellenir
 	TabList:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
 		TabBar.CanvasSize = UDim2.new(0, TabList.AbsoluteContentSize.X + 12, 0, 0)
 	end)
-	
+
 	local Container = Instance.new("Frame")
 	Container.Size = UDim2.new(1, -314, 1, -98)
 	Container.Position = UDim2.new(0, 302, 0, 88)
 	Container.BackgroundTransparency = 1
-	-- FIX: Container ClipsDescendants = true — section'lar dışarı taşamaz
+	-- FIX: Container ClipsDescendants = true â€” section'lar dÄ±ÅŸarÄ± taÅŸamaz
 	Container.ClipsDescendants = true
 	Container.Parent = MainFrame
 	self.Container = Container
-	
+
 	local ResizeGrip = Instance.new("ImageButton")
 	ResizeGrip.Size = UDim2.new(0, 16, 0, 16)
 	ResizeGrip.Position = UDim2.new(1, -16, 1, -16)
@@ -312,7 +312,7 @@ function Menu:CreateWindow(title, keyName, showButton)
 	ResizeGrip.Parent = MainFrame
 
 	self:SetupDragAndResize(Header, ResizeGrip)
-	
+
 	local DiagnosticFrame = Instance.new("Frame")
 	DiagnosticFrame.Name = "Hardcoded_DiagnosticsPanel"
 	DiagnosticFrame.Size = UDim2.new(0, 278, 1, -52)
@@ -322,7 +322,7 @@ function Menu:CreateWindow(title, keyName, showButton)
 	DiagnosticFrame.Parent = MainFrame
 	addCorner(DiagnosticFrame, 8)
 	addStroke(DiagnosticFrame, Color3.fromRGB(0, 200, 255), 1, 0.7)
-	
+
 	local AvatarImage = Instance.new("ImageLabel")
 	AvatarImage.Size = UDim2.new(0, 46, 0, 46)
 	AvatarImage.Position = UDim2.new(0, 14, 0, 10)
@@ -330,23 +330,23 @@ function Menu:CreateWindow(title, keyName, showButton)
 	AvatarImage.Parent = DiagnosticFrame
 	addCorner(AvatarImage, 23)
 	addStroke(AvatarImage, Color3.fromRGB(0, 200, 255), 1, 0.5)
-	
+
 	local thumbType = Enum.ThumbnailType.HeadShot
 	local thumbSize = Enum.ThumbnailSize.Size150x150
 	local content, isReady = Players:GetUserThumbnailAsync(LocalPlayer.UserId, thumbType, thumbSize)
-	
+
 	if isReady then
 		AvatarImage.Image = content
 	else
 		AvatarImage.Image = "rbxthumb://type=AvatarHeadShot&id=" .. tostring(LocalPlayer.UserId) .. "&x=150&y=150"
 	end
-	
+
 	task.spawn(function()
 		pcall(function()
 			ContentProvider:PreloadAsync({AvatarImage})
 		end)
 	end)
-	
+
 	local DisplayNameLabel = Instance.new("TextLabel")
 	DisplayNameLabel.Size = UDim2.new(1, -78, 0, 18)
 	DisplayNameLabel.Position = UDim2.new(0, 72, 0, 12)
@@ -357,7 +357,7 @@ function Menu:CreateWindow(title, keyName, showButton)
 	DisplayNameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 	DisplayNameLabel.TextXAlignment = Enum.TextXAlignment.Left
 	DisplayNameLabel.Parent = DiagnosticFrame
-	
+
 	local UserIdLabel = Instance.new("TextLabel")
 	UserIdLabel.Size = UDim2.new(1, -78, 0, 14)
 	UserIdLabel.Position = UDim2.new(0, 72, 0, 28)
@@ -428,7 +428,7 @@ function Menu:CreateWindow(title, keyName, showButton)
 	FpsLabel.TextColor3 = Color3.fromRGB(0, 255, 150)
 	FpsLabel.TextXAlignment = Enum.TextXAlignment.Left
 	FpsLabel.Parent = MiniPerformanceFrame
-	
+
 	local PingLabel = Instance.new("TextLabel")
 	PingLabel.Size = UDim2.new(0.5, 0, 1, 0)
 	PingLabel.Position = UDim2.new(0.5, 0, 0, 0)
@@ -447,7 +447,7 @@ function Menu:CreateWindow(title, keyName, showButton)
 	CopyScroll.ScrollBarThickness = 2
 	CopyScroll.ScrollBarImageColor3 = Color3.fromRGB(0, 200, 255)
 	CopyScroll.Parent = DiagnosticFrame
-	
+
 	local CSLayout = Instance.new("UIListLayout")
 	CSLayout.SortOrder = Enum.SortOrder.LayoutOrder
 	CSLayout.Padding = UDim.new(0, 5)
@@ -466,7 +466,7 @@ function Menu:CreateWindow(title, keyName, showButton)
 		Btn.Parent = CopyScroll
 		addCorner(Btn, 4)
 		addStroke(Btn, Color3.fromRGB(255,255,255), 1, 0.95)
-		
+
 		Btn.MouseButton1Click:Connect(function()
 			playSound(SFX.Click, 0.45)
 			local data = tostring(valueCallback())
@@ -494,7 +494,7 @@ function Menu:CreateWindow(title, keyName, showButton)
 	RadarLabel.TextColor3 = Color3.fromRGB(0, 200, 255)
 	RadarLabel.TextXAlignment = Enum.TextXAlignment.Left
 	RadarLabel.Parent = DiagnosticFrame
-	
+
 	local RadarScroll = Instance.new("ScrollingFrame")
 	RadarScroll.Size = UDim2.new(1, -24, 1, -250)
 	RadarScroll.Position = UDim2.new(0, 12, 0, 244)
@@ -504,24 +504,24 @@ function Menu:CreateWindow(title, keyName, showButton)
 	RadarScroll.ScrollBarImageColor3 = Color3.fromRGB(0, 200, 255)
 	RadarScroll.Parent = DiagnosticFrame
 	addCorner(RadarScroll, 6)
-	
+
 	local RadarLayout = Instance.new("UIListLayout")
 	RadarLayout.SortOrder = Enum.SortOrder.LayoutOrder
 	RadarLayout.Parent = RadarScroll
-	
+
 	local function updateRadar()
 		for _, v in pairs(RadarScroll:GetChildren()) do if v:IsA("TextLabel") then v:Destroy() end end
 		local activePlayers = Players:GetPlayers()
 		local count = #activePlayers
 		local maxPlayers = Players.MaxPlayers
 		RadarLabel.Text = "RADAR LIST (" .. tostring(count) .. "/" .. tostring(maxPlayers) .. ")"
-		
+
 		for _, p in pairs(activePlayers) do
 			if p ~= LocalPlayer then
 				local PLabel = Instance.new("TextLabel")
 				PLabel.Size = UDim2.new(1, 0, 0, 18)
 				PLabel.BackgroundTransparency = 1
-				PLabel.Text = " » " .. p.DisplayName .. " (@" .. p.Name .. ")"
+				PLabel.Text = " Â» " .. p.DisplayName .. " (@" .. p.Name .. ")"
 				PLabel.Font = Enum.Font.SourceSans
 				PLabel.TextSize = 14
 				PLabel.TextColor3 = Color3.fromRGB(210, 215, 220)
@@ -543,7 +543,7 @@ function Menu:CreateWindow(title, keyName, showButton)
 			FpsLabel.Text = "FPS: " .. tostring(frameCount)
 			frameCount = 0
 			lastIteration = currentTime
-			
+
 			local pingValue = math.floor(Stats.Network.ServerStatsItem["Data Ping"]:GetValue())
 			PingLabel.Text = "PING: " .. pingValue .. " ms"
 		end
@@ -553,7 +553,7 @@ function Menu:CreateWindow(title, keyName, showButton)
 	CanvasGroup.Size = UDim2.new(0, 790, 0, 0)
 	CanvasGroup.GroupTransparency = 1
 	TweenService:Create(CanvasGroup, TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Size = UDim2.new(0, 790, 0, 460), GroupTransparency = 0}):Play()
-	
+
 	local function setHeaderBtnAnims(btn, hoverBg, leaveBg, hoverCol, leaveCol)
 		btn.MouseEnter:Connect(function()
 			playSound(SFX.Hover, 0.25)
@@ -570,12 +570,12 @@ function Menu:CreateWindow(title, keyName, showButton)
 		playSound(SFX.Close, 0.6)
 		local tw = TweenService:Create(CanvasGroup, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {Size = UDim2.new(0, 790, 0, 0), GroupTransparency = 1})
 		tw:Play()
-		tw.Completed:Connect(function() 
+		tw.Completed:Connect(function()
 			if self.PersistentGui then self.PersistentGui:Destroy() end
-			ScreenGui:Destroy() 
+			ScreenGui:Destroy()
 		end)
 	end)
-	
+
 	local minimized = false
 	MinBtn.MouseButton1Click:Connect(function()
 		playSound(SFX.Click, 0.5)
@@ -586,23 +586,23 @@ function Menu:CreateWindow(title, keyName, showButton)
 		TabBarWrapper.Visible = not minimized
 		DiagnosticFrame.Visible = not minimized
 	end)
-	
+
 	self.Tabs = {}
 	self.GlobalToggleKey = Enum.KeyCode.RightShift
 	self.MenuVisible = true
 	self.IsTweeningVisibility = false
-	
+
 	if keyName ~= nil or showButton ~= nil then
 		self:SetupGlobalToggle(keyName, showButton)
 	end
-	
+
 	return self
 end
 
 function Menu:SetupDragAndResize(dragFrame, resizeGrip)
 	local main = self.CanvasGroup
 	local dragging, dragInput, dragStart, startPos
-	
+
 	dragFrame.InputBegan:Connect(function(input)
 		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
 			dragging = true
@@ -618,7 +618,7 @@ function Menu:SetupDragAndResize(dragFrame, resizeGrip)
 			dragInput = input
 		end
 	end)
-	
+
 	local resizing, resizeStart, startSize
 	resizeGrip.InputBegan:Connect(function(input)
 		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
@@ -630,7 +630,7 @@ function Menu:SetupDragAndResize(dragFrame, resizeGrip)
 			end)
 		end
 	end)
-	
+
 	UserInputService.InputChanged:Connect(function(input)
 		if dragging and input == dragInput then
 			local delta = input.Position - dragStart
@@ -657,9 +657,9 @@ function Menu:SetupGlobalToggle(keyName, showButton)
 		if self.IsTweeningVisibility then return end
 		self.IsTweeningVisibility = true
 		self.MenuVisible = state
-		
+
 		local info = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-		
+
 		if state then
 			self.CanvasGroup.Visible = true
 			playSound(SFX.Open, 0.45)
@@ -706,7 +706,7 @@ function Menu:SetupGlobalToggle(keyName, showButton)
 		PButton.Position = UDim2.new(0, 15, 0, 120)
 		PButton.BackgroundColor3 = Color3.fromRGB(12, 16, 20)
 		PButton.BackgroundTransparency = 0.4
-		PButton.Text = "🌊"
+		PButton.Text = "ğŸŒŠ"
 		PButton.TextColor3 = Color3.fromRGB(0, 200, 255)
 		PButton.Font = Enum.Font.SourceSansBold
 		PButton.TextSize = 18
@@ -768,25 +768,25 @@ function Menu:AddTab(name)
 	TabButton.Parent = self.TabBar
 	addCorner(TabButton, 5)
 	addStroke(TabButton, Color3.fromRGB(255,255,255), 1, 0.94)
-	
+
 	local TabPage = Instance.new("Frame")
 	TabPage.Size = UDim2.new(1, 0, 1, 0)
 	TabPage.BackgroundTransparency = 1
 	TabPage.Visible = false
 	TabPage.Parent = self.Container
 
-	-- FIX: Sol ve sağ zone artık ClipsDescendants = true
-	-- Section'lar scroll edildiğinde TabBar veya Header üstüne taşımaz
+	-- FIX: Sol ve saÄŸ zone artÄ±k ClipsDescendants = true
+	-- Section'lar scroll edildiÄŸinde TabBar veya Header Ã¼stÃ¼ne taÅŸÄ±maz
 	local LeftZone = Instance.new("ScrollingFrame")
 	LeftZone.Size = UDim2.new(0.5, -6, 1, 0)
 	LeftZone.BackgroundTransparency = 1
 	LeftZone.ScrollBarThickness = 3
 	LeftZone.ScrollBarImageColor3 = Color3.fromRGB(0, 200, 255)
 	LeftZone.ScrollBarImageTransparency = 0.4
-	-- FIX: false yerine true — içerik dışarı taşmaz
+	-- FIX: false yerine true â€” iÃ§erik dÄ±ÅŸarÄ± taÅŸmaz
 	LeftZone.ClipsDescendants = true
 	LeftZone.Parent = TabPage
-	
+
 	local RightZone = Instance.new("ScrollingFrame")
 	RightZone.Size = UDim2.new(0.5, -6, 1, 0)
 	RightZone.Position = UDim2.new(0.5, 6, 0, 0)
@@ -797,22 +797,22 @@ function Menu:AddTab(name)
 	-- FIX: false yerine true
 	RightZone.ClipsDescendants = true
 	RightZone.Parent = TabPage
-	
+
 	local LList = Instance.new("UIListLayout")
 	LList.SortOrder = Enum.SortOrder.LayoutOrder
 	LList.Padding = UDim.new(0, 12)
 	LList.Parent = LeftZone
-	
+
 	local RList = Instance.new("UIListLayout")
 	RList.SortOrder = Enum.SortOrder.LayoutOrder
 	RList.Padding = UDim.new(0, 12)
 	RList.Parent = RightZone
-	
+
 	LList:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function() LeftZone.CanvasSize = UDim2.new(0,0,0, LList.AbsoluteContentSize.Y + 15) end)
 	RList:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function() RightZone.CanvasSize = UDim2.new(0,0,0, RList.AbsoluteContentSize.Y + 15) end)
 
 	local tabData = {Left = LeftZone, Right = RightZone, Button = TabButton, Page = TabPage}
-	
+
 	TabButton.MouseEnter:Connect(function()
 		playSound(SFX.Hover, 0.2)
 		if not TabPage.Visible then TweenService:Create(TabButton, TweenInfo.new(0.2), {TextColor3 = Color3.fromRGB(255, 255, 255)}):Play() end
@@ -820,7 +820,7 @@ function Menu:AddTab(name)
 	TabButton.MouseLeave:Connect(function()
 		if not TabPage.Visible then TweenService:Create(TabButton, TweenInfo.new(0.2), {TextColor3 = Color3.fromRGB(140, 145, 150)}):Play() end
 	end)
-	
+
 	TabButton.MouseButton1Click:Connect(function()
 		playSound(SFX.Click, 0.45)
 		for _, t in pairs(self.Tabs) do
@@ -834,7 +834,7 @@ function Menu:AddTab(name)
 		TabButton:FindFirstChildOfClass("UIStroke").Color = Color3.fromRGB(0, 200, 255)
 		TabButton:FindFirstChildOfClass("UIStroke").Transparency = 0.4
 	end)
-	
+
 	table.insert(self.Tabs, tabData)
 	if #self.Tabs == 1 then
 		TabPage.Visible = true
@@ -849,29 +849,29 @@ end
 
 function Menu:AddSection(tabData, side, title)
 	local parentZone = (side == "Right") and tabData.Right or tabData.Left
-	
+
 	local SectionFrame = Instance.new("Frame")
 	SectionFrame.Size = UDim2.new(1, -6, 0, 50)
 	SectionFrame.BackgroundColor3 = Color3.fromRGB(16, 22, 28)
 	SectionFrame.BackgroundTransparency = 0.4
-	-- FIX: ClipsDescendants = true — section içeriği dışarı taşmaz
+	-- FIX: ClipsDescendants = true â€” section iÃ§eriÄŸi dÄ±ÅŸarÄ± taÅŸmaz
 	SectionFrame.ClipsDescendants = true
 	SectionFrame.ZIndex = 2
 	SectionFrame.Parent = parentZone
 	addCorner(SectionFrame, 8)
 	addStroke(SectionFrame, Color3.fromRGB(255,255,255), 1, 0.94)
-	
+
 	local SecLayout = Instance.new("UIListLayout")
 	SecLayout.SortOrder = Enum.SortOrder.LayoutOrder
 	SecLayout.Padding = UDim.new(0, 9)
 	SecLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 	SecLayout.Parent = SectionFrame
-	
+
 	local SecPadding = Instance.new("UIPadding")
 	SecPadding.PaddingTop = UDim.new(0, 28)
 	SecPadding.PaddingBottom = UDim.new(0, 12)
 	SecPadding.Parent = SectionFrame
-	
+
 	local SecTitle = Instance.new("TextLabel")
 	SecTitle.Size = UDim2.new(1, -20, 0, 16)
 	SecTitle.Position = UDim2.new(0, 10, 0, 6)
@@ -881,25 +881,25 @@ function Menu:AddSection(tabData, side, title)
 	SecTitle.TextSize = 12
 	SecTitle.TextColor3 = Color3.fromRGB(0, 200, 255)
 	SecTitle.TextXAlignment = Enum.TextXAlignment.Left
-	-- FIX: ZIndex yükseltildi, başlık her zaman görünür
+	-- FIX: ZIndex yÃ¼kseltildi, baÅŸlÄ±k her zaman gÃ¶rÃ¼nÃ¼r
 	SecTitle.ZIndex = 3
 	SecTitle.Parent = SectionFrame
-	
+
 	SecLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
 		SectionFrame.Size = UDim2.new(1, -6, 0, SecLayout.AbsoluteContentSize.Y + 38)
 	end)
-	
+
 	local elements = {}
-	
+
 	local function createKeybindEngine(parentFrame, name, defaultKey, callback)
 		local currentKey = defaultKey or Enum.KeyCode.E
 		local binding = false
 		local isToggleMode = false
 		local toggleState = false
-		
+
 		local info = debug.info(callback, "a")
 		if info and info > 0 then isToggleMode = true end
-		
+
 		local BindBtn = Instance.new("TextButton")
 		BindBtn.Size = UDim2.new(0, 65, 0, 18)
 		BindBtn.Position = UDim2.new(1, -70, 0.5, -9)
@@ -912,14 +912,14 @@ function Menu:AddSection(tabData, side, title)
 		BindBtn.Parent = parentFrame
 		addCorner(BindBtn, 4)
 		addStroke(BindBtn, Color3.fromRGB(0, 200, 255), 1, 0.7)
-		
+
 		BindBtn.MouseButton1Click:Connect(function()
 			binding = true
 			BindBtn.Text = "..."
 			BindBtn:FindFirstChildOfClass("UIStroke").Color = Color3.fromRGB(255, 255, 255)
 			playSound(SFX.Click, 0.4)
 		end)
-		
+
 		UserInputService.InputBegan:Connect(function(input, gpe)
 			if gpe then return end
 			if binding then
@@ -954,7 +954,7 @@ function Menu:AddSection(tabData, side, title)
 		LabelFrame.Size = UDim2.new(0.94, 0, 0, 24)
 		LabelFrame.BackgroundTransparency = 1
 		LabelFrame.Parent = SectionFrame
-		
+
 		local TextLbl = Instance.new("TextLabel")
 		TextLbl.Size = UDim2.new(1, 0, 1, 0)
 		TextLbl.BackgroundTransparency = 1
@@ -964,7 +964,7 @@ function Menu:AddSection(tabData, side, title)
 		TextLbl.TextSize = 13
 		TextLbl.TextXAlignment = Enum.TextXAlignment.Left
 		TextLbl.Parent = LabelFrame
-		
+
 		local labelObject = {}
 		function labelObject:UpdateText(newText)
 			TextLbl.Text = newText
@@ -987,7 +987,7 @@ function Menu:AddSection(tabData, side, title)
 		Btn.Parent = SectionFrame
 		addCorner(Btn, 5)
 		addStroke(Btn, Color3.fromRGB(255,255,255), 1, 0.95)
-		
+
 		Btn.MouseEnter:Connect(function()
 			playSound(SFX.Hover, 0.2)
 			TweenService:Create(Btn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(36, 46, 58), TextColor3 = Color3.fromRGB(255,255,255)}):Play()
@@ -1002,7 +1002,7 @@ function Menu:AddSection(tabData, side, title)
 			callback()
 		end)
 	end
-	
+
 	function elements:AddToggle(name, default, callback)
 		local state = default or false
 		local ToggleFrame = Instance.new("TextButton")
@@ -1010,7 +1010,7 @@ function Menu:AddSection(tabData, side, title)
 		ToggleFrame.BackgroundTransparency = 1
 		ToggleFrame.Text = ""
 		ToggleFrame.Parent = SectionFrame
-		
+
 		local Indicator = Instance.new("Frame")
 		Indicator.Size = UDim2.new(0, 16, 0, 16)
 		Indicator.Position = UDim2.new(0, 4, 0.5, -8)
@@ -1018,7 +1018,7 @@ function Menu:AddSection(tabData, side, title)
 		Indicator.Parent = ToggleFrame
 		addCorner(Indicator, 4)
 		addStroke(Indicator, Color3.fromRGB(255,255,255), 1, 0.9)
-		
+
 		local InnerGlow = Instance.new("Frame")
 		InnerGlow.Size = UDim2.new(0, 0, 0, 0)
 		InnerGlow.Position = UDim2.new(0.5, 0, 0.5, 0)
@@ -1026,7 +1026,7 @@ function Menu:AddSection(tabData, side, title)
 		InnerGlow.BackgroundTransparency = 0.5
 		InnerGlow.Parent = Indicator
 		addCorner(InnerGlow, 4)
-		
+
 		local Label = Instance.new("TextLabel")
 		Label.Size = UDim2.new(1, -30, 1, 0)
 		Label.Position = UDim2.new(0, 30, 0, 0)
@@ -1037,22 +1037,22 @@ function Menu:AddSection(tabData, side, title)
 		Label.TextSize = 14
 		Label.TextXAlignment = Enum.TextXAlignment.Left
 		Label.Parent = ToggleFrame
-		
+
 		local function updateToggle(forceState)
 			if forceState ~= nil then state = forceState else state = not state end
 			if state then playSound(SFX.ToggleOn, 0.5) else playSound(SFX.ToggleOff, 0.5) end
 			TweenService:Create(Indicator, TweenInfo.new(0.2), {BackgroundColor3 = state and Color3.fromRGB(0, 200, 255) or Color3.fromRGB(35, 42, 50)}):Play()
 			TweenService:Create(Label, TweenInfo.new(0.2), {TextColor3 = state and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(160, 165, 170)}):Play()
-			
+
 			InnerGlow.Size = UDim2.new(0,0,0,0)
 			InnerGlow.Position = UDim2.new(0.5,0,0.5,0)
 			InnerGlow.BackgroundTransparency = 0.3
 			TweenService:Create(InnerGlow, TweenInfo.new(0.25), {Size = UDim2.new(1,0,1,0), Position = UDim2.new(0,0,0,0), BackgroundTransparency = 1}):Play()
 			callback(state)
 		end
-		
+
 		ToggleFrame.MouseButton1Click:Connect(function() updateToggle() end)
-		
+
 		local toggleObject = {}
 		function toggleObject:AddKeybind(keyString, internalCallback)
 			local keyCode = Enum.KeyCode[keyString]
@@ -1063,13 +1063,13 @@ function Menu:AddSection(tabData, side, title)
 		end
 		return toggleObject
 	end
-	
+
 	function elements:AddSlider(name, min, max, default, callback)
 		local SliderFrame = Instance.new("Frame")
 		SliderFrame.Size = UDim2.new(0.94, 0, 0, 42)
 		SliderFrame.BackgroundTransparency = 1
 		SliderFrame.Parent = SectionFrame
-		
+
 		local Label = Instance.new("TextLabel")
 		Label.Size = UDim2.new(1, 0, 0, 16)
 		Label.BackgroundTransparency = 1
@@ -1079,7 +1079,7 @@ function Menu:AddSection(tabData, side, title)
 		Label.TextSize = 14
 		Label.TextXAlignment = Enum.TextXAlignment.Left
 		Label.Parent = SliderFrame
-		
+
 		local ValueLabel = Instance.new("TextLabel")
 		ValueLabel.Size = UDim2.new(1, 0, 0, 16)
 		ValueLabel.BackgroundTransparency = 1
@@ -1089,7 +1089,7 @@ function Menu:AddSection(tabData, side, title)
 		ValueLabel.TextSize = 13
 		ValueLabel.TextXAlignment = Enum.TextXAlignment.Right
 		ValueLabel.Parent = SliderFrame
-		
+
 		local Track = Instance.new("TextButton")
 		Track.Size = UDim2.new(1, 0, 0, 6)
 		Track.Position = UDim2.new(0, 0, 0, 26)
@@ -1098,14 +1098,14 @@ function Menu:AddSection(tabData, side, title)
 		Track.AutoButtonColor = false
 		Track.Parent = SliderFrame
 		addCorner(Track, 3)
-		
+
 		local Fill = Instance.new("Frame")
 		Fill.Size = UDim2.new(((default or min) - min) / (max - min), 0, 1, 0)
 		Fill.BackgroundColor3 = Color3.fromRGB(0, 200, 255)
 		Fill.BorderSizePixel = 0
 		Fill.Parent = Track
 		addCorner(Fill, 3)
-		
+
 		local SliderKnob = Instance.new("Frame")
 		SliderKnob.Size = UDim2.new(0, 10, 0, 10)
 		SliderKnob.Position = UDim2.new(1, -5, 0.5, -5)
@@ -1113,7 +1113,7 @@ function Menu:AddSection(tabData, side, title)
 		SliderKnob.Parent = Fill
 		addCorner(SliderKnob, 5)
 		addStroke(SliderKnob, Color3.fromRGB(0,200,255), 1, 0.3)
-		
+
 		local function updateSlider(input)
 			local absWidth = Track.AbsoluteSize.X
 			local absPos = Track.AbsolutePosition.X
@@ -1121,12 +1121,12 @@ function Menu:AddSection(tabData, side, title)
 			local percent = relX / absWidth
 			local rawVal = min + (percent * (max - min))
 			local finalVal = math.floor(rawVal * 100) / 100
-			
+
 			TweenService:Create(Fill, TweenInfo.new(0.08, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Size = UDim2.new(percent, 0, 1, 0)}):Play()
 			ValueLabel.Text = tostring(finalVal)
 			callback(finalVal)
 		end
-		
+
 		local sliding = false
 		Track.InputBegan:Connect(function(input)
 			if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
@@ -1136,13 +1136,13 @@ function Menu:AddSection(tabData, side, title)
 				TweenService:Create(SliderKnob, TweenInfo.new(0.12), {Size = UDim2.new(0, 14, 0, 14), Position = UDim2.new(1, -7, 0.5, -7), BackgroundColor3 = Color3.fromRGB(0,200,255)}):Play()
 			end
 		end)
-		
+
 		UserInputService.InputChanged:Connect(function(input)
 			if sliding and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
 				updateSlider(input)
 			end
 		end)
-		
+
 		UserInputService.InputEnded:Connect(function(input)
 			if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
 				sliding = false
@@ -1150,13 +1150,13 @@ function Menu:AddSection(tabData, side, title)
 			end
 		end)
 	end
-	
+
 	function elements:AddKeybind(name, defaultKey, callback)
 		local BindFrame = Instance.new("Frame")
 		BindFrame.Size = UDim2.new(0.94, 0, 0, 30)
 		BindFrame.BackgroundTransparency = 1
 		BindFrame.Parent = SectionFrame
-		
+
 		local Label = Instance.new("TextLabel")
 		Label.Size = UDim2.new(0.6, 0, 1, 0)
 		Label.BackgroundTransparency = 1
@@ -1166,7 +1166,7 @@ function Menu:AddSection(tabData, side, title)
 		Label.TextSize = 14
 		Label.TextXAlignment = Enum.TextXAlignment.Left
 		Label.Parent = BindFrame
-		
+
 		createKeybindEngine(BindFrame, name, defaultKey, callback)
 	end
 
@@ -1212,18 +1212,25 @@ function Menu:AddSection(tabData, side, title)
 			callback(InputBox.Text, enterPressed)
 		end)
 	end
-	
+
+	-- ==========================================================
+	-- FIX: AddDropdown â€” liste artÄ±k gerÃ§ek bir ScrollingFrame.
+	-- Ã–nceden ListContainer normal bir Frame idi ve ClipsDescendants
+	-- ile taÅŸan Ã¶ÄŸeler sadece gizleniyordu, kaydÄ±rÄ±lamÄ±yordu.
+	-- Åimdi Ã¶ÄŸe sayÄ±sÄ± ne olursa olsun CanvasSize gÃ¼ncelleniyor ve
+	-- kullanÄ±cÄ± liste iÃ§inde parmaÄŸÄ±yla / fare tekerleÄŸiyle kaydÄ±rabiliyor.
+	-- ==========================================================
 	function elements:AddDropdown(name, list, isMulti, callback)
 		local dropped = false
 		local selectedItems = {}
 		if not isMulti then selectedItems = {list[1] or "None"} end
-		
+
 		local DropFrame = Instance.new("Frame")
 		DropFrame.Size = UDim2.new(0.94, 0, 0, 48)
 		DropFrame.BackgroundTransparency = 1
 		DropFrame.ZIndex = 5
 		DropFrame.Parent = SectionFrame
-		
+
 		local Label = Instance.new("TextLabel")
 		Label.Size = UDim2.new(1, 0, 0, 16)
 		Label.BackgroundTransparency = 1
@@ -1233,7 +1240,7 @@ function Menu:AddSection(tabData, side, title)
 		Label.TextSize = 13
 		Label.TextXAlignment = Enum.TextXAlignment.Left
 		Label.Parent = DropFrame
-		
+
 		local ActionBtn = Instance.new("TextButton")
 		ActionBtn.Size = UDim2.new(1, 0, 0, 26)
 		ActionBtn.Position = UDim2.new(0, 0, 0, 20)
@@ -1248,36 +1255,53 @@ function Menu:AddSection(tabData, side, title)
 		ActionBtn.Parent = DropFrame
 		addCorner(ActionBtn, 5)
 		addStroke(ActionBtn, Color3.fromRGB(255,255,255), 1, 0.94)
-		
+
 		local Arrow = Instance.new("TextLabel")
 		Arrow.Size = UDim2.new(0, 24, 1, 0)
 		Arrow.Position = UDim2.new(1, -24, 0, 0)
 		Arrow.BackgroundTransparency = 1
-		Arrow.Text = "▼"
+		Arrow.Text = "â–¼"
 		Arrow.TextColor3 = Color3.fromRGB(120, 125, 130)
 		Arrow.Font = Enum.Font.SourceSansBold
 		Arrow.TextSize = 10
 		Arrow.ZIndex = 7
 		Arrow.Parent = ActionBtn
-		
-		local ListContainer = Instance.new("Frame")
+
+		-- FIX: Frame -> ScrollingFrame. KaydÄ±rma Ã§ubuÄŸu eklendi.
+		local MAX_LIST_HEIGHT = 160
+		local ITEM_HEIGHT = 24
+
+		local ListContainer = Instance.new("ScrollingFrame")
 		ListContainer.Size = UDim2.new(1, 0, 0, 0)
 		ListContainer.Position = UDim2.new(0, 0, 1, 2)
 		ListContainer.BackgroundColor3 = Color3.fromRGB(16, 20, 26)
 		ListContainer.ClipsDescendants = true
 		ListContainer.ZIndex = 50
+		-- FIX: kaydÄ±rma Ã§ubuÄŸu ve davranÄ±ÅŸÄ±
+		ListContainer.ScrollBarThickness = 3
+		ListContainer.ScrollBarImageColor3 = Color3.fromRGB(0, 200, 255)
+		ListContainer.ScrollingDirection = Enum.ScrollingDirection.Y
+		ListContainer.CanvasSize = UDim2.new(0, 0, 0, #list * ITEM_HEIGHT)
+		-- FIX: fare tekerleÄŸi / dokunmatik ile kaydÄ±rma Ã¶nceliÄŸi bu frame'de
+		ListContainer.ScrollingEnabled = true
+		ListContainer.ElasticBehavior = Enum.ElasticBehavior.Always
 		ListContainer.Parent = ActionBtn
 		addCorner(ListContainer, 5)
 		addStroke(ListContainer, Color3.fromRGB(0, 200, 255), 1, 0.7)
-		
+
 		local ListLayout = Instance.new("UIListLayout")
 		ListLayout.SortOrder = Enum.SortOrder.LayoutOrder
 		ListLayout.Parent = ListContainer
-		
+
+		-- FIX: iÃ§erik boyu deÄŸiÅŸtiÄŸinde (dinamik liste gÃ¼ncellemelerinde) CanvasSize otomatik gÃ¼ncellenir
+		ListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+			ListContainer.CanvasSize = UDim2.new(0, 0, 0, ListLayout.AbsoluteContentSize.Y)
+		end)
+
 		local function toggleDropdown()
 			dropped = not dropped
 			playSound(SFX.Click, 0.4)
-			
+
 			if dropped then
 				parentZone.ZIndex = 10
 				SectionFrame.ZIndex = 10
@@ -1293,17 +1317,24 @@ function Menu:AddSection(tabData, side, title)
 					end
 				end)
 			end
-			
-			local targetHeight = dropped and math.clamp(#list * 24, 0, 160) or 0
+
+			-- FIX: iÃ§erik MAX_LIST_HEIGHT'ten uzunsa kutu sabit yÃ¼kseklikte kalÄ±r
+			-- ve ScrollingFrame kaydÄ±rma ile fazlalÄ±ÄŸÄ± gÃ¶sterir
+			local targetHeight = dropped and math.clamp(#list * ITEM_HEIGHT, 0, MAX_LIST_HEIGHT) or 0
 			TweenService:Create(ListContainer, TweenInfo.new(0.25, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {Size = UDim2.new(1, 0, 0, targetHeight)}):Play()
 			TweenService:Create(Arrow, TweenInfo.new(0.2), {Rotation = dropped and 180 or 0, TextColor3 = dropped and Color3.fromRGB(0, 200, 255) or Color3.fromRGB(120, 125, 130)}):Play()
+
+			-- FIX: her aÃ§Ä±lÄ±ÅŸta en Ã¼ste sÄ±fÄ±rla
+			if dropped then
+				ListContainer.CanvasPosition = Vector2.new(0, 0)
+			end
 		end
-		
+
 		ActionBtn.MouseButton1Click:Connect(toggleDropdown)
-		
+
 		for _, item in pairs(list) do
 			local ItemBtn = Instance.new("TextButton")
-			ItemBtn.Size = UDim2.new(1, 0, 0, 24)
+			ItemBtn.Size = UDim2.new(1, 0, 0, ITEM_HEIGHT)
 			ItemBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 255)
 			ItemBtn.BackgroundTransparency = 1
 			ItemBtn.Text = "  " .. tostring(item)
@@ -1314,7 +1345,7 @@ function Menu:AddSection(tabData, side, title)
 			ItemBtn.ZIndex = 55
 			ItemBtn.AutoButtonColor = false
 			ItemBtn.Parent = ListContainer
-			
+
 			ItemBtn.MouseEnter:Connect(function()
 				if not table.find(selectedItems, item) then
 					TweenService:Create(ItemBtn, TweenInfo.new(0.15), {BackgroundTransparency = 0.9, TextColor3 = Color3.fromRGB(255,255,255)}):Play()
@@ -1325,7 +1356,7 @@ function Menu:AddSection(tabData, side, title)
 					TweenService:Create(ItemBtn, TweenInfo.new(0.15), {BackgroundTransparency = 1, TextColor3 = Color3.fromRGB(190, 195, 200)}):Play()
 				end
 			end)
-			
+
 			ItemBtn.MouseButton1Click:Connect(function()
 				if isMulti then
 					local idx = table.find(selectedItems, item)
@@ -1346,16 +1377,16 @@ function Menu:AddSection(tabData, side, title)
 			end)
 		end
 	end
-	
+
 	function elements:AddColorpicker(name, defaultColor, callback)
 		local opened = false
 		local color = defaultColor or Color3.fromRGB(0, 200, 255)
-		
+
 		local CpFrame = Instance.new("Frame")
 		CpFrame.Size = UDim2.new(0.94, 0, 0, 30)
 		CpFrame.BackgroundTransparency = 1
 		CpFrame.Parent = SectionFrame
-		
+
 		local Label = Instance.new("TextLabel")
 		Label.Size = UDim2.new(0.6, 0, 1, 0)
 		Label.BackgroundTransparency = 1
@@ -1365,7 +1396,7 @@ function Menu:AddSection(tabData, side, title)
 		Label.TextSize = 14
 		Label.TextXAlignment = Enum.TextXAlignment.Left
 		Label.Parent = CpFrame
-		
+
 		local BoxTrigger = Instance.new("TextButton")
 		BoxTrigger.Size = UDim2.new(0, 34, 0, 18)
 		BoxTrigger.Position = UDim2.new(1, -34, 0.5, -9)
@@ -1375,7 +1406,7 @@ function Menu:AddSection(tabData, side, title)
 		BoxTrigger.Parent = CpFrame
 		addCorner(BoxTrigger, 4)
 		addStroke(BoxTrigger, Color3.fromRGB(255,255,255), 1, 0.6)
-		
+
 		local PaletteContainer = Instance.new("Frame")
 		PaletteContainer.Size = UDim2.new(0, 160, 0, 24)
 		PaletteContainer.Position = UDim2.new(1, -165, 1, 4)
@@ -1386,24 +1417,24 @@ function Menu:AddSection(tabData, side, title)
 		PaletteContainer.Parent = BoxTrigger
 		addCorner(PaletteContainer, 5)
 		addStroke(PaletteContainer, Color3.fromRGB(0, 200, 255), 1, 0.5)
-		
+
 		local UILayout = Instance.new("UIListLayout")
 		UILayout.FillDirection = Enum.FillDirection.Horizontal
 		UILayout.SortOrder = Enum.SortOrder.LayoutOrder
 		UILayout.Parent = PaletteContainer
-		
+
 		local presetColors = {
 			Color3.fromRGB(255,0,0), Color3.fromRGB(255,127,0), Color3.fromRGB(255,255,0),
 			Color3.fromRGB(0,255,0), Color3.fromRGB(0,200,255), Color3.fromRGB(0,0,255),
 			Color3.fromRGB(139,0,255), Color3.fromRGB(255,255,255), Color3.fromRGB(0,0,0)
 		}
-		
+
 		BoxTrigger.MouseButton1Click:Connect(function()
 			opened = not opened
 			playSound(SFX.Click, 0.4)
 			PaletteContainer.Visible = opened
 		end)
-		
+
 		for i, pColor in pairs(presetColors) do
 			local ColorBlock = Instance.new("TextButton")
 			ColorBlock.Size = UDim2.new(1/#presetColors, 0, 1, 0)
@@ -1411,7 +1442,7 @@ function Menu:AddSection(tabData, side, title)
 			ColorBlock.Text = ""
 			ColorBlock.ZIndex = 16
 			ColorBlock.Parent = PaletteContainer
-			
+
 			ColorBlock.MouseButton1Click:Connect(function()
 				color = pColor
 				BoxTrigger.BackgroundColor3 = color
@@ -1422,7 +1453,7 @@ function Menu:AddSection(tabData, side, title)
 			end)
 		end
 	end
-	
+
 	return elements
 end
 
