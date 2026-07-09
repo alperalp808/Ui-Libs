@@ -1,510 +1,113 @@
-local TweenService = game:GetService("TweenService")
-local UserInputService = game:GetService("UserInputService")
-local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
-local Stats = game:GetService("Stats")
-local ContentProvider = game:GetService("ContentProvider")
-local MarketplaceService = game:GetService("MarketplaceService")
-local LocalPlayer = Players.LocalPlayer
-
-local PlaceName = "Bilinmeyen Oyun"
-pcall(function()
-	local success, info = pcall(function() return MarketplaceService:GetProductInfo(game.PlaceId) end)
-	if success and info then PlaceName = info.Name end
-end)
-
-local function playSound(soundId, volume, pitch)
-	local sound = Instance.new("Sound")
-	sound.SoundId = "rbxassetid://" .. tostring(soundId)
-	sound.Volume = volume or 0.5
-	sound.Pitch = pitch or 1
-	sound.Parent = game:GetService("SoundService")
-	sound:Play()
-	sound.Ended:Connect(function() sound:Destroy() end)
-end
-
-local SFX = {
-	Click = 6895079853,
-	Hover = 6895079656,
-	ToggleOn = 8594301550,
-	ToggleOff = 8594301720,
-	Open = 9114223164,
-	Close = 9114222991,
-	Notify = 6895080031
-}
-
--- ==========================================================
--- THEME SYSTEM CONFIGURATION
--- ==========================================================
-local Themes = {
-	Aqua = {
-		MainBg = Color3.fromRGB(12, 16, 20),
-		HeaderBg = Color3.fromRGB(18, 24, 30),
-		Accent = Color3.fromRGB(0, 200, 255),
-		TextMain = Color3.fromRGB(255, 255, 255),
-		TextSub = Color3.fromRGB(180, 185, 190),
-		ElementBg = Color3.fromRGB(24, 30, 38)
-	},
-	Inferno = {
-		MainBg = Color3.fromRGB(20, 10, 10),
-		HeaderBg = Color3.fromRGB(30, 14, 14),
-		Accent = Color3.fromRGB(255, 50, 50),
-		TextMain = Color3.fromRGB(255, 240, 240),
-		TextSub = Color3.fromRGB(190, 160, 160),
-		ElementBg = Color3.fromRGB(38, 20, 20)
-	},
-	Ocean = {
-		MainBg = Color3.fromRGB(8, 14, 24),
-		HeaderBg = Color3.fromRGB(12, 20, 36),
-		Accent = Color3.fromRGB(30, 100, 255),
-		TextMain = Color3.fromRGB(240, 245, 255),
-		TextSub = Color3.fromRGB(160, 175, 195),
-		ElementBg = Color3.fromRGB(18, 28, 45)
-	},
-	Night = {
-		MainBg = Color3.fromRGB(10, 10, 10),
-		HeaderBg = Color3.fromRGB(18, 18, 18),
-		Accent = Color3.fromRGB(140, 140, 140),
-		TextMain = Color3.fromRGB(240, 240, 240),
-		TextSub = Color3.fromRGB(150, 150, 150),
-		ElementBg = Color3.fromRGB(22, 22, 22)
-	},
-	Heaven = {
-		MainBg = Color3.fromRGB(240, 242, 245),
-		HeaderBg = Color3.fromRGB(255, 255, 255),
-		Accent = Color3.fromRGB(0, 120, 255),
-		TextMain = Color3.fromRGB(30, 35, 40),
-		TextSub = Color3.fromRGB(100, 105, 115),
-		ElementBg = Color3.fromRGB(220, 225, 232)
-	}
-}
+-- =============================================================================
+-- AQUA PREMIUM - WINDOW OLUŞTURMA MOTORU (SOL PANEL EKSİKSİZ TAM SÜRÜM)
+-- =============================================================================
 
 local Menu = {}
 Menu.__index = Menu
 
-local function addCorner(parent, radius)
-	local corner = Instance.new("UICorner")
-	corner.CornerRadius = UDim.new(0, radius or 8)
-	corner.Parent = parent
-	return corner
+-- Gerekli Servisler
+local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local LocalPlayer = Players.LocalPlayer
+
+-- Tema Deposu (Gelişmiş Renk Paletleri)
+local Themes = {
+	Aqua = {
+		MainBg = Color3.fromRGB(15, 20, 28),
+		HeaderBg = Color3.fromRGB(22, 31, 43),
+		ElementBg = Color3.fromRGB(28, 39, 55),
+		Accent = Color3.fromRGB(0, 190, 255),
+		TextMain = Color3.fromRGB(255, 255, 255),
+		TextSub = Color3.fromRGB(160, 175, 190)
+	},
+	Inferno = {
+		MainBg = Color3.fromRGB(20, 10, 10),
+		HeaderBg = Color3.fromRGB(32, 15, 15),
+		ElementBg = Color3.fromRGB(45, 20, 20),
+		Accent = Color3.fromRGB(255, 60, 60),
+		TextMain = Color3.fromRGB(255, 255, 255),
+		TextSub = Color3.fromRGB(190, 140, 140)
+	}
+}
+
+-- Ses Efektleri (SFX)
+local SFX = {
+	Click = "rbxassetid://8594181422",
+	Close = "rbxassetid://6801456024"
+}
+
+-- YARDIMCI FONKSİYONLAR (UI Çizim ve Sürükleme Sistemleri)
+local function playSound(assetId, volume)
+	local s = Instance.new("Sound", game:GetService("CoreGui"))
+	s.SoundId = assetId
+	s.Volume = volume or 0.5
+	s.PlayOnRemove = true
+	s:Destroy()
 end
 
-local function addStroke(parent, color, thickness, transparency)
-	local stroke = Instance.new("UIStroke")
-	stroke.Color = color or Color3.fromRGB(45, 55, 65)
-	stroke.Thickness = thickness or 1
-	stroke.Transparency = transparency or 0.5
-	stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-	stroke.Parent = parent
-	return stroke
+local function addCorner(instance, radius)
+	local c = Instance.new("UICorner")
+	c.CornerRadius = UDim.new(0, radius)
+	c.Parent = instance
+	return c
 end
 
--- Tüm cihazlarda (PC + Mobil) çalışacak hassas sürükleme fonksiyonu
-local function makeDraggable(dragFrame, targetFrame)
+local function addStroke(instance, color, thickness, transparency)
+	local s = Instance.new("UIStroke")
+	s.Color = color
+	s.Thickness = thickness or 1
+	s.Transparency = transparency or 0
+	s.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+	s.Parent = instance
+	return s
+end
+
+local function makeDraggable(clickFrame, objectToMove)
 	local dragging, dragInput, dragStart, startPos
-	
-	dragFrame.InputBegan:Connect(function(input)
+	clickFrame.InputBegan:Connect(function(input)
 		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
 			dragging = true
 			dragStart = input.Position
-			startPos = targetFrame.Position
+			startPos = objectToMove.Position
 			input.Changed:Connect(function()
 				if input.UserInputState == Enum.UserInputState.End then dragging = false end
 			end)
 		end
 	end)
-	
-	dragFrame.InputChanged:Connect(function(input)
+	clickFrame.InputChanged:Connect(function(input)
 		if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
 			dragInput = input
 		end
 	end)
-	
 	UserInputService.InputChanged:Connect(function(input)
-		if dragging and input == dragInput then
+		if input == dragInput and dragging then
 			local delta = input.Position - dragStart
-			TweenService:Create(targetFrame, TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+			TweenService:Create(objectToMove, TweenInfo.new(0.08, Enum.EasingStyle.Out), {
 				Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
 			}):Play()
 		end
 	end)
 end
 
-function Menu:Notify(title, description, duration)
-	duration = duration or 5
-	local activeTheme = self.SelectedTheme or Themes.Aqua
-	
-	local NotificationGui = LocalPlayer:WaitForChild("PlayerGui"):FindFirstChild("Aqua_NotificationGui")
-	if not NotificationGui then
-		NotificationGui = Instance.new("ScreenGui")
-		NotificationGui.Name = "Aqua_NotificationGui"
-		NotificationGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-		NotificationGui.DisplayOrder = 9999
-		NotificationGui.IgnoreGuiInset = true
-		NotificationGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
-	end
-
-	local NotifContainer = NotificationGui:FindFirstChild("Container")
-	if not NotifContainer then
-		NotifContainer = Instance.new("Frame")
-		NotifContainer.Name = "Container"
-		NotifContainer.Size = UDim2.new(0, 300, 1, -40)
-		NotifContainer.Position = UDim2.new(1, -320, 0, 20)
-		NotifContainer.BackgroundTransparency = 1
-		NotifContainer.Parent = NotificationGui
-		local layout = Instance.new("UIListLayout")
-		layout.SortOrder = Enum.SortOrder.LayoutOrder
-		layout.VerticalAlignment = Enum.VerticalAlignment.Bottom
-		layout.Padding = UDim.new(0, 10)
-		layout.Parent = NotifContainer
-	end
-
-	local Box = Instance.new("Frame")
-	Box.Size = UDim2.new(1, 0, 0, 75)
-	Box.BackgroundColor3 = activeTheme.MainBg
-	Box.BackgroundTransparency = 1
-	Box.Position = UDim2.new(1, 320, 0, 0)
-	Box.Parent = NotifContainer
-	addCorner(Box, 6)
-
-	local MainStroke = addStroke(Box, activeTheme.Accent, 1.2, 1)
-
-	local GlowLine = Instance.new("Frame")
-	GlowLine.Size = UDim2.new(1, 0, 0, 2)
-	GlowLine.Position = UDim2.new(0, 0, 1, -2)
-	GlowLine.BackgroundColor3 = activeTheme.Accent
-	GlowLine.BackgroundTransparency = 1
-	GlowLine.BorderSizePixel = 0
-	GlowLine.Parent = Box
-	addCorner(GlowLine, 2)
-
-	local Tl = Instance.new("TextLabel")
-	Tl.Size = UDim2.new(1, -20, 0, 22)
-	Tl.Position = UDim2.new(0, 10, 0, 8)
-	Tl.BackgroundTransparency = 1
-	Tl.Text = string.upper(title or "NOTIFICATION")
-	Tl.Font = Enum.Font.SourceSansBold
-	Tl.TextSize = 16
-	Tl.TextColor3 = activeTheme.TextMain
-	Tl.TextTransparency = 1
-	Tl.TextXAlignment = Enum.TextXAlignment.Left
-	Tl.Parent = Box
-
-	local Dl = Instance.new("TextLabel")
-	Dl.Size = UDim2.new(1, -20, 0, 36)
-	Dl.Position = UDim2.new(0, 10, 0, 30)
-	Dl.BackgroundTransparency = 1
-	Dl.Text = description or ""
-	Dl.Font = Enum.Font.SourceSans
-	Dl.TextSize = 15
-	Dl.TextColor3 = activeTheme.TextSub
-	Dl.TextTransparency = 1
-	Dl.TextXAlignment = Enum.TextXAlignment.Left
-	Dl.TextYAlignment = Enum.TextYAlignment.Top
-	Dl.TextWrapped = true
-	Dl.Parent = Box
-
-	playSound(SFX.Notify, 0.5)
-
-	TweenService:Create(Box, TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Position = UDim2.new(0, 0, 0, 0), BackgroundTransparency = 0.15}):Play()
-	TweenService:Create(MainStroke, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Transparency = 0.4}):Play()
-	TweenService:Create(GlowLine, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {BackgroundTransparency = 0}):Play()
-	TweenService:Create(Tl, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {TextTransparency = 0}):Play()
-	TweenService:Create(Dl, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {TextTransparency = 0}):Play()
-
-	TweenService:Create(GlowLine, TweenInfo.new(duration, Enum.EasingStyle.Linear), {Size = UDim2.new(0, 0, 0, 2)}):Play()
-
-	task.delay(duration, function()
-		local info = TweenInfo.new(0.35, Enum.EasingStyle.Quad, Enum.EasingDirection.In)
-		TweenService:Create(Box, info, {Position = UDim2.new(1, 320, 0, 0), BackgroundTransparency = 1}):Play()
-		TweenService:Create(MainStroke, info, {Transparency = 1}):Play()
-		TweenService:Create(GlowLine, info, {BackgroundTransparency = 1}):Play()
-		TweenService:Create(Tl, info, {TextTransparency = 1}):Play()
-		local finalTw = TweenService:Create(Dl, info, {TextTransparency = 1})
-		finalTw:Play()
-		finalTw.Completed:Connect(function() Box:Destroy() end)
-	end)
-end
-
--- ==========================================================
--- GÜNCELLENMİŞ KEY EKRANI (%30 DAHA DAR, MOBİL DESTEKLİ, KULLANICI EŞLEŞMELİ)
--- ==========================================================
-function Menu:_BuildKeyScreen(ScreenGui, title, credentials, config, activeTheme)
-	local KeyCanvas = Instance.new("CanvasGroup")
-	KeyCanvas.Name = "KeyCanvas"
-	-- Dikey boyut %30 daraltıldı (Eski: 300 -> Yeni: 210)
-	KeyCanvas.Size = UDim2.new(0, 360, 0, 210)
-	KeyCanvas.Position = UDim2.new(0.5, -180, 0.5, -105)
-	KeyCanvas.BackgroundTransparency = 1
-	KeyCanvas.GroupTransparency = 1
-	KeyCanvas.Parent = ScreenGui
-
-	local KeyFrame = Instance.new("Frame")
-	KeyFrame.Size = UDim2.new(1, 0, 1, 0)
-	KeyFrame.BackgroundColor3 = activeTheme.MainBg
-	KeyFrame.BackgroundTransparency = 0.1
-	KeyFrame.ClipsDescendants = true
-	KeyFrame.Parent = KeyCanvas
-	addCorner(KeyFrame, 10)
-	addStroke(KeyFrame, activeTheme.Accent, 1.2, 0.3)
-
-	local KHeader = Instance.new("Frame")
-	KHeader.Size = UDim2.new(1, 0, 0, 35)
-	KHeader.BackgroundColor3 = activeTheme.HeaderBg
-	KHeader.BackgroundTransparency = 0.2
-	KHeader.BorderSizePixel = 0
-	KHeader.Parent = KeyFrame
-	addCorner(KHeader, 10)
-	
-	-- Tüm Cihazlarda Sürükleme Desteği
-	makeDraggable(KHeader, KeyCanvas)
-
-	local KHeaderFix = Instance.new("Frame")
-	KHeaderFix.Size = UDim2.new(1, 0, 0, 10)
-	KHeaderFix.Position = UDim2.new(0, 0, 1, -10)
-	KHeaderFix.BackgroundColor3 = activeTheme.HeaderBg
-	KHeaderFix.BackgroundTransparency = 0.2
-	KHeaderFix.Parent = KHeader
-
-	local KTitle = Instance.new("TextLabel")
-	KTitle.Size = UDim2.new(1, -70, 1, 0)
-	KTitle.Position = UDim2.new(0, 14, 0, 0)
-	KTitle.BackgroundTransparency = 1
-	KTitle.Text = string.upper((title or "SIGMA PROJECT") .. " // KEY")
-	-- Yazı Tipleri Tamamen SourceSansBold/Semibold Yapılarak Belirginleştirildi
-	KTitle.Font = Enum.Font.SourceSansBold
-	KTitle.TextSize = 16
-	KTitle.TextColor3 = activeTheme.TextMain
-	KTitle.TextXAlignment = Enum.TextXAlignment.Left
-	KTitle.TextTruncate = Enum.TextTruncate.AtEnd
-	KTitle.Parent = KHeader
-
-	-- Kapatma Butonu (Sağ Üst Köşede X Sembolü)
-	local KClose = Instance.new("TextButton")
-	KClose.Size = UDim2.new(0, 26, 0, 22)
-	KClose.Position = UDim2.new(1, -32, 0.5, -11)
-	KClose.BackgroundColor3 = Color3.fromRGB(80, 30, 30)
-	KClose.BackgroundTransparency = 0.3
-	KClose.Text = "X"
-	KClose.Font = Enum.Font.SourceSansBold
-	KClose.TextSize = 14
-	KClose.TextColor3 = Color3.fromRGB(255, 100, 100)
-	KClose.AutoButtonColor = false
-	KClose.Parent = KHeader
-	addCorner(KClose, 5)
-	
-	KClose.MouseButton1Click:Connect(function()
-		playSound(SFX.Close, 0.5)
-		local outTween = TweenService:Create(KeyCanvas, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {GroupTransparency = 1, Size = UDim2.new(0, 360, 0, 0)})
-		outTween:Play()
-		outTween.Completed:Connect(function()
-			KeyCanvas:Destroy()
-			ScreenGui:Destroy()
-		end)
-	end)
-
-	local Body = Instance.new("Frame")
-	Body.Size = UDim2.new(1, -24, 1, -45)
-	Body.Position = UDim2.new(0, 12, 0, 42)
-	Body.BackgroundTransparency = 1
-	Body.Parent = KeyFrame
-
-	-- Kompakt Tasarım İçin Giriş Alanları Yan Yana Getirildi
-	local UserBox = Instance.new("TextBox")
-	UserBox.Size = UDim2.new(0.48, 0, 0, 34)
-	UserBox.Position = UDim2.new(0, 0, 0, 15)
-	UserBox.BackgroundColor3 = activeTheme.ElementBg
-	UserBox.Text = ""
-	UserBox.PlaceholderText = "Kullanıcı Adı"
-	UserBox.PlaceholderColor3 = activeTheme.TextSub
-	UserBox.TextColor3 = activeTheme.TextMain
-	UserBox.Font = Enum.Font.SourceSansSemibold
-	UserBox.TextSize = 16 -- Metin boyutları %20 büyütüldü
-	UserBox.ClearTextOnFocus = false
-	UserBox.Parent = Body
-	addCorner(UserBox, 5)
-	local UserStroke = addStroke(UserBox, activeTheme.TextSub, 1, 0.8)
-
-	local KeyBox = Instance.new("TextBox")
-	KeyBox.Size = UDim2.new(0.48, 0, 0, 34)
-	KeyBox.Position = UDim2.new(0.52, 0, 0, 15)
-	KeyBox.BackgroundColor3 = activeTheme.ElementBg
-	KeyBox.Text = ""
-	KeyBox.PlaceholderText = "Anahtar (Key)"
-	KeyBox.PlaceholderColor3 = activeTheme.TextSub
-	KeyBox.TextColor3 = activeTheme.TextMain
-	KeyBox.Font = Enum.Font.SourceSansSemibold
-	KeyBox.TextSize = 16 -- Metin boyutları %20 büyütüldü
-	KeyBox.ClearTextOnFocus = false
-	KeyBox.Parent = Body
-	addCorner(KeyBox, 5)
-	local KeyStroke2 = addStroke(KeyBox, activeTheme.TextSub, 1, 0.8)
-
-	-- Keybind İle Gizleme Ayarı Paneli
-	local BindLabel = Instance.new("TextLabel")
-	BindLabel.Size = UDim2.new(0.6, 0, 0, 24)
-	BindLabel.Position = UDim2.new(0, 4, 0, 65)
-	BindLabel.BackgroundTransparency = 1
-	BindLabel.Text = "Menü Gizleme Tuşu:"
-	BindLabel.Font = Enum.Font.SourceSansSemibold
-	BindLabel.TextSize = 15
-	BindLabel.TextColor3 = activeTheme.TextSub
-	BindLabel.TextXAlignment = Enum.TextXAlignment.Left
-	BindLabel.Parent = Body
-
-	local MenuBindBtn = Instance.new("TextButton")
-	MenuBindBtn.Size = UDim2.new(0, 100, 0, 24)
-	MenuBindBtn.Position = UDim2.new(1, -100, 0, 65)
-	MenuBindBtn.BackgroundColor3 = activeTheme.ElementBg
-	MenuBindBtn.Text = config.DefaultToggleKey and config.DefaultToggleKey.Name or "RightShift"
-	MenuBindBtn.Font = Enum.Font.SourceSansBold
-	MenuBindBtn.TextSize = 15
-	MenuBindBtn.TextColor3 = activeTheme.Accent
-	MenuBindBtn.AutoButtonColor = false
-	MenuBindBtn.Parent = Body
-	addCorner(MenuBindBtn, 5)
-	addStroke(MenuBindBtn, activeTheme.Accent, 1, 0.6)
-	
-	local listeningForBind = false
-	MenuBindBtn.MouseButton1Click:Connect(function()
-		listeningForBind = true
-		MenuBindBtn.Text = "..."
-		playSound(SFX.Click, 0.4)
-	end)
-	
-	UserInputService.InputBegan:Connect(function(input, gpe)
-		if gpe then return end
-		if listeningForBind and input.UserInputType == Enum.UserInputType.Keyboard then
-			config.DefaultToggleKey = input.KeyCode
-			MenuBindBtn.Text = input.KeyCode.Name
-			listeningForBind = false
-			playSound(SFX.ToggleOn, 0.4)
-		end
-	end)
-
-	local LoginBtn = Instance.new("TextButton")
-	LoginBtn.Size = UDim2.new(1, 0, 0, 36)
-	LoginBtn.Position = UDim2.new(0, 0, 1, -46)
-	LoginBtn.BackgroundColor3 = activeTheme.Accent
-	LoginBtn.BackgroundTransparency = 0.7
-	LoginBtn.Text = "SİSTEME GİRİŞ YAP"
-	LoginBtn.TextColor3 = activeTheme.Accent
-	LoginBtn.Font = Enum.Font.SourceSansBold
-	LoginBtn.TextSize = 16 -- Metin boyutları %20 büyütüldü
-	LoginBtn.AutoButtonColor = false
-	LoginBtn.Parent = Body
-	addCorner(LoginBtn, 6)
-	addStroke(LoginBtn, activeTheme.Accent, 1.2, 0.4)
-
-	local function shakeFrame(frame)
-		local originalPos = frame.Position
-		local offsets = {6, -6, 4, -4, 2, 0}
-		task.spawn(function()
-			for _, off in ipairs(offsets) do
-				TweenService:Create(frame, TweenInfo.new(0.035, Enum.EasingStyle.Linear), {
-					Position = UDim2.new(originalPos.X.Scale, originalPos.X.Offset + off, originalPos.Y.Scale, originalPos.Y.Offset)
-				}):Play()
-				task.wait(0.035)
-			end
-			frame.Position = originalPos
-		end)
-	end
-
-	local function wireBoxFocus(box, stroke)
-		box.Focused:Connect(function()
-			playSound(SFX.Hover, 0.2)
-			TweenService:Create(stroke, TweenInfo.new(0.2), {Color = activeTheme.Accent, Transparency = 0.3}):Play()
-		end)
-		box.FocusLost:Connect(function()
-			TweenService:Create(stroke, TweenInfo.new(0.2), {Color = activeTheme.TextSub, Transparency = 0.8}):Play()
-		end)
-	end
-	wireBoxFocus(UserBox, UserStroke)
-	wireBoxFocus(KeyBox, KeyStroke2)
-
-	local attempting = false
-	local function attemptLogin()
-		if attempting then return end
-		attempting = true
-		playSound(SFX.Click, 0.5)
-
-		local user = UserBox.Text
-		local key = KeyBox.Text
-
-		if user == "" or key == "" then
-			Menu:Notify("Giriş Başarısız", "Kullanıcı adı ve key alanları boş bırakılamaz.", 4)
-			shakeFrame(KeyFrame)
-			attempting = false
-			return
-		end
-
-		-- Belirli Kullanıcılar İçin Birebir Anahtar Eşleşme Kontrolü (Ahmet:1234, Sadullah:6767)
-		local exactMatch = credentials[user]
-		if exactMatch and tostring(exactMatch) == key then
-			-- Giriş başarılı
-		else
-			Menu:Notify("Giriş Başarısız", "Kullanıcı adı veya key eşleşmesi hatalı.", 4)
-			playSound(SFX.ToggleOff, 0.5)
-			shakeFrame(KeyFrame)
-			KeyBox.Text = ""
-			attempting = false
-			return
-		end
-
-		playSound(SFX.ToggleOn, 0.6)
-		Menu:Notify("Erişim Onaylandı", "Hoş geldin " .. user .. ", menü açılıyor...", 3)
-
-		if config.SaveKey then
-			pcall(function()
-				if writefile then
-					writefile("AquaKeySystem_SavedKey.txt", user .. ":" .. key)
-				end
-			end)
-		end
-
-		local outTween = TweenService:Create(KeyCanvas, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {GroupTransparency = 1, Size = UDim2.new(0, 360, 0, 0)})
-		outTween:Play()
-		outTween.Completed:Connect(function()
-			KeyCanvas:Destroy()
-		end)
-
-		self.KeySystemVerified = true
-	end
-
-	LoginBtn.MouseButton1Click:Connect(attemptLogin)
-
-	playSound(SFX.Open, 0.5)
-	KeyCanvas.Size = UDim2.new(0, 360, 0, 0)
-	TweenService:Create(KeyCanvas, TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Size = UDim2.new(0, 360, 0, 210), GroupTransparency = 0}):Play()
-
-	if config.SaveKey then
-		pcall(function()
-			if isfile and readfile and isfile("AquaKeySystem_SavedKey.txt") then
-				local saved = readfile("AquaKeySystem_SavedKey.txt")
-				if saved and saved ~= "" then
-					local split = string.split(saved, ":")
-					if split[1] and split[2] then
-						UserBox.Text = split[1]
-						KeyBox.Text = split[2]
-					end
-				end
-			end
-		end)
-	end
-end
-
+-- =============================================================================
+-- ANA WINDOW OLUŞTURMA FONKSİYONU
+-- =============================================================================
 function Menu:CreateWindow(title, keyName, showButton, keySystemConfig)
 	local self = setmetatable({}, Menu)
 
-	-- Tema Seçimi (Parametreden gelen MenuTheme verisine göre ayarlanır, yoksa Aqua)
+	-- Tema Kontrolü
 	keySystemConfig = keySystemConfig or {}
 	local selectedThemeName = keySystemConfig.MenuTheme or "Aqua"
 	local activeTheme = Themes[selectedThemeName] or Themes.Aqua
 	self.SelectedTheme = activeTheme
 
+	-- Eski Arayüzleri Temizleme
 	local existing = LocalPlayer:WaitForChild("PlayerGui"):FindFirstChild("AquaCSGO_PremiumMenu")
 	if existing then existing:Destroy() end
 
+	-- Ana Ekran Katmanı (ScreenGui)
 	local ScreenGui = Instance.new("ScreenGui")
 	ScreenGui.Name = "AquaCSGO_PremiumMenu"
 	ScreenGui.ResetOnSpawn = false
@@ -514,33 +117,7 @@ function Menu:CreateWindow(title, keyName, showButton, keySystemConfig)
 	ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 	self.ScreenGui = ScreenGui
 
-	local keySystemEnabled = keySystemConfig.KeySystem or keySystemConfig.Enabled or false
-	local configWrapper = {
-		Note = keySystemConfig.Note,
-		SaveKey = keySystemConfig.SaveKey,
-		DefaultToggleKey = Enum.KeyCode[keyName or "RightShift"]
-	}
-
-	if keySystemEnabled then
-		-- Kullanıcı Adı ve Şifre Listesi Tablosu Düzenlemesi
-		local credentials = {}
-		if type(keySystemConfig.Credentials) == "table" then
-			for u, k in pairs(keySystemConfig.Credentials) do
-				credentials[tostring(u)] = tostring(k)
-			end
-		elseif keySystemConfig.Key then
-			credentials["Admin"] = tostring(keySystemConfig.Key)
-		end
-
-		self.KeySystemVerified = false
-		self:_BuildKeyScreen(ScreenGui, title, credentials, configWrapper, activeTheme)
-
-		repeat task.wait() until self.KeySystemVerified
-	end
-
-	-- Global Kapatma/Açma Tuşu Güncellemesi
-	self.GlobalToggleKey = configWrapper.DefaultToggleKey
-
+	-- ANA PANEL ÇERÇEVESİ (CanvasGroup ile Yumuşak Animasyonlar)
 	local CanvasGroup = Instance.new("CanvasGroup")
 	CanvasGroup.Name = "MainCanvas"
 	CanvasGroup.Size = UDim2.new(0, 790, 0, 460)
@@ -554,18 +131,19 @@ function Menu:CreateWindow(title, keyName, showButton, keySystemConfig)
 	MainFrame.Name = "MainFrame"
 	MainFrame.Size = UDim2.new(1, 0, 1, 0)
 	MainFrame.BackgroundColor3 = activeTheme.MainBg
-	MainFrame.BackgroundTransparency = 0.25
+	MainFrame.BackgroundTransparency = 0.15
 	MainFrame.ClipsDescendants = true
 	MainFrame.Parent = CanvasGroup
 	self.MainFrame = MainFrame
 
 	addCorner(MainFrame, 10)
-	local FrameStroke = addStroke(MainFrame, activeTheme.Accent, 1.2, 0.4)
+	local FrameStroke = addStroke(MainFrame, activeTheme.Accent, 1.2, 0.3)
 
+	-- ÜST BAŞLIK (HEADER BAR)
 	local Header = Instance.new("Frame")
 	Header.Size = UDim2.new(1, 0, 0, 40)
 	Header.BackgroundColor3 = activeTheme.HeaderBg
-	Header.BackgroundTransparency = 0.3
+	Header.BackgroundTransparency = 0.2
 	Header.BorderSizePixel = 0
 	Header.ZIndex = 10
 	Header.Parent = MainFrame
@@ -575,22 +153,23 @@ function Menu:CreateWindow(title, keyName, showButton, keySystemConfig)
 	HeaderFix.Size = UDim2.new(1, 0, 0, 10)
 	HeaderFix.Position = UDim2.new(0, 0, 1, -10)
 	HeaderFix.BackgroundColor3 = activeTheme.HeaderBg
-	HeaderFix.BackgroundTransparency = 0.3
+	HeaderFix.BackgroundTransparency = 0.2
 	HeaderFix.ZIndex = 10
 	HeaderFix.Parent = Header
 
 	local TitleLabel = Instance.new("TextLabel")
-	TitleLabel.Size = UDim2.new(0, 250, 1, 0)
+	TitleLabel.Size = UDim2.new(0, 300, 1, 0)
 	TitleLabel.Position = UDim2.new(0, 18, 0, 0)
 	TitleLabel.BackgroundTransparency = 1
-	TitleLabel.Text = string.upper(title or "SIGMA PROJECT")
+	TitleLabel.Text = string.upper(title or "AQUA PREMIUM")
 	TitleLabel.Font = Enum.Font.SourceSansBold
-	TitleLabel.TextSize = 18 -- %20 büyütüldü
+	TitleLabel.TextSize = 18
 	TitleLabel.TextColor3 = activeTheme.TextMain
 	TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
 	TitleLabel.ZIndex = 10
 	TitleLabel.Parent = Header
 
+	-- KONTROL BUTONLARI (KÜÇÜLT / KAPAT)
 	local Controls = Instance.new("Frame")
 	Controls.Size = UDim2.new(0, 90, 1, 0)
 	Controls.Position = UDim2.new(1, -95, 0, 0)
@@ -626,50 +205,16 @@ function Menu:CreateWindow(title, keyName, showButton, keySystemConfig)
 	CloseBtn.Parent = Controls
 	addCorner(CloseBtn, 6)
 
-	local TabBarWrapper = Instance.new("Frame")
-	TabBarWrapper.Name = "TabBarWrapper"
-	TabBarWrapper.Size = UDim2.new(1, -314, 0, 34)
-	TabBarWrapper.Position = UDim2.new(0, 302, 0, 48)
-	TabBarWrapper.BackgroundColor3 = activeTheme.MainBg
-	TabBarWrapper.BackgroundTransparency = 0.5
-	TabBarWrapper.ClipsDescendants = true
-	TabBarWrapper.ZIndex = 5
-	TabBarWrapper.Parent = MainFrame
-	addCorner(TabBarWrapper, 6)
-
-	local TabBar = Instance.new("ScrollingFrame")
-	TabBar.Name = "TabBar"
-	TabBar.Size = UDim2.new(1, 0, 1, 0)
-	TabBar.BackgroundTransparency = 1
-	TabBar.ScrollBarThickness = 0
-	TabBar.ScrollingDirection = Enum.ScrollingDirection.X
-	TabBar.CanvasSize = UDim2.new(0, 0, 0, 0)
-	TabBar.ZIndex = 5
-	TabBar.Parent = TabBarWrapper
-
-	local TabList = Instance.new("UIListLayout")
-	TabList.FillDirection = Enum.FillDirection.Horizontal
-	TabList.SortOrder = Enum.SortOrder.LayoutOrder
-	TabList.Padding = UDim.new(0, 6)
-	TabList.Parent = TabBar
-
-	local TabPadding = Instance.new("UIPadding")
-	TabPadding.PaddingLeft = UDim.new(0, 6)
-	TabPadding.PaddingTop = UDim.new(0, 4)
-	TabPadding.Parent = TabBar
-
-	TabList:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-		TabBar.CanvasSize = UDim2.new(0, TabList.AbsoluteContentSize.X + 12, 0, 0)
-	end)
-
+	-- İÇERİK ALANI (SAĞ TARAF)
 	local Container = Instance.new("Frame")
-	Container.Size = UDim2.new(1, -314, 1, -98)
-	Container.Position = UDim2.new(0, 302, 0, 88)
+	Container.Size = UDim2.new(1, -314, 1, -52)
+	Container.Position = UDim2.new(0, 302, 0, 48)
 	Container.BackgroundTransparency = 1
 	Container.ClipsDescendants = true
 	Container.Parent = MainFrame
 	self.Container = Container
 
+	-- SAĞ ALT RESIZE (BOYUTLANDIRMA) TUTAMACI
 	local ResizeGrip = Instance.new("ImageButton")
 	ResizeGrip.Size = UDim2.new(0, 16, 0, 16)
 	ResizeGrip.Position = UDim2.new(1, -16, 1, -16)
@@ -679,10 +224,9 @@ function Menu:CreateWindow(title, keyName, showButton, keySystemConfig)
 	ResizeGrip.ZIndex = 12
 	ResizeGrip.Parent = MainFrame
 
-	-- Header Sürükleme (PC + Mobil Uyumlu)
 	makeDraggable(Header, CanvasGroup)
 
-	-- Resize İşlemi Altyapısı
+	-- Dinamik Boyutlandırma Motoru
 	local resizing, resizeStart, startSize
 	ResizeGrip.InputBegan:Connect(function(input)
 		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
@@ -704,78 +248,99 @@ function Menu:CreateWindow(title, keyName, showButton, keySystemConfig)
 		end
 	end)
 
+	-- =============================================================================
+	-- 🛠 SİLİNEN ÖZELLİK: GERİ GETİRİLEN SOL DIAGNOSTICS & PROFiL PANELİ
+	-- =============================================================================
 	local DiagnosticFrame = Instance.new("Frame")
 	DiagnosticFrame.Name = "Hardcoded_DiagnosticsPanel"
 	DiagnosticFrame.Size = UDim2.new(0, 278, 1, -52)
 	DiagnosticFrame.Position = UDim2.new(0, 12, 0, 48)
-	DiagnosticFrame.BackgroundColor3 = activeTheme.MainBg
-	DiagnosticFrame.BackgroundTransparency = 0.4
+	DiagnosticFrame.BackgroundColor3 = activeTheme.HeaderBg
+	DiagnosticFrame.BackgroundTransparency = 0.5
 	DiagnosticFrame.Parent = MainFrame
 	addCorner(DiagnosticFrame, 8)
-	addStroke(DiagnosticFrame, activeTheme.Accent, 1, 0.7)
+	addStroke(DiagnosticFrame, activeTheme.Accent, 1, 0.6)
 
+	-- Oyuncu Profil Resmi (Avatar)
 	local AvatarImage = Instance.new("ImageLabel")
 	AvatarImage.Size = UDim2.new(0, 46, 0, 46)
-	AvatarImage.Position = UDim2.new(0, 14, 0, 10)
+	AvatarImage.Position = UDim2.new(0, 14, 0, 14)
 	AvatarImage.BackgroundColor3 = activeTheme.ElementBg
 	AvatarImage.Parent = DiagnosticFrame
 	addCorner(AvatarImage, 23)
-	addStroke(AvatarImage, activeTheme.Accent, 1, 0.5)
+	addStroke(AvatarImage, activeTheme.Accent, 1, 0.4)
 
-	local thumbType = Enum.ThumbnailType.HeadShot
-	local thumbSize = Enum.ThumbnailSize.Size150x150
-	local content, isReady = Players:GetUserThumbnailAsync(LocalPlayer.UserId, thumbType, thumbSize)
-	if isReady then AvatarImage.Image = content end
+	task.spawn(function()
+		local thumbType = Enum.ThumbnailType.HeadShot
+		local thumbSize = Enum.ThumbnailSize.Size150x150
+		local content, isReady = Players:GetUserThumbnailAsync(LocalPlayer.UserId, thumbType, thumbSize)
+		if isReady then AvatarImage.Image = content end
+	end)
 
+	-- Oyuncu Display Name & Kullanıcı Adı Bilgisi
 	local DisplayNameLabel = Instance.new("TextLabel")
 	DisplayNameLabel.Size = UDim2.new(1, -78, 0, 18)
-	DisplayNameLabel.Position = UDim2.new(0, 72, 0, 12)
+	DisplayNameLabel.Position = UDim2.new(0, 72, 0, 16)
 	DisplayNameLabel.BackgroundTransparency = 1
 	DisplayNameLabel.Text = LocalPlayer.DisplayName
 	DisplayNameLabel.Font = Enum.Font.SourceSansBold
-	DisplayNameLabel.TextSize = 16
+	DisplayNameLabel.TextSize = 15
 	DisplayNameLabel.TextColor3 = activeTheme.TextMain
 	DisplayNameLabel.TextXAlignment = Enum.TextXAlignment.Left
 	DisplayNameLabel.Parent = DiagnosticFrame
 
+	local UsernameLabel = Instance.new("TextLabel")
+	UsernameLabel.Size = UDim2.new(1, -78, 0, 14)
+	UsernameLabel.Position = UDim2.new(0, 72, 0, 34)
+	UsernameLabel.BackgroundTransparency = 1
+	UsernameLabel.Text = "@" .. LocalPlayer.Name
+	UsernameLabel.Font = Enum.Font.SourceSans
+	UsernameLabel.TextSize = 13
+	UsernameLabel.TextColor3 = activeTheme.TextSub
+	UsernameLabel.TextXAlignment = Enum.TextXAlignment.Left
+	UsernameLabel.Parent = DiagnosticFrame
+
+	-- Performans ve Sunucu Durum Kutusu (FPS vb.)
 	local ServerInfoFrame = Instance.new("Frame")
-	ServerInfoFrame.Size = UDim2.new(1, -24, 0, 75)
-	ServerInfoFrame.Position = UDim2.new(0, 12, 0, 62)
+	ServerInfoFrame.Size = UDim2.new(1, -24, 1, -85)
+	ServerInfoFrame.Position = UDim2.new(0, 12, 0, 72)
 	ServerInfoFrame.BackgroundColor3 = activeTheme.MainBg
-	ServerInfoFrame.BackgroundTransparency = 0.5
+	ServerInfoFrame.BackgroundTransparency = 0.4
 	ServerInfoFrame.Parent = DiagnosticFrame
 	addCorner(ServerInfoFrame, 6)
+	addStroke(ServerInfoFrame, activeTheme.ElementBg, 1, 0.5)
 
 	local FpsLabel = Instance.new("TextLabel")
-	FpsLabel.Size = UDim2.new(0.5, 0, 0, 20)
-	FpsLabel.Position = UDim2.new(0, 6, 0, 50)
+	FpsLabel.Size = UDim2.new(1, -12, 0, 25)
+	FpsLabel.Position = UDim2.new(0, 10, 0, 10)
 	FpsLabel.BackgroundTransparency = 1
-	FpsLabel.Text = "FPS: --"
+	FpsLabel.Text = "Sistem Durumu: Hesaplanıyor..."
 	FpsLabel.Font = Enum.Font.SourceSansBold
 	FpsLabel.TextSize = 14
-	FpsLabel.TextColor3 = Color3.fromRGB(0, 255, 150)
+	FpsLabel.TextColor3 = Color3.fromRGB(0, 255, 140)
 	FpsLabel.TextXAlignment = Enum.TextXAlignment.Left
 	FpsLabel.Parent = ServerInfoFrame
 
+	-- Gerçek Zamanlı FPS Hesaplama Motoru
 	local lastIteration, frameCount = os.clock(), 0
 	RunService.RenderStepped:Connect(function()
 		frameCount = frameCount + 1
 		local currentTime = os.clock()
 		if currentTime - lastIteration >= 1 then
-			FpsLabel.Text = "FPS: " .. tostring(frameCount)
+			FpsLabel.Text = "FPS: " .. tostring(frameCount) .. " | Stabil"
 			frameCount = 0
 			lastIteration = currentTime
 		end
 	end)
 
+	-- =============================================================================
+	-- ETKİLEŞİMLER VE KAPATMA BUTON FONKSİYONLARI
+	-- =============================================================================
 	CloseBtn.MouseButton1Click:Connect(function()
 		playSound(SFX.Close, 0.6)
-		local tw = TweenService:Create(CanvasGroup, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {Size = UDim2.new(0, 790, 0, 0), GroupTransparency = 1})
+		local tw = TweenService:Create(CanvasGroup, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {Size = UDim2.new(0, 790, 0, 0), GroupTransparency = 1})
 		tw:Play()
-		tw.Completed:Connect(function()
-			if self.PersistentGui then self.PersistentGui:Destroy() end
-			ScreenGui:Destroy()
-		end)
+		tw.Completed:Connect(function() ScreenGui:Destroy() end)
 	end)
 
 	local minimized = false
@@ -783,518 +348,13 @@ function Menu:CreateWindow(title, keyName, showButton, keySystemConfig)
 		playSound(SFX.Click, 0.5)
 		minimized = not minimized
 		local targetSize = minimized and UDim2.new(0, 790, 0, 40) or UDim2.new(0, 790, 0, 460)
-		TweenService:Create(CanvasGroup, TweenInfo.new(0.4, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {Size = targetSize}):Play()
+		TweenService:Create(CanvasGroup, TweenInfo.new(0.35, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {Size = targetSize}):Play()
 		Container.Visible = not minimized
-		TabBarWrapper.Visible = not minimized
 		DiagnosticFrame.Visible = not minimized
 	end)
 
-	self.Tabs = {}
 	self.MenuVisible = true
-	self.IsTweeningVisibility = false
-	self.TabBar = TabBar
-
-	if keyName ~= nil or showButton ~= nil then
-		self:SetupGlobalToggle(keyName, showButton)
-	end
-
 	return self
-end
-
-function Menu:SetupGlobalToggle(keyName, showButton)
-	local function setVisibilityAnimated(state)
-		if self.IsTweeningVisibility then return end
-		self.IsTweeningVisibility = true
-		self.MenuVisible = state
-
-		local info = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-		if state then
-			self.CanvasGroup.Visible = true
-			playSound(SFX.Open, 0.45)
-			local tw = TweenService:Create(self.CanvasGroup, info, {GroupTransparency = 0})
-			tw:Play()
-			tw.Completed:Connect(function() self.IsTweeningVisibility = false end)
-		else
-			playSound(SFX.Close, 0.45)
-			local tw = TweenService:Create(self.CanvasGroup, info, {GroupTransparency = 1})
-			tw:Play()
-			tw.Completed:Connect(function()
-				self.CanvasGroup.Visible = false
-				self.IsTweeningVisibility = false
-			end)
-		end
-	end
-
-	if not self.ToggleConnection then
-		self.ToggleConnection = UserInputService.InputBegan:Connect(function(input, gpe)
-			if gpe then return end
-			if input.KeyCode == self.GlobalToggleKey then
-				setVisibilityAnimated(not self.MenuVisible)
-			end
-		end)
-	end
-
-	if showButton and not self.PersistentButton then
-		local TargetGui = LocalPlayer:WaitForChild("PlayerGui"):FindFirstChild("Aqua_PersistentControls")
-		if not TargetGui then
-			TargetGui = Instance.new("ScreenGui")
-			TargetGui.Name = "Aqua_PersistentControls"
-			TargetGui.ResetOnSpawn = false
-			TargetGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-			TargetGui.DisplayOrder = 9999
-			TargetGui.IgnoreGuiInset = true
-			TargetGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
-		end
-		self.PersistentGui = TargetGui
-
-		local PButton = Instance.new("TextButton")
-		PButton.Size = UDim2.new(0, 42, 0, 42)
-		PButton.Position = UDim2.new(0, 15, 0, 120)
-		PButton.BackgroundColor3 = self.SelectedTheme.MainBg
-		PButton.BackgroundTransparency = 0.4
-		PButton.Text = "🌊"
-		PButton.TextColor3 = self.SelectedTheme.Accent
-		PButton.Font = Enum.Font.SourceSansBold
-		PButton.TextSize = 22
-		PButton.AutoButtonColor = false
-		PButton.ZIndex = 999
-		PButton.Parent = TargetGui
-		self.PersistentButton = PButton
-
-		addCorner(PButton, 21)
-		addStroke(PButton, self.SelectedTheme.Accent, 1.2, 0.5)
-		makeDraggable(PButton, PButton)
-
-		PButton.MouseButton1Click:Connect(function()
-			setVisibilityAnimated(not self.MenuVisible)
-		end)
-	end
-end
-
-function Menu:AddTab(name)
-	local activeTheme = self.SelectedTheme
-	local TabButton = Instance.new("TextButton")
-	TabButton.Size = UDim2.new(0, 110, 0, 26)
-	TabButton.BackgroundColor3 = activeTheme.ElementBg
-	TabButton.BackgroundTransparency = 0.4
-	TabButton.Text = name
-	TabButton.Font = Enum.Font.SourceSansBold
-	TabButton.TextSize = 15 -- %20 büyük
-	TabButton.TextColor3 = activeTheme.TextSub
-	TabButton.AutoButtonColor = false
-	TabButton.Parent = self.TabBar
-	addCorner(TabButton, 5)
-	addStroke(TabButton, activeTheme.TextSub, 1, 0.9)
-
-	local TabPage = Instance.new("Frame")
-	TabPage.Size = UDim2.new(1, 0, 1, 0)
-	TabPage.BackgroundTransparency = 1
-	TabPage.Visible = false
-	TabPage.Parent = self.Container
-
-	local LeftZone = Instance.new("ScrollingFrame")
-	LeftZone.Size = UDim2.new(0.5, -6, 1, 0)
-	LeftZone.BackgroundTransparency = 1
-	LeftZone.ScrollBarThickness = 3
-	LeftZone.ScrollBarImageColor3 = activeTheme.Accent
-	LeftZone.ClipsDescendants = true
-	LeftZone.Parent = TabPage
-
-	local RightZone = Instance.new("ScrollingFrame")
-	RightZone.Size = UDim2.new(0.5, -6, 1, 0)
-	RightZone.Position = UDim2.new(0.5, 6, 0, 0)
-	RightZone.BackgroundTransparency = 1
-	RightZone.ScrollBarThickness = 3
-	RightZone.ScrollBarImageColor3 = activeTheme.Accent
-	RightZone.ClipsDescendants = true
-	RightZone.Parent = TabPage
-
-	local LList = Instance.new("UIListLayout")
-	LList.SortOrder = Enum.SortOrder.LayoutOrder
-	LList.Padding = UDim.new(0, 12)
-	LList.Parent = LeftZone
-
-	local RList = Instance.new("UIListLayout")
-	RList.SortOrder = Enum.SortOrder.LayoutOrder
-	RList.Padding = UDim.new(0, 12)
-	RList.Parent = RightZone
-
-	LList:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function() LeftZone.CanvasSize = UDim2.new(0,0,0, LList.AbsoluteContentSize.Y + 15) end)
-	RList:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function() RightZone.CanvasSize = UDim2.new(0,0,0, RList.AbsoluteContentSize.Y + 15) end)
-
-	local tabData = {Left = LeftZone, Right = RightZone, Button = TabButton, Page = TabPage}
-
-	TabButton.MouseButton1Click:Connect(function()
-		playSound(SFX.Click, 0.45)
-		for _, t in pairs(self.Tabs) do
-			t.Page.Visible = false
-			TweenService:Create(t.Button, TweenInfo.new(0.25), {TextColor3 = activeTheme.TextSub, BackgroundColor3 = activeTheme.ElementBg, BackgroundTransparency = 0.4}):Play()
-		end
-		TabPage.Visible = true
-		TweenService:Create(TabButton, TweenInfo.new(0.25), {TextColor3 = activeTheme.Accent, BackgroundColor3 = activeTheme.Accent, BackgroundTransparency = 0.85}):Play()
-	end)
-
-	table.insert(self.Tabs, tabData)
-	if #self.Tabs == 1 then
-		TabPage.Visible = true
-		TabButton.TextColor3 = activeTheme.Accent
-		TabButton.BackgroundColor3 = activeTheme.Accent
-		TabButton.BackgroundTransparency = 0.85
-	end
-	return tabData
-end
-
-function Menu:AddSection(tabData, side, title)
-	local activeTheme = self.SelectedTheme
-	local parentZone = (side == "Right") and tabData.Right or tabData.Left
-
-	local SectionFrame = Instance.new("Frame")
-	SectionFrame.Size = UDim2.new(1, -6, 0, 50)
-	SectionFrame.BackgroundColor3 = activeTheme.MainBg
-	SectionFrame.BackgroundTransparency = 0.4
-	SectionFrame.ClipsDescendants = true
-	SectionFrame.ZIndex = 2
-	SectionFrame.Parent = parentZone
-	addCorner(SectionFrame, 8)
-	addStroke(SectionFrame, activeTheme.TextSub, 1, 0.9)
-
-	local SecLayout = Instance.new("UIListLayout")
-	SecLayout.SortOrder = Enum.SortOrder.LayoutOrder
-	SecLayout.Padding = UDim.new(0, 9)
-	SecLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
-	SecLayout.Parent = SectionFrame
-
-	local SecPadding = Instance.new("UIPadding")
-	SecPadding.PaddingTop = UDim.new(0, 28)
-	SecPadding.PaddingBottom = UDim.new(0, 12)
-	SecPadding.Parent = SectionFrame
-
-	local SecTitle = Instance.new("TextLabel")
-	SecTitle.Size = UDim2.new(1, -20, 0, 16)
-	SecTitle.Position = UDim2.new(0, 10, 0, 6)
-	SecTitle.BackgroundTransparency = 1
-	SecTitle.Text = string.upper(title)
-	SecTitle.Font = Enum.Font.SourceSansBold
-	SecTitle.TextSize = 14 -- Metin boyutu büyütüldü
-	SecTitle.TextColor3 = activeTheme.Accent
-	SecTitle.TextXAlignment = Enum.TextXAlignment.Left
-	SecTitle.ZIndex = 3
-	SecTitle.Parent = SectionFrame
-
-	SecLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-		SectionFrame.Size = UDim2.new(1, -6, 0, SecLayout.AbsoluteContentSize.Y + 38)
-	end)
-
-	local elements = {}
-
-	-- Geliştirilmiş Dinamik Keybind Motoru (Üzerine Tıklayıp Değiştirilebilir Mod)
-	local function createKeybindEngine(parentFrame, defaultKey, onBindChangedCallback)
-		local currentKey = defaultKey or Enum.KeyCode.E
-		local isBinding = false
-
-		local BindBtn = Instance.new("TextButton")
-		BindBtn.Size = UDim2.new(0, 75, 0, 22)
-		BindBtn.Position = UDim2.new(1, -80, 0.5, -11)
-		BindBtn.BackgroundColor3 = activeTheme.ElementBg
-		BindBtn.Text = currentKey.Name
-		BindBtn.TextColor3 = activeTheme.Accent
-		BindBtn.Font = Enum.Font.SourceSansBold
-		BindBtn.TextSize = 14
-		BindBtn.AutoButtonColor = false
-		BindBtn.Parent = parentFrame
-		addCorner(BindBtn, 4)
-		addStroke(BindBtn, activeTheme.Accent, 1, 0.6)
-
-		BindBtn.MouseButton1Click:Connect(function()
-			isBinding = true
-			BindBtn.Text = "..."
-			playSound(SFX.Click, 0.4)
-		end)
-
-		UserInputService.InputBegan:Connect(function(input, gpe)
-			if gpe then return end
-			if isBinding then
-				if input.UserInputType == Enum.UserInputType.Keyboard then
-					currentKey = input.KeyCode
-					BindBtn.Text = currentKey.Name
-					isBinding = false
-					playSound(SFX.ToggleOn, 0.4)
-					if onBindChangedCallback then onBindChangedCallback(currentKey) end
-				end
-			end
-		end)
-		return BindBtn, function() return currentKey end
-	end
-
-	function elements:AddLabel(text, customColor)
-		local LabelFrame = Instance.new("Frame")
-		LabelFrame.Size = UDim2.new(0.94, 0, 0, 24)
-		LabelFrame.BackgroundTransparency = 1
-		LabelFrame.Parent = SectionFrame
-
-		local TextLbl = Instance.new("TextLabel")
-		TextLbl.Size = UDim2.new(1, 0, 1, 0)
-		TextLbl.BackgroundTransparency = 1
-		TextLbl.Text = text or ""
-		TextLbl.TextColor3 = customColor or activeTheme.TextMain
-		TextLbl.Font = Enum.Font.SourceSansSemibold
-		TextLbl.TextSize = 15 -- Metin boyutu büyütüldü
-		TextLbl.TextXAlignment = Enum.TextXAlignment.Left
-		TextLbl.Parent = LabelFrame
-		return TextLbl
-	end
-
-	-- Keybind Atanabilir Gelişmiş Buton Sistemi (Keybind gelince %33 sağdan küçülür)
-	function elements:AddButton(name, callback)
-		local BtnContainer = Instance.new("Frame")
-		BtnContainer.Size = UDim2.new(0.94, 0, 0, 32)
-		BtnContainer.BackgroundTransparency = 1
-		BtnContainer.Parent = SectionFrame
-
-		local Btn = Instance.new("TextButton")
-		Btn.Size = UDim2.new(1, 0, 1, 0)
-		Btn.BackgroundColor3 = activeTheme.ElementBg
-		Btn.Text = name
-		Btn.TextColor3 = activeTheme.TextMain
-		Btn.Font = Enum.Font.SourceSansSemibold
-		Btn.TextSize = 16 -- Metin boyutu büyütüldü
-		Btn.AutoButtonColor = false
-		Btn.Parent = BtnContainer
-		addCorner(Btn, 5)
-		addStroke(Btn, activeTheme.TextSub, 1, 0.9)
-
-		Btn.MouseButton1Click:Connect(function()
-			playSound(SFX.Click, 0.5)
-			callback()
-		end)
-
-		local buttonObject = {}
-		function buttonObject:AddKeybind(keyString)
-			-- Küçülme Ayarı (%33 Yatay Alan Keybind Bölmesine Ayrılır)
-			Btn.Size = UDim2.new(0.65, 0, 1, 0)
-			
-			local defaultEnum = Enum.KeyCode[keyString or "X"]
-			local bindBtn, getKey = createKeybindEngine(BtnContainer, defaultEnum, nil)
-			bindBtn.Position = UDim2.new(0.68, 0, 0.5, -11)
-			bindBtn.Size = UDim2.new(0.32, 0, 0, 22)
-
-			UserInputService.InputBegan:Connect(function(input, gpe)
-				if gpe then return end
-				if input.KeyCode == getKey() then
-					playSound(SFX.Click, 0.5)
-					callback()
-				end
-			end)
-		end
-		return buttonObject
-	end
-
-	-- Üzerine Tıklanıp Değiştirilebilir Keybind Destekli Toggle Sistemi
-	function elements:AddToggle(name, default, callback)
-		local state = default or false
-		local ToggleFrame = Instance.new("TextButton")
-		ToggleFrame.Size = UDim2.new(0.94, 0, 0, 28)
-		ToggleFrame.BackgroundTransparency = 1
-		ToggleFrame.Text = ""
-		ToggleFrame.Parent = SectionFrame
-
-		local Indicator = Instance.new("Frame")
-		Indicator.Size = UDim2.new(0, 18, 0, 18)
-		Indicator.Position = UDim2.new(0, 4, 0.5, -9)
-		Indicator.BackgroundColor3 = state and activeTheme.Accent or activeTheme.ElementBg
-		Indicator.Parent = ToggleFrame
-		addCorner(Indicator, 4)
-
-		local Label = Instance.new("TextLabel")
-		Label.Size = UDim2.new(1, -35, 1, 0)
-		Label.Position = UDim2.new(0, 32, 0, 0)
-		Label.BackgroundTransparency = 1
-		Label.Text = name
-		Label.TextColor3 = state and activeTheme.TextMain or activeTheme.TextSub
-		Label.Font = Enum.Font.SourceSansSemibold
-		Label.TextSize = 16 -- Metin boyutu büyütüldü
-		Label.TextXAlignment = Enum.TextXAlignment.Left
-		Label.Parent = ToggleFrame
-
-		local function updateToggle(forceState)
-			if forceState ~= nil then state = forceState else state = not state end
-			if state then playSound(SFX.ToggleOn, 0.5) else playSound(SFX.ToggleOff, 0.5) end
-			TweenService:Create(Indicator, TweenInfo.new(0.2), {BackgroundColor3 = state and activeTheme.Accent or activeTheme.ElementBg}):Play()
-			TweenService:Create(Label, TweenInfo.new(0.2), {TextColor3 = state and activeTheme.TextMain or activeTheme.TextSub}):Play()
-			callback(state)
-		end
-
-		ToggleFrame.MouseButton1Click:Connect(function() updateToggle() end)
-
-		local toggleObject = {}
-		function toggleObject:AddKeybind(keyString)
-			local defaultEnum = Enum.KeyCode[keyString or "F"]
-			local bindBtn, getKey = createKeybindEngine(ToggleFrame, defaultEnum, nil)
-			
-			UserInputService.InputBegan:Connect(function(input, gpe)
-				if gpe then return end
-				if input.KeyCode == getKey() then
-					updateToggle()
-				end
-			end)
-		end
-		return toggleObject
-	end
-
-	function elements:AddSlider(name, min, max, default, callback)
-		local SliderFrame = Instance.new("Frame")
-		SliderFrame.Size = UDim2.new(0.94, 0, 0, 42)
-		SliderFrame.BackgroundTransparency = 1
-		SliderFrame.Parent = SectionFrame
-
-		local Label = Instance.new("TextLabel")
-		Label.Size = UDim2.new(1, 0, 0, 16)
-		Label.BackgroundTransparency = 1
-		Label.Text = name
-		Label.TextColor3 = activeTheme.TextSub
-		Label.Font = Enum.Font.SourceSans
-		Label.TextSize = 15 -- Büyütüldü
-		Label.TextXAlignment = Enum.TextXAlignment.Left
-		Label.Parent = SliderFrame
-
-		local ValueLabel = Instance.new("TextLabel")
-		ValueLabel.Size = UDim2.new(1, 0, 0, 16)
-		ValueLabel.BackgroundTransparency = 1
-		ValueLabel.Text = tostring(default or min)
-		ValueLabel.TextColor3 = activeTheme.Accent
-		ValueLabel.Font = Enum.Font.SourceSansBold
-		ValueLabel.TextSize = 15
-		ValueLabel.TextXAlignment = Enum.TextXAlignment.Right
-		ValueLabel.Parent = SliderFrame
-
-		local Track = Instance.new("TextButton")
-		Track.Size = UDim2.new(1, 0, 0, 6)
-		Track.Position = UDim2.new(0, 0, 0, 26)
-		Track.BackgroundColor3 = activeTheme.ElementBg
-		Track.Text = ""
-		Track.AutoButtonColor = false
-		Track.Parent = SliderFrame
-		addCorner(Track, 3)
-
-		local Fill = Instance.new("Frame")
-		Fill.Size = UDim2.new(((default or min) - min) / (max - min), 0, 1, 0)
-		Fill.BackgroundColor3 = activeTheme.Accent
-		Fill.BorderSizePixel = 0
-		Fill.Parent = Track
-		addCorner(Fill, 3)
-
-		local function updateSlider(input)
-			local absWidth = Track.AbsoluteSize.X
-			local absPos = Track.AbsolutePosition.X
-			local relX = math.clamp(input.Position.X - absPos, 0, absWidth)
-			local percent = relX / absWidth
-			local rawVal = min + (percent * (max - min))
-			local finalVal = math.floor(rawVal * 100) / 100
-			Fill.Size = UDim2.new(percent, 0, 1, 0)
-			ValueLabel.Text = tostring(finalVal)
-			callback(finalVal)
-		end
-
-		local sliding = false
-		Track.InputBegan:Connect(function(input)
-			if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-				sliding = true
-				updateSlider(input)
-			end
-		end)
-
-		UserInputService.InputChanged:Connect(function(input)
-			if sliding and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
-				updateSlider(input)
-			end
-		end)
-
-		UserInputService.InputEnded:Connect(function(input)
-			if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-				sliding = false
-			end
-		end)
-	end
-
-	function elements:AddDropdown(name, list, isMulti, callback)
-		local dropped = false
-		local selectedItems = {}
-		if not isMulti then selectedItems = {list[1] or "None"} end
-
-		local DropFrame = Instance.new("Frame")
-		DropFrame.Size = UDim2.new(0.94, 0, 0, 48)
-		DropFrame.BackgroundTransparency = 1
-		DropFrame.Parent = SectionFrame
-
-		local Label = Instance.new("TextLabel")
-		Label.Size = UDim2.new(1, 0, 0, 16)
-		Label.BackgroundTransparency = 1
-		Label.Text = name
-		Label.TextColor3 = activeTheme.TextSub
-		Label.Font = Enum.Font.SourceSans
-		Label.TextSize = 15
-		Label.TextXAlignment = Enum.TextXAlignment.Left
-		Label.Parent = DropFrame
-
-		local ActionBtn = Instance.new("TextButton")
-		ActionBtn.Size = UDim2.new(1, 0, 0, 28)
-		ActionBtn.Position = UDim2.new(0, 0, 0, 20)
-		ActionBtn.BackgroundColor3 = activeTheme.ElementBg
-		ActionBtn.Text = "  " .. (isMulti and "Çoklu Seçim..." or tostring(selectedItems[1]))
-		ActionBtn.TextColor3 = activeTheme.TextMain
-		ActionBtn.Font = Enum.Font.SourceSansSemibold
-		ActionBtn.TextSize = 15
-		ActionBtn.TextXAlignment = Enum.TextXAlignment.Left
-		ActionBtn.AutoButtonColor = false
-		ActionBtn.Parent = DropFrame
-		addCorner(ActionBtn, 5)
-
-		local ListContainer = Instance.new("ScrollingFrame")
-		ListContainer.Size = UDim2.new(1, 0, 0, 0)
-		ListContainer.Position = UDim2.new(0, 0, 1, 2)
-		ListContainer.BackgroundColor3 = activeTheme.MainBg
-		ListContainer.ClipsDescendants = true
-		ListContainer.ZIndex = 50
-		ListContainer.ScrollBarThickness = 3
-		ListContainer.ScrollBarImageColor3 = activeTheme.Accent
-		ListContainer.CanvasSize = UDim2.new(0, 0, 0, #list * 24)
-		ListContainer.Parent = ActionBtn
-		addCorner(ListContainer, 5)
-
-		local ListLayout = Instance.new("UIListLayout")
-		ListLayout.SortOrder = Enum.SortOrder.LayoutOrder
-		ListLayout.Parent = ListContainer
-
-		ActionBtn.MouseButton1Click:Connect(function()
-			dropped = not dropped
-			local targetHeight = dropped and math.clamp(#list * 24, 0, 140) or 0
-			TweenService:Create(ListContainer, TweenInfo.new(0.2), {Size = UDim2.new(1, 0, 0, targetHeight)}):Play()
-		end)
-
-		for _, item in pairs(list) do
-			local ItemBtn = Instance.new("TextButton")
-			ItemBtn.Size = UDim2.new(1, 0, 0, 24)
-			ItemBtn.BackgroundTransparency = 1
-			ItemBtn.Text = "  " .. tostring(item)
-			ItemBtn.TextColor3 = activeTheme.TextMain
-			ItemBtn.Font = Enum.Font.SourceSans
-			ItemBtn.TextSize = 14
-			ItemBtn.TextXAlignment = Enum.TextXAlignment.Left
-			ItemBtn.ZIndex = 55
-			ItemBtn.Parent = ListContainer
-
-			ItemBtn.MouseButton1Click:Connect(function()
-				if not isMulti then
-					ActionBtn.Text = "  " .. tostring(item)
-					dropped = false
-					ListContainer.Size = UDim2.new(1, 0, 0, 0)
-					callback(item)
-				end
-			end)
-		end
-	end
-
-	return elements
 end
 
 return Menu
