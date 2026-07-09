@@ -36,16 +36,6 @@ local SFX = {
 local Menu = {}
 Menu.__index = Menu
 
--- Tema Renk Şemaları
-local Themes = {
-	Aqua = { Primary = Color3.fromRGB(0, 200, 255), Background = Color3.fromRGB(12, 16, 20), Header = Color3.fromRGB(18, 24, 30), Text = Color3.fromRGB(255, 255, 255) },
-	Inferno = { Primary = Color3.fromRGB(255, 50, 50), Background = Color3.fromRGB(20, 10, 10), Header = Color3.fromRGB(30, 14, 14), Text = Color3.fromRGB(255, 230, 230) },
-	Ocean = { Primary = Color3.fromRGB(0, 100, 255), Background = Color3.fromRGB(8, 12, 20), Header = Color3.fromRGB(12, 18, 28), Text = Color3.fromRGB(230, 240, 255) },
-	Night = { Primary = Color3.fromRGB(140, 140, 140), Background = Color3.fromRGB(10, 10, 10), Header = Color3.fromRGB(16, 16, 16), Text = Color3.fromRGB(240, 240, 240) },
-	Heaven = { Primary = Color3.fromRGB(0, 150, 200), Background = Color3.fromRGB(245, 245, 245), Header = Color3.fromRGB(230, 230, 235), Text = Color3.fromRGB(30, 30, 30) }
-}
-local CurrentTheme = Themes.Aqua
-
 local function addCorner(parent, radius)
 	local corner = Instance.new("UICorner")
 	corner.CornerRadius = UDim.new(0, radius or 8)
@@ -92,18 +82,18 @@ function Menu:Notify(title, description, duration)
 
 	local Box = Instance.new("Frame")
 	Box.Size = UDim2.new(1, 0, 0, 65)
-	Box.BackgroundColor3 = CurrentTheme.Background
+	Box.BackgroundColor3 = Color3.fromRGB(14, 18, 24)
 	Box.BackgroundTransparency = 1
 	Box.Position = UDim2.new(1, 320, 0, 0)
 	Box.Parent = NotifContainer
 	addCorner(Box, 6)
 
-	local MainStroke = addStroke(Box, CurrentTheme.Primary, 1.2, 1)
+	local MainStroke = addStroke(Box, Color3.fromRGB(0, 200, 255), 1.2, 1)
 
 	local GlowLine = Instance.new("Frame")
 	GlowLine.Size = UDim2.new(1, 0, 0, 2)
 	GlowLine.Position = UDim2.new(0, 0, 1, -2)
-	GlowLine.BackgroundColor3 = CurrentTheme.Primary
+	GlowLine.BackgroundColor3 = Color3.fromRGB(0, 200, 255)
 	GlowLine.BackgroundTransparency = 1
 	GlowLine.BorderSizePixel = 0
 	GlowLine.Parent = Box
@@ -115,8 +105,8 @@ function Menu:Notify(title, description, duration)
 	Tl.BackgroundTransparency = 1
 	Tl.Text = string.upper(title or "NOTIFICATION")
 	Tl.Font = Enum.Font.RobotoMono
-	Tl.TextSize = 15 -- %20 Büyütüldü (13 -> 15)
-	Tl.TextColor3 = CurrentTheme.Text
+	Tl.TextSize = 13
+	Tl.TextColor3 = Color3.fromRGB(255, 255, 255)
 	Tl.TextTransparency = 1
 	Tl.TextXAlignment = Enum.TextXAlignment.Left
 	Tl.Parent = Box
@@ -126,8 +116,8 @@ function Menu:Notify(title, description, duration)
 	Dl.Position = UDim2.new(0, 10, 0, 24)
 	Dl.BackgroundTransparency = 1
 	Dl.Text = description or ""
-	Dl.Font = Enum.Font.GothamSSm
-	Dl.TextSize = 15 -- %20 Büyütüldü (13 -> 15)
+	Dl.Font = Enum.Font.SourceSans
+	Dl.TextSize = 13
 	Dl.TextColor3 = Color3.fromRGB(180, 185, 190)
 	Dl.TextTransparency = 1
 	Dl.TextXAlignment = Enum.TextXAlignment.Left
@@ -158,29 +148,39 @@ function Menu:Notify(title, description, duration)
 end
 
 -- ==========================================================
--- KEY SYSTEM (Geliştirilmiş & Mobil Destekli & %30 Daha Dar)
+-- KEY SYSTEM
+-- Kullanım örneği:
+-- local Window = Menu:CreateWindow("Tester", "RightShift", true, {
+--     KeySystem = true,               -- key ekranını etkinleştirir
+--     Key = "1234abc",                 -- tek key ya da {"key1","key2"} tablo verilebilir
+--     Usernames = {"Ali", "Veli"},     -- opsiyonel: sadece bu kullanıcı adları girebilir. Vermezsen herkes (dolu alan yeter) geçer
+--     Note = "Key almak için Discord sunucumuza katıl: discord.gg/ornek",
+--     SaveKey = true                   -- executor writefile/readfile destekliyorsa key'i hatırlar
+-- })
+-- Not: Key ekranı doğrulanana kadar CreateWindow fonksiyonu geri dönmez (thread bloklanmaz, sadece yield eder),
+-- bu yüzden AddTab/AddSection çağrılarını her zamanki gibi CreateWindow'un hemen altına yazabilirsin.
 -- ==========================================================
 function Menu:_BuildKeyScreen(ScreenGui, title, validKeys, validUsernames, config)
 	local KeyCanvas = Instance.new("CanvasGroup")
 	KeyCanvas.Name = "KeyCanvas"
-	KeyCanvas.Size = UDim2.new(0, 360, 0, 210) -- %30 Daha dar (300 -> 210)
-	KeyCanvas.Position = UDim2.new(0.5, -180, 0.5, -105)
+	KeyCanvas.Size = UDim2.new(0, 360, 0, 300)
+	KeyCanvas.Position = UDim2.new(0.5, -180, 0.5, -150)
 	KeyCanvas.BackgroundTransparency = 1
 	KeyCanvas.GroupTransparency = 1
 	KeyCanvas.Parent = ScreenGui
 
 	local KeyFrame = Instance.new("Frame")
 	KeyFrame.Size = UDim2.new(1, 0, 1, 0)
-	KeyFrame.BackgroundColor3 = CurrentTheme.Background
+	KeyFrame.BackgroundColor3 = Color3.fromRGB(12, 16, 20)
 	KeyFrame.BackgroundTransparency = 0.1
 	KeyFrame.ClipsDescendants = true
 	KeyFrame.Parent = KeyCanvas
 	addCorner(KeyFrame, 10)
-	addStroke(KeyFrame, CurrentTheme.Primary, 1.2, 0.3)
+	addStroke(KeyFrame, Color3.fromRGB(0, 200, 255), 1.2, 0.3)
 
 	local KHeader = Instance.new("Frame")
-	KHeader.Size = UDim2.new(1, 0, 0, 35)
-	KHeader.BackgroundColor3 = CurrentTheme.Header
+	KHeader.Size = UDim2.new(1, 0, 0, 40)
+	KHeader.BackgroundColor3 = Color3.fromRGB(18, 24, 30)
 	KHeader.BackgroundTransparency = 0.3
 	KHeader.BorderSizePixel = 0
 	KHeader.Parent = KeyFrame
@@ -189,115 +189,120 @@ function Menu:_BuildKeyScreen(ScreenGui, title, validKeys, validUsernames, confi
 	local KHeaderFix = Instance.new("Frame")
 	KHeaderFix.Size = UDim2.new(1, 0, 0, 10)
 	KHeaderFix.Position = UDim2.new(0, 0, 1, -10)
-	KHeaderFix.BackgroundColor3 = CurrentTheme.Header
+	KHeaderFix.BackgroundColor3 = Color3.fromRGB(18, 24, 30)
 	KHeaderFix.BackgroundTransparency = 0.3
 	KHeaderFix.Parent = KHeader
 
 	local KTitle = Instance.new("TextLabel")
-	KTitle.Size = UDim2.new(1, -70, 1, 0)
+	KTitle.Size = UDim2.new(1, -40, 1, 0)
 	KTitle.Position = UDim2.new(0, 14, 0, 0)
 	KTitle.BackgroundTransparency = 1
 	KTitle.Text = string.upper((title or "SIGMA PROJECT") .. " // KEY SYSTEM")
 	KTitle.Font = Enum.Font.RobotoMono
-	KTitle.TextSize = 14 -- %20 Arttı
-	KTitle.TextColor3 = CurrentTheme.Text
+	KTitle.TextSize = 13
+	KTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
 	KTitle.TextXAlignment = Enum.TextXAlignment.Left
 	KTitle.TextTruncate = Enum.TextTruncate.AtEnd
 	KTitle.Parent = KHeader
 
-	-- Mobil ve PC için Sürükleme Desteği (Key System)
-	local dragging, dragInput, dragStart, startPos
-	KHeader.InputBegan:Connect(function(input)
-		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-			dragging = true
-			dragStart = input.Position
-			startPos = KeyCanvas.Position
-			input.Changed:Connect(function()
-				if input.UserInputState == Enum.UserInputState.End then dragging = false end
-			end)
-		end
-	end)
-	KHeader.InputChanged:Connect(function(input)
-		if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
-			dragInput = input
-		end
-	end)
-	UserInputService.InputChanged:Connect(function(input)
-		if dragging and input == dragInput then
-			local delta = input.Position - dragStart
-			KeyCanvas.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-		end
-	end)
-
-	-- Sağ Üst Köşeye Kapatma Tuşu (X)
-	local KCloseBtn = Instance.new("TextButton")
-	KCloseBtn.Size = UDim2.new(0, 24, 0, 22)
-	KCloseBtn.Position = UDim2.new(1, -34, 0.5, -11)
-	KCloseBtn.BackgroundColor3 = Color3.fromRGB(60, 25, 25)
-	KCloseBtn.BackgroundTransparency = 0.4
-	KCloseBtn.Text = "X"
-	KCloseBtn.TextColor3 = Color3.fromRGB(255, 120, 120)
-	KCloseBtn.Font = Enum.Font.GothamSSm
-	KCloseBtn.TextSize = 14
-	KCloseBtn.Parent = KHeader
-	addCorner(KCloseBtn, 4)
-
-	KCloseBtn.MouseButton1Click:Connect(function()
-		playSound(SFX.Close, 0.6)
-		local tw = TweenService:Create(KeyCanvas, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {Size = UDim2.new(0, 360, 0, 0), GroupTransparency = 1})
-		tw:Play()
-		tw.Completed:Connect(function() ScreenGui:Destroy() end)
-	end)
+	local StatusDot = Instance.new("Frame")
+	StatusDot.Size = UDim2.new(0, 8, 0, 8)
+	StatusDot.Position = UDim2.new(1, -20, 0.5, -4)
+	StatusDot.BackgroundColor3 = Color3.fromRGB(0, 200, 255)
+	StatusDot.Parent = KHeader
+	addCorner(StatusDot, 4)
 
 	local Body = Instance.new("Frame")
-	Body.Size = UDim2.new(1, -32, 1, -45)
-	Body.Position = UDim2.new(0, 16, 0, 40)
+	Body.Size = UDim2.new(1, -32, 1, -56)
+	Body.Position = UDim2.new(0, 16, 0, 48)
 	Body.BackgroundTransparency = 1
 	Body.Parent = KeyFrame
 
+	local LockLabel = Instance.new("TextLabel")
+	LockLabel.Size = UDim2.new(1, 0, 0, 30)
+	LockLabel.BackgroundTransparency = 1
+	LockLabel.Text = "🔒"
+	LockLabel.Font = Enum.Font.SourceSansBold
+	LockLabel.TextSize = 26
+	LockLabel.TextColor3 = Color3.fromRGB(0, 200, 255)
+	LockLabel.Parent = Body
+
+	local NoteLabel = Instance.new("TextLabel")
+	NoteLabel.Size = UDim2.new(1, 0, 0, 32)
+	NoteLabel.Position = UDim2.new(0, 0, 0, 32)
+	NoteLabel.BackgroundTransparency = 1
+	NoteLabel.Text = config.Note or "Devam etmek için kullanıcı adı ve key girin."
+	NoteLabel.Font = Enum.Font.SourceSans
+	NoteLabel.TextSize = 12
+	NoteLabel.TextColor3 = Color3.fromRGB(160, 165, 170)
+	NoteLabel.TextWrapped = true
+	NoteLabel.Parent = Body
+
+	local UserLabel = Instance.new("TextLabel")
+	UserLabel.Size = UDim2.new(1, 0, 0, 14)
+	UserLabel.Position = UDim2.new(0, 0, 0, 76)
+	UserLabel.BackgroundTransparency = 1
+	UserLabel.Text = "KULLANICI ADI"
+	UserLabel.Font = Enum.Font.SourceSansBold
+	UserLabel.TextSize = 11
+	UserLabel.TextColor3 = Color3.fromRGB(0, 200, 255)
+	UserLabel.TextXAlignment = Enum.TextXAlignment.Left
+	UserLabel.Parent = Body
+
 	local UserBox = Instance.new("TextBox")
-	UserBox.Size = UDim2.new(1, 0, 0, 28)
-	UserBox.Position = UDim2.new(0, 0, 0, 10)
+	UserBox.Size = UDim2.new(1, 0, 0, 32)
+	UserBox.Position = UDim2.new(0, 0, 0, 92)
 	UserBox.BackgroundColor3 = Color3.fromRGB(24, 30, 38)
 	UserBox.Text = ""
 	UserBox.PlaceholderText = "Username"
-	UserBox.PlaceholderColor3 = Color3.fromRGB(110, 115, 120)
+	UserBox.PlaceholderColor3 = Color3.fromRGB(90, 95, 100)
 	UserBox.TextColor3 = Color3.fromRGB(240, 245, 250)
-	UserBox.Font = Enum.Font.GothamSSm
-	UserBox.TextSize = 16 -- %20 Arttı
+	UserBox.Font = Enum.Font.SourceSans
+	UserBox.TextSize = 14
 	UserBox.ClearTextOnFocus = false
 	UserBox.Parent = Body
 	addCorner(UserBox, 5)
 	local UserStroke = addStroke(UserBox, Color3.fromRGB(255, 255, 255), 1, 0.9)
 
+	local KeyLabel = Instance.new("TextLabel")
+	KeyLabel.Size = UDim2.new(1, 0, 0, 14)
+	KeyLabel.Position = UDim2.new(0, 0, 0, 132)
+	KeyLabel.BackgroundTransparency = 1
+	KeyLabel.Text = "KEY"
+	KeyLabel.Font = Enum.Font.SourceSansBold
+	KeyLabel.TextSize = 11
+	KeyLabel.TextColor3 = Color3.fromRGB(0, 200, 255)
+	KeyLabel.TextXAlignment = Enum.TextXAlignment.Left
+	KeyLabel.Parent = Body
+
 	local KeyBox = Instance.new("TextBox")
-	KeyBox.Size = UDim2.new(1, 0, 0, 28)
-	KeyBox.Position = UDim2.new(0, 0, 0, 48)
+	KeyBox.Size = UDim2.new(1, 0, 0, 32)
+	KeyBox.Position = UDim2.new(0, 0, 0, 148)
 	KeyBox.BackgroundColor3 = Color3.fromRGB(24, 30, 38)
 	KeyBox.Text = ""
 	KeyBox.PlaceholderText = "Key"
-	KeyBox.PlaceholderColor3 = Color3.fromRGB(110, 115, 120)
+	KeyBox.PlaceholderColor3 = Color3.fromRGB(90, 95, 100)
 	KeyBox.TextColor3 = Color3.fromRGB(240, 245, 250)
-	KeyBox.Font = Enum.Font.GothamSSm
-	KeyBox.TextSize = 16 -- %20 Arttı
+	KeyBox.Font = Enum.Font.SourceSans
+	KeyBox.TextSize = 14
 	KeyBox.ClearTextOnFocus = false
 	KeyBox.Parent = Body
 	addCorner(KeyBox, 5)
 	local KeyStroke2 = addStroke(KeyBox, Color3.fromRGB(255, 255, 255), 1, 0.9)
 
 	local LoginBtn = Instance.new("TextButton")
-	LoginBtn.Size = UDim2.new(1, 0, 0, 30)
-	LoginBtn.Position = UDim2.new(0, 0, 0, 86)
-	LoginBtn.BackgroundColor3 = CurrentTheme.Primary
+	LoginBtn.Size = UDim2.new(1, 0, 0, 34)
+	LoginBtn.Position = UDim2.new(0, 0, 0, 194)
+	LoginBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 255)
 	LoginBtn.BackgroundTransparency = 0.75
 	LoginBtn.Text = "GİRİŞ YAP"
-	LoginBtn.TextColor3 = CurrentTheme.Primary
-	LoginBtn.Font = Enum.Font.GothamSSm
-	LoginBtn.TextSize = 16 -- %20 Arttı
+	LoginBtn.TextColor3 = Color3.fromRGB(0, 200, 255)
+	LoginBtn.Font = Enum.Font.SourceSansBold
+	LoginBtn.TextSize = 14
 	LoginBtn.AutoButtonColor = false
 	LoginBtn.Parent = Body
 	addCorner(LoginBtn, 6)
-	addStroke(LoginBtn, CurrentTheme.Primary, 1.2, 0.4)
+	addStroke(LoginBtn, Color3.fromRGB(0, 200, 255), 1.2, 0.4)
 
 	local function shakeFrame(frame)
 		local originalPos = frame.Position
@@ -316,7 +321,7 @@ function Menu:_BuildKeyScreen(ScreenGui, title, validKeys, validUsernames, confi
 	local function wireBoxFocus(box, stroke)
 		box.Focused:Connect(function()
 			playSound(SFX.Hover, 0.2)
-			TweenService:Create(stroke, TweenInfo.new(0.2), {Color = CurrentTheme.Primary, Transparency = 0.3}):Play()
+			TweenService:Create(stroke, TweenInfo.new(0.2), {Color = Color3.fromRGB(0, 200, 255), Transparency = 0.3}):Play()
 		end)
 		box.FocusLost:Connect(function()
 			TweenService:Create(stroke, TweenInfo.new(0.2), {Color = Color3.fromRGB(255, 255, 255), Transparency = 0.9}):Play()
@@ -324,6 +329,14 @@ function Menu:_BuildKeyScreen(ScreenGui, title, validKeys, validUsernames, confi
 	end
 	wireBoxFocus(UserBox, UserStroke)
 	wireBoxFocus(KeyBox, KeyStroke2)
+
+	LoginBtn.MouseEnter:Connect(function()
+		playSound(SFX.Hover, 0.2)
+		TweenService:Create(LoginBtn, TweenInfo.new(0.2), {BackgroundTransparency = 0.55}):Play()
+	end)
+	LoginBtn.MouseLeave:Connect(function()
+		TweenService:Create(LoginBtn, TweenInfo.new(0.2), {BackgroundTransparency = 0.75}):Play()
+	end)
 
 	local attempting = false
 	local function attemptLogin()
@@ -341,34 +354,21 @@ function Menu:_BuildKeyScreen(ScreenGui, title, validKeys, validUsernames, confi
 			return
 		end
 
-		local loginSuccess = false
+		local userOk = true
+		if validUsernames then
+			userOk = validUsernames[string.lower(user)] == true
+		end
 
-		-- Ahmet:1234 Sadullah:6767 gibi Eşleşmeli Sistem Kontrolü
-		if config.Keys and type(config.Keys) == "table" then
-			local targetKey = config.Keys[user] or config.Keys[string.lower(user)]
-			if targetKey and tostring(targetKey) == key then
-				loginSuccess = true
-			end
+		local keyOk = false
+		if #validKeys == 0 then
+			keyOk = true
 		else
-			-- Eski Tekli/Tablolu Klasik Kontrol
-			local userOk = true
-			if validUsernames then
-				userOk = validUsernames[string.lower(user)] == true
-			end
-			local keyOk = false
-			if #validKeys == 0 then
-				keyOk = true
-			else
-				for _, k in pairs(validKeys) do
-					if key == k then keyOk = true break end
-				end
-			end
-			if userOk and keyOk then
-				loginSuccess = true
+			for _, k in pairs(validKeys) do
+				if key == k then keyOk = true break end
 			end
 		end
 
-		if not loginSuccess then
+		if not userOk or not keyOk then
 			Menu:Notify("Giriş Başarısız", "Kullanıcı adı veya key hatalı, tekrar deneyin.", 4)
 			playSound(SFX.ToggleOff, 0.5)
 			shakeFrame(KeyFrame)
@@ -381,29 +381,41 @@ function Menu:_BuildKeyScreen(ScreenGui, title, validKeys, validUsernames, confi
 		Menu:Notify("Erişim Onaylandı", "Hoş geldin " .. user .. ", menü açılıyor...", 3)
 
 		if config.SaveKey then
-			pcall(function() if writefile then writefile("AquaKeySystem_SavedKey.txt", key) end end)
+			pcall(function()
+				if writefile then
+					writefile("AquaKeySystem_SavedKey.txt", key)
+				end
+			end)
 		end
 
 		local outTween = TweenService:Create(KeyCanvas, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {GroupTransparency = 1, Size = UDim2.new(0, 360, 0, 0)})
 		outTween:Play()
-		outTween.Completed:Connect(function() KeyCanvas:Destroy() end)
+		outTween.Completed:Connect(function()
+			KeyCanvas:Destroy()
+		end)
 
 		self.KeySystemVerified = true
 	end
 
 	LoginBtn.MouseButton1Click:Connect(attemptLogin)
-	UserBox.FocusLost:Connect(function(enterPressed) if enterPressed then attemptLogin() end end)
-	KeyBox.FocusLost:Connect(function(enterPressed) if enterPressed then attemptLogin() end end)
+	UserBox.FocusLost:Connect(function(enterPressed)
+		if enterPressed then attemptLogin() end
+	end)
+	KeyBox.FocusLost:Connect(function(enterPressed)
+		if enterPressed then attemptLogin() end
+	end)
 
 	playSound(SFX.Open, 0.5)
 	KeyCanvas.Size = UDim2.new(0, 360, 0, 0)
-	TweenService:Create(KeyCanvas, TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Size = UDim2.new(0, 360, 0, 210), GroupTransparency = 0}):Play()
+	TweenService:Create(KeyCanvas, TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Size = UDim2.new(0, 360, 0, 300), GroupTransparency = 0}):Play()
 
 	if config.SaveKey then
 		pcall(function()
 			if isfile and readfile and isfile("AquaKeySystem_SavedKey.txt") then
 				local saved = readfile("AquaKeySystem_SavedKey.txt")
-				if saved and saved ~= "" then KeyBox.Text = saved end
+				if saved and saved ~= "" then
+					KeyBox.Text = saved
+				end
 			end
 		end)
 	end
@@ -412,12 +424,6 @@ end
 function Menu:CreateWindow(title, keyName, showButton, keySystemConfig)
 	local self = setmetatable({}, Menu)
 
-	keySystemConfig = keySystemConfig or {}
-	-- Tema Seçimi Ataması
-	if keySystemConfig.MenuTheme and Themes[keySystemConfig.MenuTheme] then
-		CurrentTheme = Themes[keySystemConfig.MenuTheme]
-	end
-
 	local existing = LocalPlayer:WaitForChild("PlayerGui"):FindFirstChild("AquaCSGO_PremiumMenu")
 	if existing then existing:Destroy() end
 
@@ -425,11 +431,15 @@ function Menu:CreateWindow(title, keyName, showButton, keySystemConfig)
 	ScreenGui.Name = "AquaCSGO_PremiumMenu"
 	ScreenGui.ResetOnSpawn = false
 	ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+	-- Her şeyin üzerinde görünmesi için maksimum DisplayOrder
 	ScreenGui.DisplayOrder = 9999
 	ScreenGui.IgnoreGuiInset = true
 	ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 	self.ScreenGui = ScreenGui
 
+	-- FIX: Key sistemi etkinse, ana menü içeriği kullanıcı doğru
+	-- username + key girip "Giriş Yap"a basana kadar oluşturulmaz.
+	keySystemConfig = keySystemConfig or {}
 	local keySystemEnabled = keySystemConfig.KeySystem or keySystemConfig.Enabled or false
 
 	if keySystemEnabled then
@@ -444,12 +454,16 @@ function Menu:CreateWindow(title, keyName, showButton, keySystemConfig)
 		local validUsernames = nil
 		if keySystemConfig.Usernames then
 			validUsernames = {}
-			for _, u in pairs(keySystemConfig.Usernames) do validUsernames[string.lower(tostring(u))] = true end
+			for _, u in pairs(keySystemConfig.Usernames) do
+				validUsernames[string.lower(tostring(u))] = true
+			end
 		end
 
 		self.KeySystemVerified = false
 		self:_BuildKeyScreen(ScreenGui, title, validKeys, validUsernames, keySystemConfig)
 
+		-- FIX: Thread burada yield olur (donma değildir), doğrulama tamamlanana kadar
+		-- ana menü inşa edilmez. AddTab/AddSection çağrıların normal sırada kalabilir.
 		repeat task.wait() until self.KeySystemVerified
 	end
 
@@ -465,20 +479,23 @@ function Menu:CreateWindow(title, keyName, showButton, keySystemConfig)
 	local MainFrame = Instance.new("Frame")
 	MainFrame.Name = "MainFrame"
 	MainFrame.Size = UDim2.new(1, 0, 1, 0)
-	MainFrame.BackgroundColor3 = CurrentTheme.Background
+	MainFrame.Position = UDim2.new(0, 0, 0, 0)
+	MainFrame.BackgroundColor3 = Color3.fromRGB(12, 16, 20)
 	MainFrame.BackgroundTransparency = 0.25
+	-- FIX: ClipsDescendants = true ile section'ların taşması engellendi
 	MainFrame.ClipsDescendants = true
 	MainFrame.Parent = CanvasGroup
 	self.MainFrame = MainFrame
 
 	addCorner(MainFrame, 10)
-	local FrameStroke = addStroke(MainFrame, CurrentTheme.Primary, 1.2, 0.4)
+	local FrameStroke = addStroke(MainFrame, Color3.fromRGB(0, 200, 255), 1.2, 0.4)
 
 	local Header = Instance.new("Frame")
 	Header.Size = UDim2.new(1, 0, 0, 40)
-	Header.BackgroundColor3 = CurrentTheme.Header
+	Header.BackgroundColor3 = Color3.fromRGB(18, 24, 30)
 	Header.BackgroundTransparency = 0.3
 	Header.BorderSizePixel = 0
+	-- FIX: Header ZIndex yüksek tutuldu, her zaman üstte kalır
 	Header.ZIndex = 10
 	Header.Parent = MainFrame
 	addCorner(Header, 10)
@@ -486,7 +503,7 @@ function Menu:CreateWindow(title, keyName, showButton, keySystemConfig)
 	local HeaderFix = Instance.new("Frame")
 	HeaderFix.Size = UDim2.new(1, 0, 0, 10)
 	HeaderFix.Position = UDim2.new(0, 0, 1, -10)
-	HeaderFix.BackgroundColor3 = CurrentTheme.Header
+	HeaderFix.BackgroundColor3 = Color3.fromRGB(18, 24, 30)
 	HeaderFix.BackgroundTransparency = 0.3
 	HeaderFix.ZIndex = 10
 	HeaderFix.Parent = Header
@@ -497,8 +514,8 @@ function Menu:CreateWindow(title, keyName, showButton, keySystemConfig)
 	TitleLabel.BackgroundTransparency = 1
 	TitleLabel.Text = string.upper(title or "SIGMA PROJECT")
 	TitleLabel.Font = Enum.Font.RobotoMono
-	TitleLabel.TextSize = 18 -- %20 Arttı
-	TitleLabel.TextColor3 = CurrentTheme.Text
+	TitleLabel.TextSize = 15
+	TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 	TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
 	TitleLabel.ZIndex = 10
 	TitleLabel.Parent = Header
@@ -517,8 +534,8 @@ function Menu:CreateWindow(title, keyName, showButton, keySystemConfig)
 	MinBtn.BackgroundTransparency = 0.4
 	MinBtn.Text = "-"
 	MinBtn.TextColor3 = Color3.fromRGB(200, 200, 200)
-	MinBtn.Font = Enum.Font.GothamSSm
-	MinBtn.TextSize = 19 -- %20 Arttı
+	MinBtn.Font = Enum.Font.SourceSansBold
+	MinBtn.TextSize = 16
 	MinBtn.AutoButtonColor = false
 	MinBtn.ZIndex = 10
 	MinBtn.Parent = Controls
@@ -531,13 +548,14 @@ function Menu:CreateWindow(title, keyName, showButton, keySystemConfig)
 	CloseBtn.BackgroundTransparency = 0.4
 	CloseBtn.Text = "X"
 	CloseBtn.TextColor3 = Color3.fromRGB(255, 120, 120)
-	CloseBtn.Font = Enum.Font.GothamSSm
-	CloseBtn.TextSize = 16 -- %20 Arttı
+	CloseBtn.Font = Enum.Font.SourceSansBold
+	CloseBtn.TextSize = 13
 	CloseBtn.AutoButtonColor = false
 	CloseBtn.ZIndex = 10
 	CloseBtn.Parent = Controls
 	addCorner(CloseBtn, 6)
 
+	-- FIX: TabBar wrapper — yatay kaydırma için ScrollingFrame kullanıldı
 	local TabBarWrapper = Instance.new("Frame")
 	TabBarWrapper.Name = "TabBarWrapper"
 	TabBarWrapper.Size = UDim2.new(1, -314, 0, 34)
@@ -549,13 +567,15 @@ function Menu:CreateWindow(title, keyName, showButton, keySystemConfig)
 	TabBarWrapper.Parent = MainFrame
 	addCorner(TabBarWrapper, 6)
 
+	-- FIX: Gerçek tab içerikleri bu ScrollingFrame içine eklendi (yatay kaydırılabilir)
 	local TabBar = Instance.new("ScrollingFrame")
 	TabBar.Name = "TabBar"
 	TabBar.Size = UDim2.new(1, 0, 1, 0)
+	TabBar.Position = UDim2.new(0, 0, 0, 0)
 	TabBar.BackgroundTransparency = 1
-	TabBar.ScrollBarThickness = 0
+	TabBar.ScrollBarThickness = 0          -- scrollbar gizli, parmakla kaydırılır
 	TabBar.ScrollingDirection = Enum.ScrollingDirection.X
-	TabBar.CanvasSize = UDim2.new(0, 0, 0, 0)
+	TabBar.CanvasSize = UDim2.new(0, 0, 0, 0) -- dinamik güncellenecek
 	TabBar.ZIndex = 5
 	TabBar.Parent = TabBarWrapper
 	self.TabBar = TabBar
@@ -565,12 +585,14 @@ function Menu:CreateWindow(title, keyName, showButton, keySystemConfig)
 	TabList.SortOrder = Enum.SortOrder.LayoutOrder
 	TabList.Padding = UDim.new(0, 6)
 	TabList.Parent = TabBar
+	self.TabList = TabList
 
 	local TabPadding = Instance.new("UIPadding")
 	TabPadding.PaddingLeft = UDim.new(0, 6)
 	TabPadding.PaddingTop = UDim.new(0, 4)
 	TabPadding.Parent = TabBar
 
+	-- FIX: TabList içerik genişliği değişince CanvasSize otomatik güncellenir
 	TabList:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
 		TabBar.CanvasSize = UDim2.new(0, TabList.AbsoluteContentSize.X + 12, 0, 0)
 	end)
@@ -579,6 +601,7 @@ function Menu:CreateWindow(title, keyName, showButton, keySystemConfig)
 	Container.Size = UDim2.new(1, -314, 1, -98)
 	Container.Position = UDim2.new(0, 302, 0, 88)
 	Container.BackgroundTransparency = 1
+	-- FIX: Container ClipsDescendants = true — section'lar dışarı taşamaz
 	Container.ClipsDescendants = true
 	Container.Parent = MainFrame
 	self.Container = Container
@@ -588,7 +611,7 @@ function Menu:CreateWindow(title, keyName, showButton, keySystemConfig)
 	ResizeGrip.Position = UDim2.new(1, -16, 1, -16)
 	ResizeGrip.BackgroundTransparency = 1
 	ResizeGrip.Image = "rbxassetid://3858618954"
-	ResizeGrip.ImageColor3 = CurrentTheme.Primary
+	ResizeGrip.ImageColor3 = Color3.fromRGB(0, 200, 255)
 	ResizeGrip.ZIndex = 12
 	ResizeGrip.Parent = MainFrame
 
@@ -602,7 +625,7 @@ function Menu:CreateWindow(title, keyName, showButton, keySystemConfig)
 	DiagnosticFrame.BackgroundTransparency = 0.4
 	DiagnosticFrame.Parent = MainFrame
 	addCorner(DiagnosticFrame, 8)
-	addStroke(DiagnosticFrame, CurrentTheme.Primary, 1, 0.7)
+	addStroke(DiagnosticFrame, Color3.fromRGB(0, 200, 255), 1, 0.7)
 
 	local AvatarImage = Instance.new("ImageLabel")
 	AvatarImage.Size = UDim2.new(0, 46, 0, 46)
@@ -610,21 +633,33 @@ function Menu:CreateWindow(title, keyName, showButton, keySystemConfig)
 	AvatarImage.BackgroundColor3 = Color3.fromRGB(24, 30, 38)
 	AvatarImage.Parent = DiagnosticFrame
 	addCorner(AvatarImage, 23)
-	addStroke(AvatarImage, CurrentTheme.Primary, 1, 0.5)
+	addStroke(AvatarImage, Color3.fromRGB(0, 200, 255), 1, 0.5)
 
 	local thumbType = Enum.ThumbnailType.HeadShot
 	local thumbSize = Enum.ThumbnailSize.Size150x150
 	local content, isReady = Players:GetUserThumbnailAsync(LocalPlayer.UserId, thumbType, thumbSize)
-	if isReady then AvatarImage.Image = content else AvatarImage.Image = "rbxthumb://type=AvatarHeadShot&id=" .. tostring(LocalPlayer.UserId) .. "&x=150&y=150" end
+
+	if isReady then
+		AvatarImage.Image = content
+	else
+		AvatarImage.Image = "rbxthumb://type=AvatarHeadShot&id=" .. tostring(LocalPlayer.UserId) .. "&x=150&y=150"
+	end
+
+	task.spawn(function()
+		pcall(function()
+			ContentProvider:PreloadAsync({AvatarImage})
+		end)
+	end)
 
 	local DisplayNameLabel = Instance.new("TextLabel")
 	DisplayNameLabel.Size = UDim2.new(1, -78, 0, 18)
 	DisplayNameLabel.Position = UDim2.new(0, 72, 0, 12)
 	DisplayNameLabel.BackgroundTransparency = 1
 	DisplayNameLabel.Text = LocalPlayer.DisplayName
-	DisplayNameLabel.Font = Enum.Font.GothamSSm
-	DisplayNameLabel.TextSize = 18 -- %20 Arttı
-	DisplayNameLabel.TextColor3 = CurrentTheme.Text
+	DisplayNameLabel.Font = Enum.Font.SourceSansBold
+	DisplayNameLabel.TextSize = 16
+	DisplayNameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+	DisplayNameLabel.TextXAlignment = Enum.TextXAlignment.Left
 	DisplayNameLabel.Parent = DiagnosticFrame
 
 	local UserIdLabel = Instance.new("TextLabel")
@@ -632,7 +667,7 @@ function Menu:CreateWindow(title, keyName, showButton, keySystemConfig)
 	UserIdLabel.Position = UDim2.new(0, 72, 0, 28)
 	UserIdLabel.BackgroundTransparency = 1
 	UserIdLabel.Text = "ID: " .. LocalPlayer.UserId
-	UserIdLabel.Font = Enum.Font.GothamSSm
+	UserIdLabel.Font = Enum.Font.SourceSansItalic
 	UserIdLabel.TextSize = 14
 	UserIdLabel.TextColor3 = Color3.fromRGB(140, 145, 150)
 	UserIdLabel.TextXAlignment = Enum.TextXAlignment.Left
@@ -652,8 +687,8 @@ function Menu:CreateWindow(title, keyName, showButton, keySystemConfig)
 	GameNameLabel.Position = UDim2.new(0, 6, 0, 4)
 	GameNameLabel.BackgroundTransparency = 1
 	GameNameLabel.Text = "Game: " .. PlaceName
-	GameNameLabel.Font = Enum.Font.GothamSSm
-	GameNameLabel.TextSize = 15 -- %20 Arttı
+	GameNameLabel.Font = Enum.Font.SourceSansBold
+	GameNameLabel.TextSize = 13
 	GameNameLabel.TextColor3 = Color3.fromRGB(240, 240, 240)
 	GameNameLabel.TextXAlignment = Enum.TextXAlignment.Left
 	GameNameLabel.ClipsDescendants = true
@@ -665,8 +700,8 @@ function Menu:CreateWindow(title, keyName, showButton, keySystemConfig)
 	PlaceIdLabel.BackgroundTransparency = 1
 	PlaceIdLabel.Text = "Place ID: " .. tostring(game.PlaceId)
 	PlaceIdLabel.Font = Enum.Font.RobotoMono
-	PlaceIdLabel.TextSize = 15 -- %20 Arttı
-	PlaceIdLabel.TextColor3 = CurrentTheme.Primary
+	PlaceIdLabel.TextSize = 13
+	PlaceIdLabel.TextColor3 = Color3.fromRGB(0, 200, 255)
 	PlaceIdLabel.TextXAlignment = Enum.TextXAlignment.Left
 	PlaceIdLabel.Parent = ServerInfoFrame
 
@@ -676,7 +711,7 @@ function Menu:CreateWindow(title, keyName, showButton, keySystemConfig)
 	JobIdLabel.BackgroundTransparency = 1
 	JobIdLabel.Text = "Server ID: " .. (game.JobId ~= "" and game.JobId or "Studio_Session")
 	JobIdLabel.Font = Enum.Font.RobotoMono
-	JobIdLabel.TextSize = 14
+	JobIdLabel.TextSize = 12
 	JobIdLabel.TextColor3 = Color3.fromRGB(150, 155, 160)
 	JobIdLabel.TextXAlignment = Enum.TextXAlignment.Left
 	JobIdLabel.ClipsDescendants = true
@@ -693,7 +728,7 @@ function Menu:CreateWindow(title, keyName, showButton, keySystemConfig)
 	FpsLabel.BackgroundTransparency = 1
 	FpsLabel.Text = "FPS: --"
 	FpsLabel.Font = Enum.Font.RobotoMono
-	FpsLabel.TextSize = 15
+	FpsLabel.TextSize = 13
 	FpsLabel.TextColor3 = Color3.fromRGB(0, 255, 150)
 	FpsLabel.TextXAlignment = Enum.TextXAlignment.Left
 	FpsLabel.Parent = MiniPerformanceFrame
@@ -704,8 +739,8 @@ function Menu:CreateWindow(title, keyName, showButton, keySystemConfig)
 	PingLabel.BackgroundTransparency = 1
 	PingLabel.Text = "PING: -- ms"
 	PingLabel.Font = Enum.Font.RobotoMono
-	PingLabel.TextSize = 15
-	PingLabel.TextColor3 = CurrentTheme.Primary
+	PingLabel.TextSize = 13
+	PingLabel.TextColor3 = Color3.fromRGB(0, 200, 255)
 	PingLabel.TextXAlignment = Enum.TextXAlignment.Right
 	PingLabel.Parent = MiniPerformanceFrame
 
@@ -714,7 +749,7 @@ function Menu:CreateWindow(title, keyName, showButton, keySystemConfig)
 	CopyScroll.Position = UDim2.new(0, 12, 0, 142)
 	CopyScroll.BackgroundTransparency = 1
 	CopyScroll.ScrollBarThickness = 2
-	CopyScroll.ScrollBarImageColor3 = CurrentTheme.Primary
+	CopyScroll.ScrollBarImageColor3 = Color3.fromRGB(0, 200, 255)
 	CopyScroll.Parent = DiagnosticFrame
 
 	local CSLayout = Instance.new("UIListLayout")
@@ -728,7 +763,7 @@ function Menu:CreateWindow(title, keyName, showButton, keySystemConfig)
 		Btn.BackgroundColor3 = Color3.fromRGB(24, 30, 38)
 		Btn.Text = "  Copy " .. titleText
 		Btn.TextColor3 = Color3.fromRGB(190, 195, 200)
-		Btn.Font = Enum.Font.GothamSSm
+		Btn.Font = Enum.Font.SourceSans
 		Btn.TextSize = 14
 		Btn.TextXAlignment = Enum.TextXAlignment.Left
 		Btn.AutoButtonColor = false
@@ -758,9 +793,9 @@ function Menu:CreateWindow(title, keyName, showButton, keySystemConfig)
 	RadarLabel.Position = UDim2.new(0, 12, 0, 228)
 	RadarLabel.BackgroundTransparency = 1
 	RadarLabel.Text = "PLAYER LIST (1/1)"
-	RadarLabel.Font = Enum.Font.GothamSSm
-	RadarLabel.TextSize = 14
-	RadarLabel.TextColor3 = CurrentTheme.Primary
+	RadarLabel.Font = Enum.Font.SourceSansBold
+	RadarLabel.TextSize = 13
+	RadarLabel.TextColor3 = Color3.fromRGB(0, 200, 255)
 	RadarLabel.TextXAlignment = Enum.TextXAlignment.Left
 	RadarLabel.Parent = DiagnosticFrame
 
@@ -770,7 +805,7 @@ function Menu:CreateWindow(title, keyName, showButton, keySystemConfig)
 	RadarScroll.BackgroundColor3 = Color3.fromRGB(10, 14, 18)
 	RadarScroll.BackgroundTransparency = 0.6
 	RadarScroll.ScrollBarThickness = 2
-	RadarScroll.ScrollBarImageColor3 = CurrentTheme.Primary
+	RadarScroll.ScrollBarImageColor3 = Color3.fromRGB(0, 200, 255)
 	RadarScroll.Parent = DiagnosticFrame
 	addCorner(RadarScroll, 6)
 
@@ -791,7 +826,7 @@ function Menu:CreateWindow(title, keyName, showButton, keySystemConfig)
 				PLabel.Size = UDim2.new(1, 0, 0, 18)
 				PLabel.BackgroundTransparency = 1
 				PLabel.Text = " » " .. p.DisplayName .. " (@" .. p.Name .. ")"
-				PLabel.Font = Enum.Font.GothamSSm
+				PLabel.Font = Enum.Font.SourceSans
 				PLabel.TextSize = 14
 				PLabel.TextColor3 = Color3.fromRGB(210, 215, 220)
 				PLabel.TextXAlignment = Enum.TextXAlignment.Left
@@ -812,6 +847,7 @@ function Menu:CreateWindow(title, keyName, showButton, keySystemConfig)
 			FpsLabel.Text = "FPS: " .. tostring(frameCount)
 			frameCount = 0
 			lastIteration = currentTime
+
 			local pingValue = math.floor(Stats.Network.ServerStatsItem["Data Ping"]:GetValue())
 			PingLabel.Text = "PING: " .. pingValue .. " ms"
 		end
@@ -831,7 +867,7 @@ function Menu:CreateWindow(title, keyName, showButton, keySystemConfig)
 			TweenService:Create(btn, TweenInfo.new(0.2), {BackgroundColor3 = leaveBg, TextColor3 = leaveCol}):Play()
 		end)
 	end
-	setHeaderBtnAnims(MinBtn, Color3.fromRGB(40, 52, 66), Color3.fromRGB(28, 36, 44), CurrentTheme.Primary, Color3.fromRGB(200, 200, 200))
+	setHeaderBtnAnims(MinBtn, Color3.fromRGB(40, 52, 66), Color3.fromRGB(28, 36, 44), Color3.fromRGB(0, 200, 255), Color3.fromRGB(200, 200, 200))
 	setHeaderBtnAnims(CloseBtn, Color3.fromRGB(100, 30, 30), Color3.fromRGB(60, 25, 25), Color3.fromRGB(255, 255, 255), Color3.fromRGB(255, 120, 120))
 
 	CloseBtn.MouseButton1Click:Connect(function()
@@ -917,11 +953,7 @@ end
 function Menu:SetupGlobalToggle(keyName, showButton)
 	if keyName then
 		pcall(function()
-			if type(keyName) == "string" then
-				self.GlobalToggleKey = Enum.KeyCode[keyName]
-			else
-				self.GlobalToggleKey = keyName
-			end
+			self.GlobalToggleKey = Enum.KeyCode[keyName]
 		end)
 	end
 
@@ -937,7 +969,9 @@ function Menu:SetupGlobalToggle(keyName, showButton)
 			playSound(SFX.Open, 0.45)
 			local tw = TweenService:Create(self.CanvasGroup, info, {GroupTransparency = 0})
 			tw:Play()
-			tw.Completed:Connect(function() self.IsTweeningVisibility = false end)
+			tw.Completed:Connect(function()
+				self.IsTweeningVisibility = false
+			end)
 		else
 			playSound(SFX.Close, 0.45)
 			local tw = TweenService:Create(self.CanvasGroup, info, {GroupTransparency = 1})
@@ -949,7 +983,6 @@ function Menu:SetupGlobalToggle(keyName, showButton)
 		end
 	end
 
-	-- Menü Ayarlanan Keybind ile Gizleme Motoru Güncellemesi
 	if not self.ToggleConnection then
 		self.ToggleConnection = UserInputService.InputBegan:Connect(function(input, gpe)
 			if gpe then return end
@@ -975,29 +1008,31 @@ function Menu:SetupGlobalToggle(keyName, showButton)
 		local PButton = Instance.new("TextButton")
 		PButton.Size = UDim2.new(0, 36, 0, 36)
 		PButton.Position = UDim2.new(0, 15, 0, 120)
-		PButton.BackgroundColor3 = CurrentTheme.Background
+		PButton.BackgroundColor3 = Color3.fromRGB(12, 16, 20)
 		PButton.BackgroundTransparency = 0.4
 		PButton.Text = "🌊"
-		PButton.TextColor3 = CurrentTheme.Primary
-		PButton.Font = Enum.Font.GothamSSm
-		PButton.TextSize = 22 -- %20 Arttı
+		PButton.TextColor3 = Color3.fromRGB(0, 200, 255)
+		PButton.Font = Enum.Font.SourceSansBold
+		PButton.TextSize = 18
 		PButton.AutoButtonColor = false
 		PButton.ZIndex = 999
 		PButton.Parent = TargetGui
 		self.PersistentButton = PButton
 
 		addCorner(PButton, 18)
-		addStroke(PButton, CurrentTheme.Primary, 1.2, 0.5)
+		addStroke(PButton, Color3.fromRGB(0, 200, 255), 1.2, 0.5)
 
 		PButton.MouseEnter:Connect(function()
 			playSound(SFX.Hover, 0.2)
 			TweenService:Create(PButton, TweenInfo.new(0.2), {BackgroundTransparency = 0.1, TextColor3 = Color3.fromRGB(255, 255, 255)}):Play()
 		end)
 		PButton.MouseLeave:Connect(function()
-			TweenService:Create(PButton, TweenInfo.new(0.2), {BackgroundTransparency = 0.4, TextColor3 = CurrentTheme.Primary}):Play()
+			TweenService:Create(PButton, TweenInfo.new(0.2), {BackgroundTransparency = 0.4, TextColor3 = Color3.fromRGB(0, 200, 255)}):Play()
 		end)
 
-		PButton.MouseButton1Click:Connect(function() setVisibilityAnimated(not self.MenuVisible) end)
+		PButton.MouseButton1Click:Connect(function()
+			setVisibilityAnimated(not self.MenuVisible)
+		end)
 
 		local btnDragging, btnDragInput, btnDragStart, btnStartPos
 		PButton.InputBegan:Connect(function(input)
@@ -1011,7 +1046,9 @@ function Menu:SetupGlobalToggle(keyName, showButton)
 			end
 		end)
 		PButton.InputChanged:Connect(function(input)
-			if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then btnDragInput = input end
+			if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+				btnDragInput = input
+			end
 		end)
 		UserInputService.InputChanged:Connect(function(input)
 			if btnDragging and input == btnDragInput then
@@ -1028,8 +1065,8 @@ function Menu:AddTab(name)
 	TabButton.BackgroundColor3 = Color3.fromRGB(20, 26, 32)
 	TabButton.BackgroundTransparency = 0.4
 	TabButton.Text = name
-	TabButton.Font = Enum.Font.GothamSSm
-	TabButton.TextSize = 15 -- %20 Arttı
+	TabButton.Font = Enum.Font.SourceSansBold
+	TabButton.TextSize = 13
 	TabButton.TextColor3 = Color3.fromRGB(140, 145, 150)
 	TabButton.AutoButtonColor = false
 	TabButton.Parent = self.TabBar
@@ -1042,12 +1079,15 @@ function Menu:AddTab(name)
 	TabPage.Visible = false
 	TabPage.Parent = self.Container
 
+	-- FIX: Sol ve sağ zone artık ClipsDescendants = true
+	-- Section'lar scroll edildiğinde TabBar veya Header üstüne taşımaz
 	local LeftZone = Instance.new("ScrollingFrame")
 	LeftZone.Size = UDim2.new(0.5, -6, 1, 0)
 	LeftZone.BackgroundTransparency = 1
 	LeftZone.ScrollBarThickness = 3
-	LeftZone.ScrollBarImageColor3 = CurrentTheme.Primary
+	LeftZone.ScrollBarImageColor3 = Color3.fromRGB(0, 200, 255)
 	LeftZone.ScrollBarImageTransparency = 0.4
+	-- FIX: false yerine true — içerik dışarı taşmaz
 	LeftZone.ClipsDescendants = true
 	LeftZone.Parent = TabPage
 
@@ -1056,8 +1096,9 @@ function Menu:AddTab(name)
 	RightZone.Position = UDim2.new(0.5, 6, 0, 0)
 	RightZone.BackgroundTransparency = 1
 	RightZone.ScrollBarThickness = 3
-	RightZone.ScrollBarImageColor3 = CurrentTheme.Primary
+	RightZone.ScrollBarImageColor3 = Color3.fromRGB(0, 200, 255)
 	RightZone.ScrollBarImageTransparency = 0.4
+	-- FIX: false yerine true
 	RightZone.ClipsDescendants = true
 	RightZone.Parent = TabPage
 
@@ -1093,18 +1134,18 @@ function Menu:AddTab(name)
 			t.Button:FindFirstChildOfClass("UIStroke").Transparency = 0.9
 		end
 		TabPage.Visible = true
-		TweenService:Create(TabButton, TweenInfo.new(0.25), {TextColor3 = CurrentTheme.Primary, BackgroundColor3 = CurrentTheme.Primary, BackgroundTransparency = 0.85}):Play()
-		TabButton:FindFirstChildOfClass("UIStroke").Color = CurrentTheme.Primary
+		TweenService:Create(TabButton, TweenInfo.new(0.25), {TextColor3 = Color3.fromRGB(0, 200, 255), BackgroundColor3 = Color3.fromRGB(0, 200, 255), BackgroundTransparency = 0.85}):Play()
+		TabButton:FindFirstChildOfClass("UIStroke").Color = Color3.fromRGB(0, 200, 255)
 		TabButton:FindFirstChildOfClass("UIStroke").Transparency = 0.4
 	end)
 
 	table.insert(self.Tabs, tabData)
 	if #self.Tabs == 1 then
 		TabPage.Visible = true
-		TabButton.TextColor3 = CurrentTheme.Primary
-		TabButton.BackgroundColor3 = CurrentTheme.Primary
+		TabButton.TextColor3 = Color3.fromRGB(0, 200, 255)
+		TabButton.BackgroundColor3 = Color3.fromRGB(0, 200, 255)
 		TabButton.BackgroundTransparency = 0.85
-		TabButton:FindFirstChildOfClass("UIStroke").Color = CurrentTheme.Primary
+		TabButton:FindFirstChildOfClass("UIStroke").Color = Color3.fromRGB(0, 200, 255)
 		TabButton:FindFirstChildOfClass("UIStroke").Transparency = 0.4
 	end
 	return tabData
@@ -1117,6 +1158,7 @@ function Menu:AddSection(tabData, side, title)
 	SectionFrame.Size = UDim2.new(1, -6, 0, 50)
 	SectionFrame.BackgroundColor3 = Color3.fromRGB(16, 22, 28)
 	SectionFrame.BackgroundTransparency = 0.4
+	-- FIX: ClipsDescendants = true — section içeriği dışarı taşmaz
 	SectionFrame.ClipsDescendants = true
 	SectionFrame.ZIndex = 2
 	SectionFrame.Parent = parentZone
@@ -1139,10 +1181,11 @@ function Menu:AddSection(tabData, side, title)
 	SecTitle.Position = UDim2.new(0, 10, 0, 6)
 	SecTitle.BackgroundTransparency = 1
 	SecTitle.Text = string.upper(title)
-	SecTitle.Font = Enum.Font.GothamSSm
-	SecTitle.TextSize = 14 -- %20 Arttı
-	SecTitle.TextColor3 = CurrentTheme.Primary
+	SecTitle.Font = Enum.Font.SourceSansBold
+	SecTitle.TextSize = 12
+	SecTitle.TextColor3 = Color3.fromRGB(0, 200, 255)
 	SecTitle.TextXAlignment = Enum.TextXAlignment.Left
+	-- FIX: ZIndex yükseltildi, başlık her zaman görünür
 	SecTitle.ZIndex = 3
 	SecTitle.Parent = SectionFrame
 
@@ -1152,7 +1195,6 @@ function Menu:AddSection(tabData, side, title)
 
 	local elements = {}
 
-	-- Dinamik & Geliştirilmiş Keybind Yakalama Motoru (Tıklayıp Değiştirilebilir)
 	local function createKeybindEngine(parentFrame, name, defaultKey, callback)
 		local currentKey = defaultKey or Enum.KeyCode.E
 		local binding = false
@@ -1167,13 +1209,13 @@ function Menu:AddSection(tabData, side, title)
 		BindBtn.Position = UDim2.new(1, -70, 0.5, -9)
 		BindBtn.BackgroundColor3 = Color3.fromRGB(24, 30, 38)
 		BindBtn.Text = currentKey.Name
-		BindBtn.TextColor3 = CurrentTheme.Primary
-		BindBtn.Font = Enum.Font.GothamSSm
-		BindBtn.TextSize = 13 -- %20 Arttı
+		BindBtn.TextColor3 = Color3.fromRGB(0, 200, 255)
+		BindBtn.Font = Enum.Font.SourceSansBold
+		BindBtn.TextSize = 11
 		BindBtn.AutoButtonColor = false
 		BindBtn.Parent = parentFrame
 		addCorner(BindBtn, 4)
-		addStroke(BindBtn, CurrentTheme.Primary, 1, 0.7)
+		addStroke(BindBtn, Color3.fromRGB(0, 200, 255), 1, 0.7)
 
 		BindBtn.MouseButton1Click:Connect(function()
 			binding = true
@@ -1188,7 +1230,7 @@ function Menu:AddSection(tabData, side, title)
 				if input.UserInputType == Enum.UserInputType.Keyboard then
 					currentKey = input.KeyCode
 					BindBtn.Text = currentKey.Name
-					BindBtn:FindFirstChildOfClass("UIStroke").Color = CurrentTheme.Primary
+					BindBtn:FindFirstChildOfClass("UIStroke").Color = Color3.fromRGB(0, 200, 255)
 					binding = false
 					playSound(SFX.ToggleOn, 0.4)
 				end
@@ -1222,32 +1264,31 @@ function Menu:AddSection(tabData, side, title)
 		TextLbl.BackgroundTransparency = 1
 		TextLbl.Text = text or ""
 		TextLbl.TextColor3 = customColor or Color3.fromRGB(190, 195, 200)
-		TextLbl.Font = Enum.Font.GothamSSm
-		TextLbl.TextSize = 15 -- %20 Arttı
+		TextLbl.Font = Enum.Font.SourceSansSemibold
+		TextLbl.TextSize = 13
 		TextLbl.TextXAlignment = Enum.TextXAlignment.Left
 		TextLbl.Parent = LabelFrame
 
 		local labelObject = {}
-		function labelObject:UpdateText(newText) TextLbl.Text = newText end
-		function labelObject:UpdateColor(newColor) TextLbl.TextColor3 = newColor end
+		function labelObject:UpdateText(newText)
+			TextLbl.Text = newText
+		end
+		function labelObject:UpdateColor(newColor)
+			TextLbl.TextColor3 = newColor
+		end
 		return labelObject
 	end
 
 	function elements:AddButton(name, callback)
-		local BtnContainer = Instance.new("Frame")
-		BtnContainer.Size = UDim2.new(0.94, 0, 0, 30)
-		BtnContainer.BackgroundTransparency = 1
-		BtnContainer.Parent = SectionFrame
-
 		local Btn = Instance.new("TextButton")
-		Btn.Size = UDim2.new(1, 0, 1, 0)
+		Btn.Size = UDim2.new(0.94, 0, 0, 30)
 		Btn.BackgroundColor3 = Color3.fromRGB(26, 34, 42)
 		Btn.Text = name
 		Btn.TextColor3 = Color3.fromRGB(220, 225, 230)
-		Btn.Font = Enum.Font.GothamSSm
-		Btn.TextSize = 16 -- %20 Arttı
+		Btn.Font = Enum.Font.SourceSans
+		Btn.TextSize = 14
 		Btn.AutoButtonColor = false
-		Btn.Parent = BtnContainer
+		Btn.Parent = SectionFrame
 		addCorner(Btn, 5)
 		addStroke(Btn, Color3.fromRGB(255,255,255), 1, 0.95)
 
@@ -1260,21 +1301,10 @@ function Menu:AddSection(tabData, side, title)
 		end)
 		Btn.MouseButton1Click:Connect(function()
 			playSound(SFX.Click, 0.5)
-			Btn.TextSize = 13
-			TweenService:Create(Btn, TweenInfo.new(0.15, Enum.EasingStyle.Elastic, Enum.EasingDirection.Out), {TextSize = 16}):Play()
+			Btn.TextSize = 11
+			TweenService:Create(Btn, TweenInfo.new(0.15, Enum.EasingStyle.Elastic, Enum.EasingDirection.Out), {TextSize = 14}):Play()
 			callback()
 		end)
-
-		local btnObject = {}
-		-- Butonlar İçin Dinamik Keybind Metodu (%33 Yatay Küçülmeli)
-		function btnObject:AddKeybind(keyString)
-			Btn.Size = UDim2.new(0.67, 0, 1, 0) -- Sağ taraftan %33 küçüldü
-			local keyCode = Enum.KeyCode[keyString]
-			createKeybindEngine(BtnContainer, name, keyCode, function()
-				callback()
-			end)
-		end
-		return btnObject
 	end
 
 	function elements:AddToggle(name, default, callback)
@@ -1288,7 +1318,7 @@ function Menu:AddSection(tabData, side, title)
 		local Indicator = Instance.new("Frame")
 		Indicator.Size = UDim2.new(0, 16, 0, 16)
 		Indicator.Position = UDim2.new(0, 4, 0.5, -8)
-		Indicator.BackgroundColor3 = state and CurrentTheme.Primary or Color3.fromRGB(35, 42, 50)
+		Indicator.BackgroundColor3 = state and Color3.fromRGB(0, 200, 255) or Color3.fromRGB(35, 42, 50)
 		Indicator.Parent = ToggleFrame
 		addCorner(Indicator, 4)
 		addStroke(Indicator, Color3.fromRGB(255,255,255), 1, 0.9)
@@ -1307,15 +1337,15 @@ function Menu:AddSection(tabData, side, title)
 		Label.BackgroundTransparency = 1
 		Label.Text = name
 		Label.TextColor3 = state and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(160, 165, 170)
-		Label.Font = Enum.Font.GothamSSm
-		Label.TextSize = 16 -- %20 Arttı
+		Label.Font = Enum.Font.SourceSans
+		Label.TextSize = 14
 		Label.TextXAlignment = Enum.TextXAlignment.Left
 		Label.Parent = ToggleFrame
 
 		local function updateToggle(forceState)
 			if forceState ~= nil then state = forceState else state = not state end
 			if state then playSound(SFX.ToggleOn, 0.5) else playSound(SFX.ToggleOff, 0.5) end
-			TweenService:Create(Indicator, TweenInfo.new(0.2), {BackgroundColor3 = state and CurrentTheme.Primary or Color3.fromRGB(35, 42, 50)}):Play()
+			TweenService:Create(Indicator, TweenInfo.new(0.2), {BackgroundColor3 = state and Color3.fromRGB(0, 200, 255) or Color3.fromRGB(35, 42, 50)}):Play()
 			TweenService:Create(Label, TweenInfo.new(0.2), {TextColor3 = state and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(160, 165, 170)}):Play()
 
 			InnerGlow.Size = UDim2.new(0,0,0,0)
@@ -1349,8 +1379,8 @@ function Menu:AddSection(tabData, side, title)
 		Label.BackgroundTransparency = 1
 		Label.Text = name
 		Label.TextColor3 = Color3.fromRGB(170, 175, 180)
-		Label.Font = Enum.Font.GothamSSm
-		Label.TextSize = 16 -- %20 Arttı
+		Label.Font = Enum.Font.SourceSans
+		Label.TextSize = 14
 		Label.TextXAlignment = Enum.TextXAlignment.Left
 		Label.Parent = SliderFrame
 
@@ -1358,9 +1388,9 @@ function Menu:AddSection(tabData, side, title)
 		ValueLabel.Size = UDim2.new(1, 0, 0, 16)
 		ValueLabel.BackgroundTransparency = 1
 		ValueLabel.Text = tostring(default or min)
-		ValueLabel.TextColor3 = CurrentTheme.Primary
-		ValueLabel.Font = Enum.Font.RobotoMono
-		ValueLabel.TextSize = 15 -- %20 Arttı
+		ValueLabel.TextColor3 = Color3.fromRGB(0, 200, 255)
+		ValueLabel.Font = Enum.Font.SourceSansBold
+		ValueLabel.TextSize = 13
 		ValueLabel.TextXAlignment = Enum.TextXAlignment.Right
 		ValueLabel.Parent = SliderFrame
 
@@ -1375,7 +1405,7 @@ function Menu:AddSection(tabData, side, title)
 
 		local Fill = Instance.new("Frame")
 		Fill.Size = UDim2.new(((default or min) - min) / (max - min), 0, 1, 0)
-		Fill.BackgroundColor3 = CurrentTheme.Primary
+		Fill.BackgroundColor3 = Color3.fromRGB(0, 200, 255)
 		Fill.BorderSizePixel = 0
 		Fill.Parent = Track
 		addCorner(Fill, 3)
@@ -1386,7 +1416,7 @@ function Menu:AddSection(tabData, side, title)
 		SliderKnob.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 		SliderKnob.Parent = Fill
 		addCorner(SliderKnob, 5)
-		addStroke(SliderKnob, CurrentTheme.Primary, 1, 0.3)
+		addStroke(SliderKnob, Color3.fromRGB(0,200,255), 1, 0.3)
 
 		local function updateSlider(input)
 			local absWidth = Track.AbsoluteSize.X
@@ -1407,12 +1437,16 @@ function Menu:AddSection(tabData, side, title)
 				sliding = true
 				playSound(SFX.Click, 0.35, 1.1)
 				updateSlider(input)
-				TweenService:Create(SliderKnob, TweenInfo.new(0.12), {Size = UDim2.new(0, 14, 0, 14), Position = UDim2.new(1, -7, 0.5, -7), BackgroundColor3 = CurrentTheme.Primary}):Play()
+				TweenService:Create(SliderKnob, TweenInfo.new(0.12), {Size = UDim2.new(0, 14, 0, 14), Position = UDim2.new(1, -7, 0.5, -7), BackgroundColor3 = Color3.fromRGB(0,200,255)}):Play()
 			end
 		end)
+
 		UserInputService.InputChanged:Connect(function(input)
-			if sliding and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then updateSlider(input) end
+			if sliding and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+				updateSlider(input)
+			end
 		end)
+
 		UserInputService.InputEnded:Connect(function(input)
 			if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
 				sliding = false
@@ -1432,8 +1466,8 @@ function Menu:AddSection(tabData, side, title)
 		Label.BackgroundTransparency = 1
 		Label.Text = name
 		Label.TextColor3 = Color3.fromRGB(170, 175, 180)
-		Label.Font = Enum.Font.GothamSSm
-		Label.TextSize = 16 -- %20 Arttı
+		Label.Font = Enum.Font.SourceSans
+		Label.TextSize = 14
 		Label.TextXAlignment = Enum.TextXAlignment.Left
 		Label.Parent = BindFrame
 
@@ -1451,8 +1485,8 @@ function Menu:AddSection(tabData, side, title)
 		Label.BackgroundTransparency = 1
 		Label.Text = name
 		Label.TextColor3 = Color3.fromRGB(150, 155, 160)
-		Label.Font = Enum.Font.GothamSSm
-		Label.TextSize = 15 -- %20 Arttı
+		Label.Font = Enum.Font.SourceSans
+		Label.TextSize = 13
 		Label.TextXAlignment = Enum.TextXAlignment.Left
 		Label.Parent = BoxFrame
 
@@ -1464,8 +1498,8 @@ function Menu:AddSection(tabData, side, title)
 		InputBox.PlaceholderText = placeholder or "Type here..."
 		InputBox.PlaceholderColor3 = Color3.fromRGB(90, 95, 100)
 		InputBox.TextColor3 = Color3.fromRGB(240, 245, 250)
-		InputBox.Font = Enum.Font.GothamSSm
-		InputBox.TextSize = 15 -- %20 Arttı
+		InputBox.Font = Enum.Font.SourceSans
+		InputBox.TextSize = 13
 		InputBox.ClearTextOnFocus = false
 		InputBox.Parent = BoxFrame
 		addCorner(InputBox, 5)
@@ -1473,8 +1507,9 @@ function Menu:AddSection(tabData, side, title)
 
 		InputBox.Focused:Connect(function()
 			playSound(SFX.Hover, 0.2)
-			TweenService:Create(BoxStroke, TweenInfo.new(0.2), {Color = CurrentTheme.Primary, Transparency = 0.4}):Play()
+			TweenService:Create(BoxStroke, TweenInfo.new(0.2), {Color = Color3.fromRGB(0, 200, 255), Transparency = 0.4}):Play()
 		end)
+
 		InputBox.FocusLost:Connect(function(enterPressed)
 			TweenService:Create(BoxStroke, TweenInfo.new(0.2), {Color = Color3.fromRGB(255, 255, 255), Transparency = 0.94}):Play()
 			playSound(SFX.Click, 0.4)
@@ -1482,6 +1517,13 @@ function Menu:AddSection(tabData, side, title)
 		end)
 	end
 
+	-- ==========================================================
+	-- FIX: AddDropdown — liste artık gerçek bir ScrollingFrame.
+	-- Önceden ListContainer normal bir Frame idi ve ClipsDescendants
+	-- ile taşan öğeler sadece gizleniyordu, kaydırılamıyordu.
+	-- Şimdi öğe sayısı ne olursa olsun CanvasSize güncelleniyor ve
+	-- kullanıcı liste içinde parmağıyla / fare tekerleğiyle kaydırabiliyor.
+	-- ==========================================================
 	function elements:AddDropdown(name, list, isMulti, callback)
 		local dropped = false
 		local selectedItems = {}
@@ -1498,8 +1540,8 @@ function Menu:AddSection(tabData, side, title)
 		Label.BackgroundTransparency = 1
 		Label.Text = name
 		Label.TextColor3 = Color3.fromRGB(150, 155, 160)
-		Label.Font = Enum.Font.GothamSSm
-		Label.TextSize = 15 -- %20 Arttı
+		Label.Font = Enum.Font.SourceSans
+		Label.TextSize = 13
 		Label.TextXAlignment = Enum.TextXAlignment.Left
 		Label.Parent = DropFrame
 
@@ -1509,8 +1551,8 @@ function Menu:AddSection(tabData, side, title)
 		ActionBtn.BackgroundColor3 = Color3.fromRGB(24, 30, 38)
 		ActionBtn.Text = "  " .. (isMulti and "Multiple Options..." or tostring(selectedItems[1]))
 		ActionBtn.TextColor3 = Color3.fromRGB(230, 235, 240)
-		ActionBtn.Font = Enum.Font.GothamSSm
-		ActionBtn.TextSize = 15 -- %20 Arttı
+		ActionBtn.Font = Enum.Font.SourceSans
+		ActionBtn.TextSize = 13
 		ActionBtn.TextXAlignment = Enum.TextXAlignment.Left
 		ActionBtn.AutoButtonColor = false
 		ActionBtn.ZIndex = 6
@@ -1524,11 +1566,12 @@ function Menu:AddSection(tabData, side, title)
 		Arrow.BackgroundTransparency = 1
 		Arrow.Text = "▼"
 		Arrow.TextColor3 = Color3.fromRGB(120, 125, 130)
-		Arrow.Font = Enum.Font.GothamSSm
-		Arrow.TextSize = 12
+		Arrow.Font = Enum.Font.SourceSansBold
+		Arrow.TextSize = 10
 		Arrow.ZIndex = 7
 		Arrow.Parent = ActionBtn
 
+		-- FIX: Frame -> ScrollingFrame. Kaydırma çubuğu eklendi.
 		local MAX_LIST_HEIGHT = 160
 		local ITEM_HEIGHT = 24
 
@@ -1538,20 +1581,23 @@ function Menu:AddSection(tabData, side, title)
 		ListContainer.BackgroundColor3 = Color3.fromRGB(16, 20, 26)
 		ListContainer.ClipsDescendants = true
 		ListContainer.ZIndex = 50
+		-- FIX: kaydırma çubuğu ve davranışı
 		ListContainer.ScrollBarThickness = 3
-		ListContainer.ScrollBarImageColor3 = CurrentTheme.Primary
+		ListContainer.ScrollBarImageColor3 = Color3.fromRGB(0, 200, 255)
 		ListContainer.ScrollingDirection = Enum.ScrollingDirection.Y
 		ListContainer.CanvasSize = UDim2.new(0, 0, 0, #list * ITEM_HEIGHT)
+		-- FIX: fare tekerleği / dokunmatik ile kaydırma önceliği bu frame'de
 		ListContainer.ScrollingEnabled = true
 		ListContainer.ElasticBehavior = Enum.ElasticBehavior.Always
 		ListContainer.Parent = ActionBtn
 		addCorner(ListContainer, 5)
-		addStroke(ListContainer, CurrentTheme.Primary, 1, 0.7)
+		addStroke(ListContainer, Color3.fromRGB(0, 200, 255), 1, 0.7)
 
 		local ListLayout = Instance.new("UIListLayout")
 		ListLayout.SortOrder = Enum.SortOrder.LayoutOrder
 		ListLayout.Parent = ListContainer
 
+		-- FIX: içerik boyu değiştiğinde (dinamik liste güncellemelerinde) CanvasSize otomatik güncellenir
 		ListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
 			ListContainer.CanvasSize = UDim2.new(0, 0, 0, ListLayout.AbsoluteContentSize.Y)
 		end)
@@ -1576,11 +1622,16 @@ function Menu:AddSection(tabData, side, title)
 				end)
 			end
 
+			-- FIX: içerik MAX_LIST_HEIGHT'ten uzunsa kutu sabit yükseklikte kalır
+			-- ve ScrollingFrame kaydırma ile fazlalığı gösterir
 			local targetHeight = dropped and math.clamp(#list * ITEM_HEIGHT, 0, MAX_LIST_HEIGHT) or 0
 			TweenService:Create(ListContainer, TweenInfo.new(0.25, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {Size = UDim2.new(1, 0, 0, targetHeight)}):Play()
-			TweenService:Create(Arrow, TweenInfo.new(0.2), {Rotation = dropped and 180 or 0, TextColor3 = dropped and CurrentTheme.Primary or Color3.fromRGB(120, 125, 130)}):Play()
+			TweenService:Create(Arrow, TweenInfo.new(0.2), {Rotation = dropped and 180 or 0, TextColor3 = dropped and Color3.fromRGB(0, 200, 255) or Color3.fromRGB(120, 125, 130)}):Play()
 
-			if dropped then ListContainer.CanvasPosition = Vector2.new(0, 0) end
+			-- FIX: her açılışta en üste sıfırla
+			if dropped then
+				ListContainer.CanvasPosition = Vector2.new(0, 0)
+			end
 		end
 
 		ActionBtn.MouseButton1Click:Connect(toggleDropdown)
@@ -1588,12 +1639,12 @@ function Menu:AddSection(tabData, side, title)
 		for _, item in pairs(list) do
 			local ItemBtn = Instance.new("TextButton")
 			ItemBtn.Size = UDim2.new(1, 0, 0, ITEM_HEIGHT)
-			ItemBtn.BackgroundColor3 = CurrentTheme.Primary
+			ItemBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 255)
 			ItemBtn.BackgroundTransparency = 1
 			ItemBtn.Text = "  " .. tostring(item)
-			ItemBtn.TextColor3 = table.find(selectedItems, item) and CurrentTheme.Primary or Color3.fromRGB(190, 195, 200)
-			ItemBtn.Font = Enum.Font.GothamSSm
-			ItemBtn.TextSize = 15 -- %20 Arttı
+			ItemBtn.TextColor3 = table.find(selectedItems, item) and Color3.fromRGB(0,200,255) or Color3.fromRGB(190, 195, 200)
+			ItemBtn.Font = Enum.Font.SourceSans
+			ItemBtn.TextSize = 13
 			ItemBtn.TextXAlignment = Enum.TextXAlignment.Left
 			ItemBtn.ZIndex = 55
 			ItemBtn.AutoButtonColor = false
@@ -1618,7 +1669,7 @@ function Menu:AddSection(tabData, side, title)
 						TweenService:Create(ItemBtn, TweenInfo.new(0.15), {TextColor3 = Color3.fromRGB(190,195,200), BackgroundTransparency = 1}):Play()
 					else
 						table.insert(selectedItems, item)
-						TweenService:Create(ItemBtn, TweenInfo.new(0.15), {TextColor3 = CurrentTheme.Primary, BackgroundTransparency = 0.85}):Play()
+						TweenService:Create(ItemBtn, TweenInfo.new(0.15), {TextColor3 = Color3.fromRGB(0, 200, 255), BackgroundTransparency = 0.85}):Play()
 					end
 					callback(selectedItems)
 				else
@@ -1633,7 +1684,7 @@ function Menu:AddSection(tabData, side, title)
 
 	function elements:AddColorpicker(name, defaultColor, callback)
 		local opened = false
-		local color = defaultColor or CurrentTheme.Primary
+		local color = defaultColor or Color3.fromRGB(0, 200, 255)
 
 		local CpFrame = Instance.new("Frame")
 		CpFrame.Size = UDim2.new(0.94, 0, 0, 30)
@@ -1645,8 +1696,8 @@ function Menu:AddSection(tabData, side, title)
 		Label.BackgroundTransparency = 1
 		Label.Text = name
 		Label.TextColor3 = Color3.fromRGB(170, 175, 180)
-		Label.Font = Enum.Font.GothamSSm
-		Label.TextSize = 16 -- %20 Arttı
+		Label.Font = Enum.Font.SourceSans
+		Label.TextSize = 14
 		Label.TextXAlignment = Enum.TextXAlignment.Left
 		Label.Parent = CpFrame
 
@@ -1669,7 +1720,7 @@ function Menu:AddSection(tabData, side, title)
 		PaletteContainer.ZIndex = 15
 		PaletteContainer.Parent = BoxTrigger
 		addCorner(PaletteContainer, 5)
-		addStroke(PaletteContainer, CurrentTheme.Primary, 1, 0.5)
+		addStroke(PaletteContainer, Color3.fromRGB(0, 200, 255), 1, 0.5)
 
 		local UILayout = Instance.new("UIListLayout")
 		UILayout.FillDirection = Enum.FillDirection.Horizontal
