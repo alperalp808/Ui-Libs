@@ -157,7 +157,7 @@ function Menu:CreateWindow(title, keyName, showButton)
 	ScreenGui.Name = "AquaCSGO_PremiumMenu"
 	ScreenGui.ResetOnSpawn = false
 	ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-	-- Her ÅŸeyin Ã¼zerinde gÃ¶rÃ¼nmesi iÃ§in maksimum DisplayOrder
+	-- Her şeyin üzerinde görünmesi için maksimum DisplayOrder
 	ScreenGui.DisplayOrder = 9999
 	ScreenGui.IgnoreGuiInset = true
 	ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
@@ -178,7 +178,7 @@ function Menu:CreateWindow(title, keyName, showButton)
 	MainFrame.Position = UDim2.new(0, 0, 0, 0)
 	MainFrame.BackgroundColor3 = Color3.fromRGB(12, 16, 20)
 	MainFrame.BackgroundTransparency = 0.25
-	-- FIX: ClipsDescendants = true ile section'larÄ±n taÅŸmasÄ± engellendi
+	-- FIX: ClipsDescendants = true ile section'ların taşması engellendi
 	MainFrame.ClipsDescendants = true
 	MainFrame.Parent = CanvasGroup
 	self.MainFrame = MainFrame
@@ -191,7 +191,7 @@ function Menu:CreateWindow(title, keyName, showButton)
 	Header.BackgroundColor3 = Color3.fromRGB(18, 24, 30)
 	Header.BackgroundTransparency = 0.3
 	Header.BorderSizePixel = 0
-	-- FIX: Header ZIndex yÃ¼ksek tutuldu, her zaman Ã¼stte kalÄ±r
+	-- FIX: Header ZIndex yüksek tutuldu, her zaman üstte kalır
 	Header.ZIndex = 10
 	Header.Parent = MainFrame
 	addCorner(Header, 10)
@@ -251,7 +251,7 @@ function Menu:CreateWindow(title, keyName, showButton)
 	CloseBtn.Parent = Controls
 	addCorner(CloseBtn, 6)
 
-	-- FIX: TabBar wrapper â€” yatay kaydÄ±rma iÃ§in ScrollingFrame kullanÄ±ldÄ±
+	-- FIX: TabBar wrapper — yatay kaydırma için ScrollingFrame kullanıldı
 	local TabBarWrapper = Instance.new("Frame")
 	TabBarWrapper.Name = "TabBarWrapper"
 	TabBarWrapper.Size = UDim2.new(1, -314, 0, 34)
@@ -263,15 +263,15 @@ function Menu:CreateWindow(title, keyName, showButton)
 	TabBarWrapper.Parent = MainFrame
 	addCorner(TabBarWrapper, 6)
 
-	-- FIX: GerÃ§ek tab iÃ§erikleri bu ScrollingFrame iÃ§ine eklendi (yatay kaydÄ±rÄ±labilir)
+	-- FIX: Gerçek tab içerikleri bu ScrollingFrame içine eklendi (yatay kaydırılabilir)
 	local TabBar = Instance.new("ScrollingFrame")
 	TabBar.Name = "TabBar"
 	TabBar.Size = UDim2.new(1, 0, 1, 0)
 	TabBar.Position = UDim2.new(0, 0, 0, 0)
 	TabBar.BackgroundTransparency = 1
-	TabBar.ScrollBarThickness = 0          -- scrollbar gizli, parmakla kaydÄ±rÄ±lÄ±r
+	TabBar.ScrollBarThickness = 0          -- scrollbar gizli, parmakla kaydırılır
 	TabBar.ScrollingDirection = Enum.ScrollingDirection.X
-	TabBar.CanvasSize = UDim2.new(0, 0, 0, 0) -- dinamik gÃ¼ncellenecek
+	TabBar.CanvasSize = UDim2.new(0, 0, 0, 0) -- dinamik güncellenecek
 	TabBar.ZIndex = 5
 	TabBar.Parent = TabBarWrapper
 	self.TabBar = TabBar
@@ -288,7 +288,7 @@ function Menu:CreateWindow(title, keyName, showButton)
 	TabPadding.PaddingTop = UDim.new(0, 4)
 	TabPadding.Parent = TabBar
 
-	-- FIX: TabList iÃ§erik geniÅŸliÄŸi deÄŸiÅŸince CanvasSize otomatik gÃ¼ncellenir
+	-- FIX: TabList içerik genişliği değişince CanvasSize otomatik güncellenir
 	TabList:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
 		TabBar.CanvasSize = UDim2.new(0, TabList.AbsoluteContentSize.X + 12, 0, 0)
 	end)
@@ -297,7 +297,7 @@ function Menu:CreateWindow(title, keyName, showButton)
 	Container.Size = UDim2.new(1, -314, 1, -98)
 	Container.Position = UDim2.new(0, 302, 0, 88)
 	Container.BackgroundTransparency = 1
-	-- FIX: Container ClipsDescendants = true â€” section'lar dÄ±ÅŸarÄ± taÅŸamaz
+	-- FIX: Container ClipsDescendants = true — section'lar dışarı taşamaz
 	Container.ClipsDescendants = true
 	Container.Parent = MainFrame
 	self.Container = Container
@@ -521,7 +521,7 @@ function Menu:CreateWindow(title, keyName, showButton)
 				local PLabel = Instance.new("TextLabel")
 				PLabel.Size = UDim2.new(1, 0, 0, 18)
 				PLabel.BackgroundTransparency = 1
-				PLabel.Text = " Â» " .. p.DisplayName .. " (@" .. p.Name .. ")"
+				PLabel.Text = " » " .. p.DisplayName .. " (@" .. p.Name .. ")"
 				PLabel.Font = Enum.Font.SourceSans
 				PLabel.TextSize = 14
 				PLabel.TextColor3 = Color3.fromRGB(210, 215, 220)
@@ -706,7 +706,7 @@ function Menu:SetupGlobalToggle(keyName, showButton)
 		PButton.Position = UDim2.new(0, 15, 0, 120)
 		PButton.BackgroundColor3 = Color3.fromRGB(12, 16, 20)
 		PButton.BackgroundTransparency = 0.4
-		PButton.Text = "ğŸŒŠ"
+		PButton.Text = "🌊"
 		PButton.TextColor3 = Color3.fromRGB(0, 200, 255)
 		PButton.Font = Enum.Font.SourceSansBold
 		PButton.TextSize = 18
@@ -775,15 +775,15 @@ function Menu:AddTab(name)
 	TabPage.Visible = false
 	TabPage.Parent = self.Container
 
-	-- FIX: Sol ve saÄŸ zone artÄ±k ClipsDescendants = true
-	-- Section'lar scroll edildiÄŸinde TabBar veya Header Ã¼stÃ¼ne taÅŸÄ±maz
+	-- FIX: Sol ve sağ zone artık ClipsDescendants = true
+	-- Section'lar scroll edildiğinde TabBar veya Header üstüne taşımaz
 	local LeftZone = Instance.new("ScrollingFrame")
 	LeftZone.Size = UDim2.new(0.5, -6, 1, 0)
 	LeftZone.BackgroundTransparency = 1
 	LeftZone.ScrollBarThickness = 3
 	LeftZone.ScrollBarImageColor3 = Color3.fromRGB(0, 200, 255)
 	LeftZone.ScrollBarImageTransparency = 0.4
-	-- FIX: false yerine true â€” iÃ§erik dÄ±ÅŸarÄ± taÅŸmaz
+	-- FIX: false yerine true — içerik dışarı taşmaz
 	LeftZone.ClipsDescendants = true
 	LeftZone.Parent = TabPage
 
@@ -854,7 +854,7 @@ function Menu:AddSection(tabData, side, title)
 	SectionFrame.Size = UDim2.new(1, -6, 0, 50)
 	SectionFrame.BackgroundColor3 = Color3.fromRGB(16, 22, 28)
 	SectionFrame.BackgroundTransparency = 0.4
-	-- FIX: ClipsDescendants = true â€” section iÃ§eriÄŸi dÄ±ÅŸarÄ± taÅŸmaz
+	-- FIX: ClipsDescendants = true — section içeriği dışarı taşmaz
 	SectionFrame.ClipsDescendants = true
 	SectionFrame.ZIndex = 2
 	SectionFrame.Parent = parentZone
@@ -881,7 +881,7 @@ function Menu:AddSection(tabData, side, title)
 	SecTitle.TextSize = 12
 	SecTitle.TextColor3 = Color3.fromRGB(0, 200, 255)
 	SecTitle.TextXAlignment = Enum.TextXAlignment.Left
-	-- FIX: ZIndex yÃ¼kseltildi, baÅŸlÄ±k her zaman gÃ¶rÃ¼nÃ¼r
+	-- FIX: ZIndex yükseltildi, başlık her zaman görünür
 	SecTitle.ZIndex = 3
 	SecTitle.Parent = SectionFrame
 
@@ -1214,11 +1214,11 @@ function Menu:AddSection(tabData, side, title)
 	end
 
 	-- ==========================================================
-	-- FIX: AddDropdown â€” liste artÄ±k gerÃ§ek bir ScrollingFrame.
-	-- Ã–nceden ListContainer normal bir Frame idi ve ClipsDescendants
-	-- ile taÅŸan Ã¶ÄŸeler sadece gizleniyordu, kaydÄ±rÄ±lamÄ±yordu.
-	-- Åimdi Ã¶ÄŸe sayÄ±sÄ± ne olursa olsun CanvasSize gÃ¼ncelleniyor ve
-	-- kullanÄ±cÄ± liste iÃ§inde parmaÄŸÄ±yla / fare tekerleÄŸiyle kaydÄ±rabiliyor.
+	-- FIX: AddDropdown — liste artık gerçek bir ScrollingFrame.
+	-- Önceden ListContainer normal bir Frame idi ve ClipsDescendants
+	-- ile taşan öğeler sadece gizleniyordu, kaydırılamıyordu.
+	-- Şimdi öğe sayısı ne olursa olsun CanvasSize güncelleniyor ve
+	-- kullanıcı liste içinde parmağıyla / fare tekerleğiyle kaydırabiliyor.
 	-- ==========================================================
 	function elements:AddDropdown(name, list, isMulti, callback)
 		local dropped = false
@@ -1260,14 +1260,14 @@ function Menu:AddSection(tabData, side, title)
 		Arrow.Size = UDim2.new(0, 24, 1, 0)
 		Arrow.Position = UDim2.new(1, -24, 0, 0)
 		Arrow.BackgroundTransparency = 1
-		Arrow.Text = "â–¼"
+		Arrow.Text = "▼"
 		Arrow.TextColor3 = Color3.fromRGB(120, 125, 130)
 		Arrow.Font = Enum.Font.SourceSansBold
 		Arrow.TextSize = 10
 		Arrow.ZIndex = 7
 		Arrow.Parent = ActionBtn
 
-		-- FIX: Frame -> ScrollingFrame. KaydÄ±rma Ã§ubuÄŸu eklendi.
+		-- FIX: Frame -> ScrollingFrame. Kaydırma çubuğu eklendi.
 		local MAX_LIST_HEIGHT = 160
 		local ITEM_HEIGHT = 24
 
@@ -1277,12 +1277,12 @@ function Menu:AddSection(tabData, side, title)
 		ListContainer.BackgroundColor3 = Color3.fromRGB(16, 20, 26)
 		ListContainer.ClipsDescendants = true
 		ListContainer.ZIndex = 50
-		-- FIX: kaydÄ±rma Ã§ubuÄŸu ve davranÄ±ÅŸÄ±
+		-- FIX: kaydırma çubuğu ve davranışı
 		ListContainer.ScrollBarThickness = 3
 		ListContainer.ScrollBarImageColor3 = Color3.fromRGB(0, 200, 255)
 		ListContainer.ScrollingDirection = Enum.ScrollingDirection.Y
 		ListContainer.CanvasSize = UDim2.new(0, 0, 0, #list * ITEM_HEIGHT)
-		-- FIX: fare tekerleÄŸi / dokunmatik ile kaydÄ±rma Ã¶nceliÄŸi bu frame'de
+		-- FIX: fare tekerleği / dokunmatik ile kaydırma önceliği bu frame'de
 		ListContainer.ScrollingEnabled = true
 		ListContainer.ElasticBehavior = Enum.ElasticBehavior.Always
 		ListContainer.Parent = ActionBtn
@@ -1293,7 +1293,7 @@ function Menu:AddSection(tabData, side, title)
 		ListLayout.SortOrder = Enum.SortOrder.LayoutOrder
 		ListLayout.Parent = ListContainer
 
-		-- FIX: iÃ§erik boyu deÄŸiÅŸtiÄŸinde (dinamik liste gÃ¼ncellemelerinde) CanvasSize otomatik gÃ¼ncellenir
+		-- FIX: içerik boyu değiştiğinde (dinamik liste güncellemelerinde) CanvasSize otomatik güncellenir
 		ListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
 			ListContainer.CanvasSize = UDim2.new(0, 0, 0, ListLayout.AbsoluteContentSize.Y)
 		end)
@@ -1318,13 +1318,13 @@ function Menu:AddSection(tabData, side, title)
 				end)
 			end
 
-			-- FIX: iÃ§erik MAX_LIST_HEIGHT'ten uzunsa kutu sabit yÃ¼kseklikte kalÄ±r
-			-- ve ScrollingFrame kaydÄ±rma ile fazlalÄ±ÄŸÄ± gÃ¶sterir
+			-- FIX: içerik MAX_LIST_HEIGHT'ten uzunsa kutu sabit yükseklikte kalır
+			-- ve ScrollingFrame kaydırma ile fazlalığı gösterir
 			local targetHeight = dropped and math.clamp(#list * ITEM_HEIGHT, 0, MAX_LIST_HEIGHT) or 0
 			TweenService:Create(ListContainer, TweenInfo.new(0.25, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {Size = UDim2.new(1, 0, 0, targetHeight)}):Play()
 			TweenService:Create(Arrow, TweenInfo.new(0.2), {Rotation = dropped and 180 or 0, TextColor3 = dropped and Color3.fromRGB(0, 200, 255) or Color3.fromRGB(120, 125, 130)}):Play()
 
-			-- FIX: her aÃ§Ä±lÄ±ÅŸta en Ã¼ste sÄ±fÄ±rla
+			-- FIX: her açılışta en üste sıfırla
 			if dropped then
 				ListContainer.CanvasPosition = Vector2.new(0, 0)
 			end
