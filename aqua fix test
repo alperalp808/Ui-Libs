@@ -945,56 +945,124 @@ function Menu:CreateWindow(title, keyName, showButton, config)
 	createClipboardButton("HWID Matrix", function() return game:GetService("RbxAnalyticsService"):GetClientId() or "Unknown_Hardware_Identifier" end)
 	createClipboardButton("Vector Position", function() return tostring(LocalPlayer.Character and LocalPlayer.Character:GetPivot().Position or Vector3.zero) end)
 
-	local RadarLabel = Instance.new("TextLabel")
-	RadarLabel.Size = UDim2.new(1, -24, 0, 16)
-	RadarLabel.Position = UDim2.new(0, 12, 0, 228)
-	RadarLabel.BackgroundTransparency = 1
-	RadarLabel.Text = "RADAR LIST (1/1)"
-	RadarLabel.Font = Enum.Font.GothamBold
-	RadarLabel.TextSize = 15
-	RadarLabel.TextColor3 = Theme.Accent
-	RadarLabel.TextXAlignment = Enum.TextXAlignment.Left
-	RadarLabel.Parent = DiagnosticFrame
+	-- FIX: "Radar List" ismi "Player List" olarak değiştirildi
+	local PlayerListLabel = Instance.new("TextLabel")
+	PlayerListLabel.Size = UDim2.new(1, -24, 0, 16)
+	PlayerListLabel.Position = UDim2.new(0, 12, 0, 228)
+	PlayerListLabel.BackgroundTransparency = 1
+	PlayerListLabel.Text = "PLAYER LIST (1/1)"
+	PlayerListLabel.Font = Enum.Font.GothamBold
+	PlayerListLabel.TextSize = 15
+	PlayerListLabel.TextColor3 = Theme.Accent
+	PlayerListLabel.TextXAlignment = Enum.TextXAlignment.Left
+	PlayerListLabel.Parent = DiagnosticFrame
 
-	local RadarScroll = Instance.new("ScrollingFrame")
-	RadarScroll.Size = UDim2.new(1, -24, 1, -250)
-	RadarScroll.Position = UDim2.new(0, 12, 0, 244)
-	RadarScroll.BackgroundColor3 = Theme.Background
-	RadarScroll.BackgroundTransparency = 0.6
-	RadarScroll.ScrollBarThickness = 2
-	RadarScroll.ScrollBarImageColor3 = Theme.Accent
-	RadarScroll.Parent = DiagnosticFrame
-	addCorner(RadarScroll, 6)
+	local PlayerListScroll = Instance.new("ScrollingFrame")
+	PlayerListScroll.Size = UDim2.new(1, -24, 1, -250)
+	PlayerListScroll.Position = UDim2.new(0, 12, 0, 244)
+	PlayerListScroll.BackgroundColor3 = Theme.Background
+	PlayerListScroll.BackgroundTransparency = 0.6
+	PlayerListScroll.ScrollBarThickness = 2
+	PlayerListScroll.ScrollBarImageColor3 = Theme.Accent
+	PlayerListScroll.Parent = DiagnosticFrame
+	addCorner(PlayerListScroll, 6)
 
-	local RadarLayout = Instance.new("UIListLayout")
-	RadarLayout.SortOrder = Enum.SortOrder.LayoutOrder
-	RadarLayout.Parent = RadarScroll
+	local PlayerListLayout = Instance.new("UIListLayout")
+	PlayerListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+	PlayerListLayout.Padding = UDim.new(0, 2)
+	PlayerListLayout.Parent = PlayerListScroll
 
-	local function updateRadar()
-		for _, v in pairs(RadarScroll:GetChildren()) do if v:IsA("TextLabel") then v:Destroy() end end
+	-- FIX: script bu iki fonksiyonu kendi ihtiyacına göre override edebilir, örn:
+	-- Window.OnPlayerView = function(player, state) ... end
+	-- Window.OnPlayerAction = function(player) ... end
+	self.OnPlayerView = self.OnPlayerView or function(player, state) end
+	self.OnPlayerAction = self.OnPlayerAction or function(player) end
+	local playerViewStates = {}
+
+	local function updatePlayerList()
+		for _, v in pairs(PlayerListScroll:GetChildren()) do if v:IsA("Frame") then v:Destroy() end end
 		local activePlayers = Players:GetPlayers()
 		local count = #activePlayers
 		local maxPlayers = Players.MaxPlayers
-		RadarLabel.Text = "RADAR LIST (" .. tostring(count) .. "/" .. tostring(maxPlayers) .. ")"
+		PlayerListLabel.Text = "PLAYER LIST (" .. tostring(count) .. "/" .. tostring(maxPlayers) .. ")"
 
 		for _, p in pairs(activePlayers) do
 			if p ~= LocalPlayer then
+				local Row = Instance.new("Frame")
+				Row.Size = UDim2.new(1, 0, 0, 20)
+				Row.BackgroundTransparency = 1
+				Row.Parent = PlayerListScroll
+
 				local PLabel = Instance.new("TextLabel")
-				PLabel.Size = UDim2.new(1, 0, 0, 18)
+				PLabel.Size = UDim2.new(1, -46, 1, 0)
 				PLabel.BackgroundTransparency = 1
 				PLabel.Text = " » " .. p.DisplayName .. " (@" .. p.Name .. ")"
 				PLabel.Font = Enum.Font.Gotham
 				PLabel.TextSize = 14
 				PLabel.TextColor3 = Theme.TextSecondary
 				PLabel.TextXAlignment = Enum.TextXAlignment.Left
-				PLabel.Parent = RadarScroll
+				PLabel.TextTruncate = Enum.TextTruncate.AtEnd
+				PLabel.Parent = Row
+
+				-- FIX: göz sembolü — açık/kapalı geçişli izleme butonu, gerçek davranış
+				-- Window.OnPlayerView ile dışarıdan bağlanır (örn. ESP açma/kapama)
+				local ViewBtn = Instance.new("TextButton")
+				ViewBtn.Size = UDim2.new(0, 20, 0, 20)
+				ViewBtn.Position = UDim2.new(1, -42, 0, 0)
+				ViewBtn.BackgroundColor3 = Theme.Field
+				ViewBtn.Text = "👁"
+				ViewBtn.TextColor3 = Theme.TextMuted
+				ViewBtn.Font = Enum.Font.SourceSans
+				ViewBtn.TextSize = 13
+				ViewBtn.AutoButtonColor = false
+				ViewBtn.Parent = Row
+				addCorner(ViewBtn, 4)
+				addStroke(ViewBtn, Color3.fromRGB(255,255,255), 1, 0.9)
+
+				-- FIX: ışınlanma / hedefe git sembolü — Window.OnPlayerAction ile bağlanır
+				local ActionBtn = Instance.new("TextButton")
+				ActionBtn.Size = UDim2.new(0, 20, 0, 20)
+				ActionBtn.Position = UDim2.new(1, -20, 0, 0)
+				ActionBtn.BackgroundColor3 = Theme.Field
+				ActionBtn.Text = "➤"
+				ActionBtn.TextColor3 = Theme.TextMuted
+				ActionBtn.Font = Enum.Font.SourceSans
+				ActionBtn.TextSize = 13
+				ActionBtn.AutoButtonColor = false
+				ActionBtn.Parent = Row
+				addCorner(ActionBtn, 4)
+				addStroke(ActionBtn, Color3.fromRGB(255,255,255), 1, 0.9)
+
+				ViewBtn.MouseButton1Click:Connect(function()
+					playSound(SFX.Click, 0.4)
+					local newState = not playerViewStates[p.UserId]
+					playerViewStates[p.UserId] = newState
+					TweenService:Create(ViewBtn, TweenInfo.new(0.2), {
+						BackgroundColor3 = newState and Theme.Accent or Theme.Field,
+						TextColor3 = newState and Theme.TextPrimary or Theme.TextMuted
+					}):Play()
+					self.OnPlayerView(p, newState)
+				end)
+
+				ActionBtn.MouseButton1Click:Connect(function()
+					playSound(SFX.Click, 0.45, 1.1)
+					TweenService:Create(ActionBtn, TweenInfo.new(0.1), {BackgroundColor3 = Theme.Accent, TextColor3 = Theme.TextPrimary}):Play()
+					task.delay(0.15, function()
+						TweenService:Create(ActionBtn, TweenInfo.new(0.2), {BackgroundColor3 = Theme.Field, TextColor3 = Theme.TextMuted}):Play()
+					end)
+					self.OnPlayerAction(p)
+				end)
+
+				for _, btn in ipairs({ViewBtn, ActionBtn}) do
+					btn.MouseEnter:Connect(function() playSound(SFX.Hover, 0.15) end)
+				end
 			end
 		end
-		RadarScroll.CanvasSize = UDim2.new(0, 0, 0, RadarLayout.AbsoluteContentSize.Y + 5)
+		PlayerListScroll.CanvasSize = UDim2.new(0, 0, 0, PlayerListLayout.AbsoluteContentSize.Y + 5)
 	end
-	Players.PlayerAdded:Connect(updateRadar)
-	Players.PlayerRemoving:Connect(updateRadar)
-	updateRadar()
+	Players.PlayerAdded:Connect(updatePlayerList)
+	Players.PlayerRemoving:Connect(updatePlayerList)
+	updatePlayerList()
 
 	local lastIteration, frameCount = os.clock(), 0
 	RunService.RenderStepped:Connect(function()
@@ -1662,7 +1730,17 @@ function Menu:AddSection(tabData, side, title)
 		createKeybindEngine(BindFrame, name, defaultKey, callback)
 	end
 
-	function elements:AddTextbox(name, placeholder, callback)
+	-- FIX: AddTextbox artık "defaultValue" (first value) parametresi alıyor.
+	-- Örnek: Section:AddTextbox("Hız", "Sayı gir...", "30", function(text) ... end)
+	-- "30" kutunun içinde hazır yazılı gelir, silinip başka bir şey yazılabilir.
+	-- Eski kullanım (defaultValue vermeden) de çalışmaya devam eder.
+	function elements:AddTextbox(name, placeholder, defaultValue, callback)
+		if type(defaultValue) == "function" then
+			-- geriye dönük uyumluluk: eskiden 3. parametre callback'ti
+			callback = defaultValue
+			defaultValue = nil
+		end
+
 		local BoxFrame = Instance.new("Frame")
 		BoxFrame.Size = UDim2.new(0.94, 0, 0, 52)
 		BoxFrame.BackgroundTransparency = 1
@@ -1682,7 +1760,7 @@ function Menu:AddSection(tabData, side, title)
 		InputBox.Size = UDim2.new(1, 0, 0, 28)
 		InputBox.Position = UDim2.new(0, 0, 0, 22)
 		InputBox.BackgroundColor3 = Theme.Field
-		InputBox.Text = ""
+		InputBox.Text = tostring(defaultValue or "")
 		InputBox.PlaceholderText = placeholder or "Type here..."
 		InputBox.PlaceholderColor3 = Theme.TextMuted
 		InputBox.TextColor3 = Theme.TextPrimary
@@ -1701,8 +1779,17 @@ function Menu:AddSection(tabData, side, title)
 		InputBox.FocusLost:Connect(function(enterPressed)
 			TweenService:Create(BoxStroke, TweenInfo.new(0.2), {Color = Color3.fromRGB(255, 255, 255), Transparency = 0.94}):Play()
 			playSound(SFX.Click, 0.4)
-			callback(InputBox.Text, enterPressed)
+			if callback then callback(InputBox.Text, enterPressed) end
 		end)
+
+		local textboxObject = {}
+		function textboxObject:SetValue(newValue)
+			InputBox.Text = tostring(newValue or "")
+		end
+		function textboxObject:GetValue()
+			return InputBox.Text
+		end
+		return textboxObject
 	end
 
 	-- ==========================================================
@@ -1861,13 +1948,19 @@ function Menu:AddSection(tabData, side, title)
 		end
 	end
 
+	-- ==========================================================
+	-- FIX: AddColorpicker tamamen yenilendi — artık gerçek bir HSV renk paleti:
+	-- doygunluk/parlaklık kutusu (sürüklenebilir), hue şeridi (sürüklenebilir),
+	-- hex kod girişi ve hazır renk swatch'ları içeriyor.
+	-- ==========================================================
 	function elements:AddColorpicker(name, defaultColor, callback)
 		local opened = false
-		local color = defaultColor or Theme.Accent
+		local hue, sat, val = (defaultColor or Theme.Accent):ToHSV()
 
 		local CpFrame = Instance.new("Frame")
 		CpFrame.Size = UDim2.new(0.94, 0, 0, 32)
 		CpFrame.BackgroundTransparency = 1
+		CpFrame.ZIndex = 5
 		CpFrame.Parent = SectionFrame
 
 		local Label = Instance.new("TextLabel")
@@ -1878,63 +1971,260 @@ function Menu:AddSection(tabData, side, title)
 		Label.Font = Enum.Font.Gotham
 		Label.TextSize = 17
 		Label.TextXAlignment = Enum.TextXAlignment.Left
+		Label.ZIndex = 5
 		Label.Parent = CpFrame
 
 		local BoxTrigger = Instance.new("TextButton")
 		BoxTrigger.Size = UDim2.new(0, 34, 0, 18)
 		BoxTrigger.Position = UDim2.new(1, -34, 0.5, -9)
-		BoxTrigger.BackgroundColor3 = color
+		BoxTrigger.BackgroundColor3 = defaultColor or Theme.Accent
 		BoxTrigger.Text = ""
 		BoxTrigger.AutoButtonColor = false
+		BoxTrigger.ZIndex = 6
 		BoxTrigger.Parent = CpFrame
 		addCorner(BoxTrigger, 4)
 		addStroke(BoxTrigger, Color3.fromRGB(255,255,255), 1, 0.6)
 
+		local PANEL_W, PANEL_H = 194, 158
 		local PaletteContainer = Instance.new("Frame")
-		PaletteContainer.Size = UDim2.new(0, 160, 0, 24)
-		PaletteContainer.Position = UDim2.new(1, -165, 1, 4)
+		PaletteContainer.Size = UDim2.new(0, PANEL_W, 0, PANEL_H)
+		PaletteContainer.Position = UDim2.new(1, -PANEL_W, 1, 6)
 		PaletteContainer.BackgroundColor3 = Theme.Panel
-		PaletteContainer.ClipsDescendants = true
 		PaletteContainer.Visible = false
-		PaletteContainer.ZIndex = 15
+		PaletteContainer.ZIndex = 40
 		PaletteContainer.Parent = BoxTrigger
-		addCorner(PaletteContainer, 5)
-		addStroke(PaletteContainer, Theme.Accent, 1, 0.5)
+		addCorner(PaletteContainer, 6)
+		addStroke(PaletteContainer, Theme.Accent, 1, 0.4)
 
-		local UILayout = Instance.new("UIListLayout")
-		UILayout.FillDirection = Enum.FillDirection.Horizontal
-		UILayout.SortOrder = Enum.SortOrder.LayoutOrder
-		UILayout.Parent = PaletteContainer
+		local PalPadding = Instance.new("UIPadding")
+		PalPadding.PaddingTop = UDim.new(0, 10)
+		PalPadding.PaddingLeft = UDim.new(0, 10)
+		PalPadding.PaddingRight = UDim.new(0, 10)
+		PalPadding.PaddingBottom = UDim.new(0, 10)
+		PalPadding.Parent = PaletteContainer
+
+		-- Doygunluk / Parlaklık kutusu
+		local SVBox = Instance.new("Frame")
+		SVBox.Size = UDim2.new(0, 140, 0, 90)
+		SVBox.Position = UDim2.new(0, 0, 0, 0)
+		SVBox.BackgroundColor3 = Color3.fromHSV(hue, 1, 1)
+		SVBox.ZIndex = 41
+		SVBox.Parent = PaletteContainer
+		addCorner(SVBox, 5)
+
+		local WhiteOverlay = Instance.new("Frame")
+		WhiteOverlay.Size = UDim2.new(1, 0, 1, 0)
+		WhiteOverlay.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+		WhiteOverlay.BorderSizePixel = 0
+		WhiteOverlay.ZIndex = 42
+		WhiteOverlay.Parent = SVBox
+		addCorner(WhiteOverlay, 5)
+		local WhiteGradient = Instance.new("UIGradient")
+		WhiteGradient.Transparency = NumberSequence.new(0, 1)
+		WhiteGradient.Rotation = 0
+		WhiteGradient.Parent = WhiteOverlay
+
+		local BlackOverlay = Instance.new("Frame")
+		BlackOverlay.Size = UDim2.new(1, 0, 1, 0)
+		BlackOverlay.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+		BlackOverlay.BorderSizePixel = 0
+		BlackOverlay.ZIndex = 43
+		BlackOverlay.Parent = SVBox
+		addCorner(BlackOverlay, 5)
+		local BlackGradient = Instance.new("UIGradient")
+		BlackGradient.Transparency = NumberSequence.new(1, 0)
+		BlackGradient.Rotation = 90
+		BlackGradient.Parent = BlackOverlay
+
+		local SVSelector = Instance.new("Frame")
+		SVSelector.Size = UDim2.new(0, 10, 0, 10)
+		SVSelector.AnchorPoint = Vector2.new(0.5, 0.5)
+		SVSelector.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+		SVSelector.ZIndex = 44
+		SVSelector.Parent = SVBox
+		addCorner(SVSelector, 5)
+		addStroke(SVSelector, Color3.fromRGB(0, 0, 0), 1.5, 0.3)
+
+		-- Hue (renk tonu) şeridi
+		local HueStrip = Instance.new("Frame")
+		HueStrip.Size = UDim2.new(0, 16, 0, 90)
+		HueStrip.Position = UDim2.new(0, 150, 0, 0)
+		HueStrip.ZIndex = 41
+		HueStrip.Parent = PaletteContainer
+		addCorner(HueStrip, 5)
+		local HueGradient = Instance.new("UIGradient")
+		HueGradient.Rotation = 90
+		HueGradient.Color = ColorSequence.new({
+			ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255, 0, 0)),
+			ColorSequenceKeypoint.new(0.17, Color3.fromRGB(255, 255, 0)),
+			ColorSequenceKeypoint.new(0.33, Color3.fromRGB(0, 255, 0)),
+			ColorSequenceKeypoint.new(0.50, Color3.fromRGB(0, 255, 255)),
+			ColorSequenceKeypoint.new(0.67, Color3.fromRGB(0, 0, 255)),
+			ColorSequenceKeypoint.new(0.83, Color3.fromRGB(255, 0, 255)),
+			ColorSequenceKeypoint.new(1.00, Color3.fromRGB(255, 0, 0)),
+		})
+		HueGradient.Parent = HueStrip
+
+		local HueKnob = Instance.new("Frame")
+		HueKnob.Size = UDim2.new(1, 4, 0, 4)
+		HueKnob.AnchorPoint = Vector2.new(0, 0.5)
+		HueKnob.Position = UDim2.new(0, -2, 0, 0)
+		HueKnob.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+		HueKnob.BorderSizePixel = 0
+		HueKnob.ZIndex = 45
+		HueKnob.Parent = HueStrip
+		addStroke(HueKnob, Color3.fromRGB(0, 0, 0), 1, 0.3)
+
+		-- Hex kod girişi
+		local HexBox = Instance.new("TextBox")
+		HexBox.Size = UDim2.new(0, 140, 0, 22)
+		HexBox.Position = UDim2.new(0, 0, 0, 98)
+		HexBox.BackgroundColor3 = Theme.Field
+		HexBox.Text = "#FFFFFF"
+		HexBox.TextColor3 = Theme.TextPrimary
+		HexBox.Font = Enum.Font.RobotoMono
+		HexBox.TextSize = 13
+		HexBox.ClearTextOnFocus = false
+		HexBox.ZIndex = 41
+		HexBox.Parent = PaletteContainer
+		addCorner(HexBox, 4)
+		addStroke(HexBox, Color3.fromRGB(255, 255, 255), 1, 0.9)
+
+		-- Hazır renkler
+		local PresetRow = Instance.new("Frame")
+		PresetRow.Size = UDim2.new(1, 0, 0, 18)
+		PresetRow.Position = UDim2.new(0, 0, 0, 128)
+		PresetRow.BackgroundTransparency = 1
+		PresetRow.ZIndex = 41
+		PresetRow.Parent = PaletteContainer
+
+		local PresetLayout = Instance.new("UIListLayout")
+		PresetLayout.FillDirection = Enum.FillDirection.Horizontal
+		PresetLayout.SortOrder = Enum.SortOrder.LayoutOrder
+		PresetLayout.Padding = UDim.new(0, 4)
+		PresetLayout.Parent = PresetRow
 
 		local presetColors = {
-			Color3.fromRGB(255,0,0), Color3.fromRGB(255,127,0), Color3.fromRGB(255,255,0),
-			Color3.fromRGB(0,255,0), Color3.fromRGB(0,200,255), Color3.fromRGB(0,0,255),
-			Color3.fromRGB(139,0,255), Color3.fromRGB(255,255,255), Color3.fromRGB(0,0,0)
+			Color3.fromRGB(255, 0, 0), Color3.fromRGB(255, 140, 0), Color3.fromRGB(255, 230, 0),
+			Color3.fromRGB(60, 220, 60), Color3.fromRGB(0, 200, 255), Color3.fromRGB(40, 90, 255),
+			Color3.fromRGB(160, 60, 255), Color3.fromRGB(255, 255, 255)
 		}
+
+		local function refreshVisual()
+			local c = Color3.fromHSV(hue, sat, val)
+			BoxTrigger.BackgroundColor3 = c
+			SVBox.BackgroundColor3 = Color3.fromHSV(hue, 1, 1)
+			SVSelector.Position = UDim2.new(sat, 0, 1 - val, 0)
+			SVSelector.BackgroundColor3 = c
+			HueKnob.Position = UDim2.new(0, -2, hue, 0)
+			HexBox.Text = string.format("#%02X%02X%02X", math.floor(c.R * 255 + 0.5), math.floor(c.G * 255 + 0.5), math.floor(c.B * 255 + 0.5))
+			return c
+		end
+
+		local function commitColor()
+			local c = refreshVisual()
+			callback(c)
+		end
+
+		refreshVisual()
+
+		local svDragging, hueDragging = false, false
+
+		local function updateSVFromInput(input)
+			local absPos, absSize = SVBox.AbsolutePosition, SVBox.AbsoluteSize
+			sat = math.clamp((input.Position.X - absPos.X) / absSize.X, 0, 1)
+			val = 1 - math.clamp((input.Position.Y - absPos.Y) / absSize.Y, 0, 1)
+			commitColor()
+		end
+
+		local function updateHueFromInput(input)
+			local absPos, absSize = HueStrip.AbsolutePosition, HueStrip.AbsoluteSize
+			hue = math.clamp((input.Position.Y - absPos.Y) / absSize.Y, 0, 1)
+			commitColor()
+		end
+
+		SVBox.InputBegan:Connect(function(input)
+			if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+				svDragging = true
+				updateSVFromInput(input)
+			end
+		end)
+		SVBox.InputEnded:Connect(function(input)
+			if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+				svDragging = false
+			end
+		end)
+
+		HueStrip.InputBegan:Connect(function(input)
+			if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+				hueDragging = true
+				updateHueFromInput(input)
+			end
+		end)
+		HueStrip.InputEnded:Connect(function(input)
+			if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+				hueDragging = false
+			end
+		end)
+
+		UserInputService.InputChanged:Connect(function(input)
+			if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+				if svDragging then
+					updateSVFromInput(input)
+				elseif hueDragging then
+					updateHueFromInput(input)
+				end
+			end
+		end)
+
+		HexBox.FocusLost:Connect(function()
+			playSound(SFX.Click, 0.4)
+			local hexStr = HexBox.Text:gsub("#", "")
+			if #hexStr == 6 and hexStr:match("^%x+$") then
+				local r = tonumber(hexStr:sub(1, 2), 16)
+				local g = tonumber(hexStr:sub(3, 4), 16)
+				local b = tonumber(hexStr:sub(5, 6), 16)
+				hue, sat, val = Color3.fromRGB(r, g, b):ToHSV()
+				commitColor()
+			else
+				refreshVisual()
+			end
+		end)
+
+		for _, pColor in ipairs(presetColors) do
+			local ColorBlock = Instance.new("TextButton")
+			ColorBlock.Size = UDim2.new(0, 18, 1, 0)
+			ColorBlock.BackgroundColor3 = pColor
+			ColorBlock.Text = ""
+			ColorBlock.AutoButtonColor = false
+			ColorBlock.ZIndex = 42
+			ColorBlock.Parent = PresetRow
+			addCorner(ColorBlock, 4)
+			addStroke(ColorBlock, Color3.fromRGB(255, 255, 255), 1, 0.7)
+
+			ColorBlock.MouseButton1Click:Connect(function()
+				playSound(SFX.Click, 0.4)
+				hue, sat, val = pColor:ToHSV()
+				commitColor()
+			end)
+		end
 
 		BoxTrigger.MouseButton1Click:Connect(function()
 			opened = not opened
 			playSound(SFX.Click, 0.4)
 			PaletteContainer.Visible = opened
+			if opened then
+				parentZone.ZIndex = 10
+				SectionFrame.ZIndex = 10
+				CpFrame.ZIndex = 10
+				BoxTrigger.ZIndex = 11
+			else
+				parentZone.ZIndex = 1
+				SectionFrame.ZIndex = 2
+				CpFrame.ZIndex = 5
+				BoxTrigger.ZIndex = 6
+			end
 		end)
-
-		for i, pColor in pairs(presetColors) do
-			local ColorBlock = Instance.new("TextButton")
-			ColorBlock.Size = UDim2.new(1/#presetColors, 0, 1, 0)
-			ColorBlock.BackgroundColor3 = pColor
-			ColorBlock.Text = ""
-			ColorBlock.ZIndex = 16
-			ColorBlock.Parent = PaletteContainer
-
-			ColorBlock.MouseButton1Click:Connect(function()
-				color = pColor
-				BoxTrigger.BackgroundColor3 = color
-				opened = false
-				PaletteContainer.Visible = false
-				playSound(SFX.ToggleOn, 0.4)
-				callback(color)
-			end)
-		end
 	end
 
 	return elements
