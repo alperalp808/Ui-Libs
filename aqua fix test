@@ -13,14 +13,34 @@ pcall(function()
 	if success and info then PlaceName = info.Name end
 end)
 
+-- FIX: bazı SoundId'ler (kaldırılmış/gizli/geçersiz asset) sessizce çalmayı
+-- reddedebiliyordu ve Ended hiç tetiklenmediği için Sound objesi de silinmeden
+-- kalıyordu. Artık pcall ile korunuyor ve her ihtimalde bir süre sonra temizleniyor.
 local function playSound(soundId, volume, pitch)
-	local sound = Instance.new("Sound")
-	sound.SoundId = "rbxassetid://" .. tostring(soundId)
-	sound.Volume = volume or 0.5
-	sound.Pitch = pitch or 1
-	sound.Parent = game:GetService("SoundService")
-	sound:Play()
-	sound.Ended:Connect(function() sound:Destroy() end)
+	local ok, sound = pcall(function()
+		local s = Instance.new("Sound")
+		s.SoundId = "rbxassetid://" .. tostring(soundId)
+		s.Volume = volume or 0.5
+		s.Pitch = pitch or 1
+		s.Parent = game:GetService("SoundService")
+		return s
+	end)
+	if not ok or not sound then return end
+
+	local playOk = pcall(function() sound:Play() end)
+	if not playOk then
+		sound:Destroy()
+		return
+	end
+
+	local cleaned = false
+	local function cleanup()
+		if cleaned then return end
+		cleaned = true
+		pcall(function() sound:Destroy() end)
+	end
+	sound.Ended:Connect(cleanup)
+	task.delay(6, cleanup)
 end
 
 local SFX = {
@@ -1024,7 +1044,7 @@ function Menu:CreateWindow(title, keyName, showButton, config)
 				ActionBtn.Size = UDim2.new(0, 20, 0, 20)
 				ActionBtn.Position = UDim2.new(1, -20, 0, 0)
 				ActionBtn.BackgroundColor3 = Theme.Field
-				ActionBtn.Text = "➤"
+				ActionBtn.Text = "🌀"
 				ActionBtn.TextColor3 = Theme.TextMuted
 				ActionBtn.Font = Enum.Font.SourceSans
 				ActionBtn.TextSize = 13
@@ -1344,6 +1364,7 @@ end
 
 function Menu:AddSection(tabData, side, title)
 	local Theme = self.Theme
+	local ScreenGuiRef = self.ScreenGui
 	local parentZone = (side == "Right") and tabData.Right or tabData.Left
 
 	local SectionFrame = Instance.new("Frame")
@@ -1986,13 +2007,16 @@ function Menu:AddSection(tabData, side, title)
 		addStroke(BoxTrigger, Color3.fromRGB(255,255,255), 1, 0.6)
 
 		local PANEL_W, PANEL_H = 194, 158
+		-- FIX: Panel artık BoxTrigger'ın değil, en üst seviye ScreenGui'nin çocuğu.
+		-- Section/ScrollingFrame'lerin ClipsDescendants=true olması yüzünden panel
+		-- section altında kalınca kesiliyor ve kullanılamıyordu; ScreenGui'ye taşındığı
+		-- için artık hiçbir üst container tarafından kesilmiyor.
 		local PaletteContainer = Instance.new("Frame")
 		PaletteContainer.Size = UDim2.new(0, PANEL_W, 0, PANEL_H)
-		PaletteContainer.Position = UDim2.new(1, -PANEL_W, 1, 6)
 		PaletteContainer.BackgroundColor3 = Theme.Panel
 		PaletteContainer.Visible = false
-		PaletteContainer.ZIndex = 40
-		PaletteContainer.Parent = BoxTrigger
+		PaletteContainer.ZIndex = 500
+		PaletteContainer.Parent = ScreenGuiRef
 		addCorner(PaletteContainer, 6)
 		addStroke(PaletteContainer, Theme.Accent, 1, 0.4)
 
@@ -2212,7 +2236,31 @@ function Menu:AddSection(tabData, side, title)
 		BoxTrigger.MouseButton1Click:Connect(function()
 			opened = not opened
 			playSound(SFX.Click, 0.4)
+
+			if opened then
+				-- FIX: panel her açılışta ekran sınırlarına göre konumlanır;
+				-- alta sığmazsa yukarı, sağa taşarsa sola doğru açılır.
+				local absPos = BoxTrigger.AbsolutePosition
+				local absSize = BoxTrigger.AbsoluteSize
+				local screenSize = ScreenGuiRef.AbsoluteSize
+
+				local targetX = absPos.X + absSize.X - PANEL_W
+				local targetY = absPos.Y + absSize.Y + 6
+
+				if targetY + PANEL_H > screenSize.Y then
+					targetY = absPos.Y - PANEL_H - 6
+				end
+				if targetX + PANEL_W > screenSize.X then
+					targetX = screenSize.X - PANEL_W - 6
+				end
+				if targetX < 6 then targetX = 6 end
+				if targetY < 6 then targetY = 6 end
+
+				PaletteContainer.Position = UDim2.new(0, targetX, 0, targetY)
+			end
+
 			PaletteContainer.Visible = opened
+
 			if opened then
 				parentZone.ZIndex = 10
 				SectionFrame.ZIndex = 10
