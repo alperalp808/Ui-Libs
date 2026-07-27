@@ -235,7 +235,7 @@ function Spectrum:AddWindow(config)
     local ScreenGui = Create("ScreenGui", {
         Name = "SpectrumUI",
         ResetOnSpawn = false,
-        ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
+        ZIndexBehavior = Enum.ZIndexBehavior.Global, -- Dropdown/Colorpicker panelleri diğer elementlerin üstünde kalsın
         Parent = ParentGui,
     })
     Window.ScreenGui = ScreenGui
@@ -385,7 +385,7 @@ function Spectrum:AddWindow(config)
     local NotifyHolder = Create("Frame", {
         Name = "NotifyHolder",
         AnchorPoint = Vector2.new(1, 1),
-        Size = UDim2.new(0, 280, 1, -20),
+        Size = UDim2.new(0, 240, 0, 480),
         Position = UDim2.new(1, -16, 1, -16),
         BackgroundTransparency = 1,
         Parent = ScreenGui,
@@ -404,17 +404,17 @@ function Spectrum:AddWindow(config)
         Name = "ToggleButton",
         Size = UDim2.new(0, 44, 0, 44),
         Position = UDim2.new(0, 20, 0, 20),
-        BackgroundColor3 = Theme.Accent,
-        BackgroundTransparency = 0.1,
+        BackgroundColor3 = Theme.Background,
+        BackgroundTransparency = 0.5,
         Text = "S",
         Font = Enum.Font.GothamBold,
         TextSize = 16,
-        TextColor3 = Color3.new(1, 1, 1),
+        TextColor3 = Theme.Accent,
         AutoButtonColor = false,
         Visible = not KeySystemCfg.Enabled,
         Parent = ScreenGui,
     })
-    Stroke(ToggleButton, Theme.Stroke, 1.5, 0.2)
+    local ToggleButtonStroke = Stroke(ToggleButton, Theme.Accent, 1.5, 0)
     MakeDraggable(ToggleButton, ToggleButton)
 
     --// Aç / Kapat / Küçült fonksiyonları
@@ -495,7 +495,9 @@ function Spectrum:AddWindow(config)
         Main.BackgroundColor3 = t.Background
         TopBar.BackgroundColor3 = t.Secondary
         TabList.BackgroundColor3 = t.Secondary
-        ToggleButton.BackgroundColor3 = t.Accent
+        ToggleButton.BackgroundColor3 = t.Background
+        ToggleButton.TextColor3 = t.Accent
+        ToggleButtonStroke.Color = t.Accent
     end
 
     --// Bildirim Gönderme (sağ alt, yarı saydam, kayarak gelir)
@@ -595,11 +597,11 @@ function Spectrum:AddWindow(config)
             Size = UDim2.new(0, 320, 0, 240),
             Position = UDim2.new(0.5, -160, 0.5, -120),
             BackgroundColor3 = Theme.Background,
-            BackgroundTransparency = 0.08,
+            BackgroundTransparency = 0.32,
             BorderSizePixel = 0,
             Parent = ScreenGui,
         })
-        Stroke(LoginFrame, Theme.Accent, 1.5, 0.25)
+        Stroke(LoginFrame, Theme.Stroke, 1.5, 0.15)
 
         Create("Frame", {
             Size = UDim2.new(1, 0, 0, 3),
@@ -641,11 +643,12 @@ function Spectrum:AddWindow(config)
             TextSize = 12,
             TextColor3 = Theme.Text,
             PlaceholderColor3 = Theme.SubText,
+            TextXAlignment = Enum.TextXAlignment.Center,
+            TextYAlignment = Enum.TextYAlignment.Center,
             ClearTextOnFocus = false,
             Parent = LoginFrame,
         })
         Stroke(UserBox, Theme.Stroke, 1, 0.4)
-        Pad(UserBox, 10, 0, 10, 0)
 
         local KeyBox = Create("TextBox", {
             Size = UDim2.new(1, -32, 0, 32),
@@ -661,22 +664,9 @@ function Spectrum:AddWindow(config)
             Parent = LoginFrame,
         })
         Stroke(KeyBox, Theme.Stroke, 1, 0.4)
-        Pad(KeyBox, 10, 0, 10, 0)
 
-        -- Anahtar alanını gizlemek için basit maskeleme
-        local RealKey = ""
-        KeyBox:GetPropertyChangedSignal("Text"):Connect(function()
-            local t = KeyBox.Text
-            if #t > #RealKey then
-                RealKey = RealKey .. t:sub(#RealKey + 1)
-            else
-                RealKey = RealKey:sub(1, #t)
-            end
-            local masked = string.rep("•", #RealKey)
-            if KeyBox.Text ~= masked then
-                KeyBox.Text = masked
-            end
-        end)
+        KeyBox.TextXAlignment = Enum.TextXAlignment.Center
+        KeyBox.TextYAlignment = Enum.TextYAlignment.Center
 
         local ErrorLabel = Create("TextLabel", {
             Size = UDim2.new(1, -32, 0, 16),
@@ -709,7 +699,7 @@ function Spectrum:AddWindow(config)
             ClickBounce(LoginButton)
             PlaySound(Sounds.Click, 0.3)
             local uname = UserBox.Text
-            local kkey = RealKey
+            local kkey = KeyBox.Text
             local valid = false
             for _, u in ipairs(Window.KeySystemUsers) do
                 if u.Username == uname and u.Key == kkey then
@@ -875,7 +865,8 @@ function Spectrum:AddWindow(config)
                     BackgroundColor3 = Theme.Tertiary,
                     BackgroundTransparency = 0.06,
                     BorderSizePixel = 0,
-                    ClipsDescendants = true,
+                    ClipsDescendants = false, -- Dropdown/Colorpicker panelleri dışa taşabilsin ve tıklanabilsin
+                    ZIndex = 2,
                     Parent = ElementHolder,
                 })
                 Stroke(Frame, Theme.Stroke, 1, 0.3)
@@ -1234,11 +1225,12 @@ function Spectrum:AddWindow(config)
                     TextSize = 11,
                     TextColor3 = Theme.Text,
                     PlaceholderColor3 = Theme.SubText,
+                    TextXAlignment = Enum.TextXAlignment.Center,
+                    TextYAlignment = Enum.TextYAlignment.Center,
                     ClearTextOnFocus = false,
                     Parent = Frame,
                 })
                 Stroke(InputBox, Theme.Stroke, 1, 0.3)
-                Pad(InputBox, 8, 0, 8, 0)
 
                 InputBox.Focused:Connect(function()
                     Tween(InputBox, { BackgroundColor3 = Theme.Tertiary }, 0.15)
