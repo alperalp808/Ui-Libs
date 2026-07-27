@@ -235,7 +235,7 @@ function Spectrum:AddWindow(config)
     local ScreenGui = Create("ScreenGui", {
         Name = "SpectrumUI",
         ResetOnSpawn = false,
-        ZIndexBehavior = Enum.ZIndexBehavior.Global, -- Dropdown/Colorpicker panelleri diğer elementlerin üstünde kalsın
+        ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
         Parent = ParentGui,
     })
     Window.ScreenGui = ScreenGui
@@ -366,6 +366,58 @@ function Spectrum:AddWindow(config)
         Parent = Main,
     })
     Window.ContentArea = ContentArea
+
+    --// Popup Katmanı (Dropdown / Colorpicker panelleri buraya taşınır — her zaman en üstte ve tıklanabilir)
+    local Overlay = Create("Frame", {
+        Name = "Overlay",
+        Size = UDim2.new(1, 0, 1, 0),
+        BackgroundTransparency = 1,
+        ZIndex = 50,
+        Parent = Main,
+    })
+
+    local OpenCatchers = {}
+
+    local function ClosePopup(panel)
+        panel.Visible = false
+        if OpenCatchers[panel] then
+            OpenCatchers[panel]:Destroy()
+            OpenCatchers[panel] = nil
+        end
+    end
+
+    local function OpenPopup(panel, targetButton, gapY, fixedWidth, align)
+        local absPos = targetButton.AbsolutePosition
+        local absSize = targetButton.AbsoluteSize
+        local mainPos = Main.AbsolutePosition
+        local width = fixedWidth or absSize.X
+        local relX = absPos.X - mainPos.X
+        if align == "right" then
+            relX = (relX + absSize.X) - width
+        end
+        panel.Position = UDim2.new(0, relX, 0, (absPos.Y - mainPos.Y) + absSize.Y + (gapY or 4))
+        panel.Size = UDim2.new(0, width, panel.Size.Y.Scale, panel.Size.Y.Offset)
+        panel.Visible = true
+
+        if OpenCatchers[panel] then
+            OpenCatchers[panel]:Destroy()
+            OpenCatchers[panel] = nil
+        end
+
+        local Catcher = Create("TextButton", {
+            Name = "Catcher",
+            Size = UDim2.new(1, 0, 1, 0),
+            BackgroundTransparency = 1,
+            Text = "",
+            AutoButtonColor = false,
+            ZIndex = panel.ZIndex - 1,
+            Parent = Overlay,
+        })
+        OpenCatchers[panel] = Catcher
+        Catcher.MouseButton1Click:Connect(function()
+            ClosePopup(panel)
+        end)
+    end
 
     --// Sürüm etiketi (alt sağ köşe — ince detay)
     Create("TextLabel", {
@@ -528,7 +580,7 @@ function Spectrum:AddWindow(config)
         Stroke(NotifFrame, Theme.Accent, 1, 0.35)
         Pad(NotifFrame, 12, 10, 12, 10)
         Create("Frame", {
-            Size = UDim2.new(0, 3, 1, 0),
+            Size = UDim2.new(1, 0, 0, 2), -- SABİT yükseklik (Scale kullanmak AutomaticSize ile çakışıp kutuyu sonsuz büyütüyordu)
             BackgroundColor3 = Theme.Accent,
             BackgroundTransparency = 0.1,
             BorderSizePixel = 0,
@@ -1293,15 +1345,16 @@ function Spectrum:AddWindow(config)
                 Stroke(Swatch, Theme.Stroke, 1, 0.2)
 
                 local Panel = Create("Frame", {
-                    Size = UDim2.new(1, 0, 0, 150),
-                    Position = UDim2.new(0, 0, 1, 4),
+                    Size = UDim2.new(0, 220, 0, 150),
+                    Position = UDim2.new(0, 0, 0, 0),
                     BackgroundColor3 = Theme.Secondary,
+                    BackgroundTransparency = 0.05,
                     BorderSizePixel = 0,
                     Visible = false,
-                    ZIndex = 5,
-                    Parent = Frame,
+                    ZIndex = 60,
+                    Parent = Overlay,
                 })
-                Stroke(Panel, Theme.Stroke, 1, 0.3)
+                Stroke(Panel, Theme.Stroke, 1, 0.2)
                 Pad(Panel, 10, 10, 10, 10)
 
                 local SVBox = Create("Frame", {
@@ -1429,7 +1482,11 @@ function Spectrum:AddWindow(config)
 
                 Swatch.MouseButton1Click:Connect(function()
                     PlaySound(Sounds.Click, 0.3)
-                    Panel.Visible = not Panel.Visible
+                    if Panel.Visible then
+                        ClosePopup(Panel)
+                    else
+                        OpenPopup(Panel, Swatch, 6, 220, "right")
+                    end
                 end)
 
                 local API = { Instance = Frame }
@@ -1492,17 +1549,18 @@ function Spectrum:AddWindow(config)
                 Stroke(DropBtn, Theme.Stroke, 1, 0.3)
 
                 local ListFrame = Create("Frame", {
-                    Size = UDim2.new(0, DropBtn.AbsoluteSize.X, 0, 0),
-                    Position = UDim2.new(1, -150, 1, 6),
+                    Size = UDim2.new(0, 150, 0, 0),
+                    Position = UDim2.new(0, 0, 0, 0),
                     BackgroundColor3 = Theme.Secondary,
+                    BackgroundTransparency = 0.05,
                     BorderSizePixel = 0,
                     ClipsDescendants = true,
                     AutomaticSize = Enum.AutomaticSize.Y,
                     Visible = false,
-                    ZIndex = 10,
-                    Parent = Frame,
+                    ZIndex = 60,
+                    Parent = Overlay,
                 })
-                Stroke(ListFrame, Theme.Stroke, 1, 0.3)
+                Stroke(ListFrame, Theme.Stroke, 1, 0.2)
                 Create("UIListLayout", {
                     SortOrder = Enum.SortOrder.LayoutOrder,
                     Parent = ListFrame,
@@ -1547,7 +1605,7 @@ function Spectrum:AddWindow(config)
                                 OptBtn.BackgroundTransparency = Selected[opt] and 0.1 or 1
                             else
                                 Selected = opt
-                                ListFrame.Visible = false
+                                ClosePopup(ListFrame)
                             end
                             RefreshText()
                             DoNotify(Notifications, "Dropdown Tetiklendi", Name .. " -> " .. tostring(opt))
@@ -1560,7 +1618,11 @@ function Spectrum:AddWindow(config)
 
                 DropBtn.MouseButton1Click:Connect(function()
                     PlaySound(Sounds.Click, 0.3)
-                    ListFrame.Visible = not ListFrame.Visible
+                    if ListFrame.Visible then
+                        ClosePopup(ListFrame)
+                    else
+                        OpenPopup(ListFrame, DropBtn, 4, DropBtn.AbsoluteSize.X)
+                    end
                 end)
 
                 local API = { Instance = Frame }
