@@ -1,15 +1,26 @@
 --[[
     ============================================================
-    SPECTRUM UI LIBRARY
+    SPECTRUM UI LIBRARY  |  v3.0.0
     ------------------------------------------------------------
     Kullanım:
         local Spectrum = loadstring(game:HttpGet("URL_BURAYA"))()
 
         local Window = Spectrum:AddWindow({
             Name = "Spectrum",
-            Theme = "Dark",              -- "Crimson" | "Dark" | "Light"
+            Theme = "Dark",                          -- "Crimson" | "Dark" | "Light"
             ToggleKeybind = Enum.KeyCode.RightControl,
-            Size = UDim2.new(0, 650, 0, 400),
+            Size = UDim2.new(0, 620, 0, 380),
+            Notifications = true,
+
+            KeySystem = {
+                Enabled = true,
+                Title = "Spectrum | Giriş",
+                Subtitle = "Devam etmek için giriş yapın",
+                Users = {
+                    { Username = "Admin", Key = "1234" },
+                    { Username = "Test",  Key = "abcd" },
+                },
+            },
         })
 
         local Tab = Window:AddTab("Ana Sayfa")
@@ -18,22 +29,19 @@
         Section:AddButton({
             Name = "Test Butonu",
             Notifications = true,
-            Callback = function()
-                print("Butona basıldı")
-            end
+            Callback = function() print("Butona basıldı") end
         })
     ============================================================
 ]]
 
-local TweenService   = game:GetService("TweenService")
+local TweenService     = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
-local Players         = game:GetService("Players")
-local SoundService    = game:GetService("SoundService")
-local Debris          = game:GetService("Debris")
-local RunService      = game:GetService("RunService")
+local Players           = game:GetService("Players")
+local SoundService      = game:GetService("SoundService")
+local Debris             = game:GetService("Debris")
 
 local LocalPlayer = Players.LocalPlayer
-local PlayerGui    = LocalPlayer:WaitForChild("PlayerGui")
+local PlayerGui     = LocalPlayer:WaitForChild("PlayerGui")
 
 local ParentGui
 if gethui then
@@ -49,34 +57,37 @@ end
 --=====================================================================
 local Themes = {
     Crimson = {
-        Background   = Color3.fromRGB(18, 10, 12),
-        Secondary    = Color3.fromRGB(28, 16, 18),
-        Tertiary     = Color3.fromRGB(36, 20, 23),
-        Accent       = Color3.fromRGB(190, 35, 55),
-        AccentDark   = Color3.fromRGB(140, 20, 40),
-        Text         = Color3.fromRGB(240, 225, 225),
-        SubText      = Color3.fromRGB(180, 150, 150),
-        Stroke       = Color3.fromRGB(70, 25, 32),
+        Background = Color3.fromRGB(16, 9, 11),
+        Secondary   = Color3.fromRGB(26, 14, 16),
+        Tertiary     = Color3.fromRGB(34, 18, 21),
+        Accent       = Color3.fromRGB(196, 34, 56),
+        AccentDark = Color3.fromRGB(140, 20, 40),
+        Text          = Color3.fromRGB(242, 227, 227),
+        SubText     = Color3.fromRGB(178, 148, 148),
+        Stroke        = Color3.fromRGB(72, 26, 34),
+        Danger        = Color3.fromRGB(220, 60, 60),
     },
     Dark = {
-        Background   = Color3.fromRGB(20, 20, 24),
-        Secondary    = Color3.fromRGB(30, 30, 35),
-        Tertiary     = Color3.fromRGB(38, 38, 44),
-        Accent       = Color3.fromRGB(95, 105, 240),
-        AccentDark   = Color3.fromRGB(65, 75, 190),
-        Text         = Color3.fromRGB(235, 235, 240),
-        SubText      = Color3.fromRGB(160, 160, 172),
-        Stroke       = Color3.fromRGB(48, 48, 56),
+        Background = Color3.fromRGB(17, 17, 20),
+        Secondary   = Color3.fromRGB(26, 26, 31),
+        Tertiary     = Color3.fromRGB(34, 34, 40),
+        Accent       = Color3.fromRGB(100, 110, 245),
+        AccentDark = Color3.fromRGB(65, 75, 190),
+        Text          = Color3.fromRGB(237, 237, 242),
+        SubText     = Color3.fromRGB(158, 158, 170),
+        Stroke        = Color3.fromRGB(46, 46, 54),
+        Danger        = Color3.fromRGB(230, 70, 70),
     },
     Light = {
-        Background   = Color3.fromRGB(240, 240, 245),
-        Secondary    = Color3.fromRGB(226, 226, 233),
-        Tertiary     = Color3.fromRGB(214, 214, 222),
-        Accent       = Color3.fromRGB(70, 110, 230),
-        AccentDark   = Color3.fromRGB(50, 85, 190),
-        Text         = Color3.fromRGB(22, 22, 26),
-        SubText      = Color3.fromRGB(95, 95, 105),
-        Stroke       = Color3.fromRGB(198, 198, 208),
+        Background = Color3.fromRGB(238, 238, 243),
+        Secondary   = Color3.fromRGB(222, 222, 229),
+        Tertiary     = Color3.fromRGB(208, 208, 217),
+        Accent       = Color3.fromRGB(65, 105, 225),
+        AccentDark = Color3.fromRGB(45, 80, 185),
+        Text          = Color3.fromRGB(20, 20, 24),
+        SubText     = Color3.fromRGB(90, 90, 100),
+        Stroke        = Color3.fromRGB(190, 190, 200),
+        Danger        = Color3.fromRGB(200, 50, 50),
     },
 }
 
@@ -88,10 +99,12 @@ local Sounds = {
     Hover  = "rbxassetid://6042053626",
     Toggle = "rbxassetid://6042056524",
     Notify = "rbxassetid://6518811702",
+    Error  = "rbxassetid://6042055414",
+    Success = "rbxassetid://6042539569",
 }
 
 local function PlaySound(id, volume)
-    local ok = pcall(function()
+    pcall(function()
         local s = Instance.new("Sound")
         s.SoundId = id
         s.Volume = volume or 0.4
@@ -99,7 +112,6 @@ local function PlaySound(id, volume)
         s:Play()
         Debris:AddItem(s, 3)
     end)
-    return ok
 end
 
 --=====================================================================
@@ -122,9 +134,9 @@ local function Tween(obj, props, time, style, dir)
     return tw
 end
 
-local function Corner(parent, radius)
-    return Create("UICorner", { CornerRadius = UDim.new(0, radius or 6), Parent = parent })
-end
+-- Tema "keskin kenar" (sharp corner) olduğu için köşe yuvarlama devre dışı.
+-- Fonksiyon imzası uyumluluğu için tutuluyor; hiçbir UICorner eklemez.
+local function Corner(_, _) end
 
 local function Stroke(parent, color, thickness, transparency)
     return Create("UIStroke", { Color = color, Thickness = thickness or 1, Transparency = transparency or 0, Parent = parent })
@@ -142,11 +154,23 @@ end
 
 local function ClickBounce(obj)
     local orig = obj.Size
-    Tween(obj, { Size = orig - UDim2.new(0, 4, 0, 2) }, 0.08)
-    task.delay(0.08, function()
+    Tween(obj, { Size = orig - UDim2.new(0, 4, 0, 2) }, 0.07)
+    task.delay(0.07, function()
         if obj and obj.Parent then
-            Tween(obj, { Size = orig }, 0.12, Enum.EasingStyle.Back)
+            Tween(obj, { Size = orig }, 0.14, Enum.EasingStyle.Back)
         end
+    end)
+end
+
+local function ShakeFrame(frame)
+    local origPos = frame.Position
+    local seq = { 8, -8, 6, -6, 3, 0 }
+    task.spawn(function()
+        for _, off in ipairs(seq) do
+            Tween(frame, { Position = origPos + UDim2.new(0, off, 0, 0) }, 0.05)
+            task.wait(0.05)
+        end
+        frame.Position = origPos
     end)
 end
 
@@ -185,11 +209,12 @@ Spectrum.__index = Spectrum
 
 function Spectrum:AddWindow(config)
     config = config or {}
-    local WindowName   = config.Name or "Spectrum"
-    local ThemeName     = config.Theme or "Dark"
-    local ToggleKeybind = config.ToggleKeybind or Enum.KeyCode.RightControl
-    local WindowSize    = config.Size or UDim2.new(0, 650, 0, 400)
+    local WindowName       = config.Name or "Spectrum"
+    local ThemeName         = config.Theme or "Dark"
+    local ToggleKeybind     = config.ToggleKeybind or Enum.KeyCode.RightControl
+    local WindowSize         = config.Size or UDim2.new(0, 620, 0, 380)
     local GlobalNotifications = (config.Notifications == nil) and true or config.Notifications
+    local KeySystemCfg       = config.KeySystem or { Enabled = false }
 
     local Theme = Themes[ThemeName] or Themes.Dark
 
@@ -200,6 +225,11 @@ function Spectrum:AddWindow(config)
     Window.ToggleKeybind = ToggleKeybind
     Window.GlobalNotifications = GlobalNotifications
     Window.Open = true
+    Window.Authenticated = not KeySystemCfg.Enabled
+    Window.KeySystemUsers = {}
+    for _, u in ipairs(KeySystemCfg.Users or {}) do
+        table.insert(Window.KeySystemUsers, { Username = u.Username, Key = u.Key })
+    end
 
     --// Ekran GUI
     local ScreenGui = Create("ScreenGui", {
@@ -214,78 +244,112 @@ function Spectrum:AddWindow(config)
         syn.protect_gui(ScreenGui)
     end
 
-    --// Ana Çerçeve (yatay dikdörtgen, yarı saydam)
+    --// Ana Çerçeve (yatay dikdörtgen, yarı saydam, KESKİN KENAR)
     local Main = Create("Frame", {
         Name = "Main",
         Size = WindowSize,
         Position = UDim2.new(0.5, -WindowSize.X.Offset / 2, 0.5, -WindowSize.Y.Offset / 2),
         BackgroundColor3 = Theme.Background,
-        BackgroundTransparency = 0.12,
+        BackgroundTransparency = 0.32,
         BorderSizePixel = 0,
+        Visible = false,
         Parent = ScreenGui,
     })
-    Corner(Main, 10)
-    Stroke(Main, Theme.Stroke, 1, 0.3)
+    Stroke(Main, Theme.Stroke, 1.5, 0.15)
     Window.Main = Main
 
-    --// Üst Bar (sürükleme kolu + başlık)
+    --// Üst Bar
     local TopBar = Create("Frame", {
         Name = "TopBar",
-        Size = UDim2.new(1, 0, 0, 38),
+        Size = UDim2.new(1, 0, 0, 36),
         BackgroundColor3 = Theme.Secondary,
-        BackgroundTransparency = 0.15,
+        BackgroundTransparency = 0.2,
         BorderSizePixel = 0,
         Parent = Main,
     })
-    Corner(TopBar, 10)
-
-    Create("Frame", { -- alt köşeleri kare yapmak için
-        Size = UDim2.new(1, 0, 0, 12),
-        Position = UDim2.new(0, 0, 1, -12),
-        BackgroundColor3 = Theme.Secondary,
-        BackgroundTransparency = 0.15,
+    Create("Frame", { -- alt ayırıcı çizgi
+        Size = UDim2.new(1, 0, 0, 1),
+        Position = UDim2.new(0, 0, 1, 0),
+        BackgroundColor3 = Theme.Accent,
+        BackgroundTransparency = 0.4,
         BorderSizePixel = 0,
         Parent = TopBar,
     })
 
     Create("TextLabel", {
         Name = "Title",
-        Size = UDim2.new(1, -80, 1, 0),
+        Size = UDim2.new(1, -150, 1, 0),
         Position = UDim2.new(0, 14, 0, 0),
         BackgroundTransparency = 1,
         Font = Enum.Font.GothamBold,
         Text = WindowName,
         TextColor3 = Theme.Text,
-        TextSize = 15,
+        TextSize = 14,
         TextXAlignment = Enum.TextXAlignment.Left,
         Parent = TopBar,
     })
 
     local ThemeLabel = Create("TextLabel", {
         Size = UDim2.new(0, 70, 1, 0),
-        Position = UDim2.new(1, -80, 0, 0),
+        Position = UDim2.new(1, -150, 0, 0),
         BackgroundTransparency = 1,
         Font = Enum.Font.Gotham,
         Text = ThemeName,
         TextColor3 = Theme.SubText,
-        TextSize = 12,
+        TextSize = 11,
         TextXAlignment = Enum.TextXAlignment.Right,
         Parent = TopBar,
     })
+
+    --// Kapat (X) ve Küçült (-) Butonları — sağ üst köşe
+    local CloseButton = Create("TextButton", {
+        Name = "CloseButton",
+        Size = UDim2.new(0, 28, 0, 26),
+        Position = UDim2.new(1, -32, 0.5, -13),
+        BackgroundColor3 = Theme.Tertiary,
+        BackgroundTransparency = 0.1,
+        Text = "X",
+        Font = Enum.Font.GothamBold,
+        TextSize = 13,
+        TextColor3 = Theme.Text,
+        AutoButtonColor = false,
+        Parent = TopBar,
+    })
+    Stroke(CloseButton, Theme.Stroke, 1, 0.4)
+
+    local MinimizeButton = Create("TextButton", {
+        Name = "MinimizeButton",
+        Size = UDim2.new(0, 28, 0, 26),
+        Position = UDim2.new(1, -64, 0.5, -13),
+        BackgroundColor3 = Theme.Tertiary,
+        BackgroundTransparency = 0.1,
+        Text = "-",
+        Font = Enum.Font.GothamBold,
+        TextSize = 15,
+        TextColor3 = Theme.Text,
+        AutoButtonColor = false,
+        Parent = TopBar,
+    })
+    Stroke(MinimizeButton, Theme.Stroke, 1, 0.4)
+
+    CloseButton.MouseEnter:Connect(function() Tween(CloseButton, { BackgroundColor3 = Theme.Danger, BackgroundTransparency = 0.15 }, 0.12) end)
+    CloseButton.MouseLeave:Connect(function() Tween(CloseButton, { BackgroundColor3 = Theme.Tertiary, BackgroundTransparency = 0.1 }, 0.12) end)
+    MinimizeButton.MouseEnter:Connect(function() Tween(MinimizeButton, { BackgroundColor3 = Theme.Accent, BackgroundTransparency = 0.15 }, 0.12) end)
+    MinimizeButton.MouseLeave:Connect(function() Tween(MinimizeButton, { BackgroundColor3 = Theme.Tertiary, BackgroundTransparency = 0.1 }, 0.12) end)
 
     MakeDraggable(Main, TopBar)
 
     --// Sekme Listesi (SOL - dikey)
     local TabList = Create("Frame", {
         Name = "TabList",
-        Size = UDim2.new(0, 140, 1, -46),
-        Position = UDim2.new(0, 6, 0, 44),
+        Size = UDim2.new(0, 132, 1, -44),
+        Position = UDim2.new(0, 6, 0, 42),
         BackgroundColor3 = Theme.Secondary,
-        BackgroundTransparency = 0.2,
+        BackgroundTransparency = 0.25,
         BorderSizePixel = 0,
         Parent = Main,
     })
-    Corner(TabList, 8)
+    Stroke(TabList, Theme.Stroke, 1, 0.45)
     local TabListLayout = Create("UIListLayout", {
         Padding = UDim.new(0, 4),
         SortOrder = Enum.SortOrder.LayoutOrder,
@@ -296,60 +360,112 @@ function Spectrum:AddWindow(config)
     --// İçerik Alanı (SAĞ)
     local ContentArea = Create("Frame", {
         Name = "ContentArea",
-        Size = UDim2.new(1, -158, 1, -46),
-        Position = UDim2.new(0, 152, 0, 44),
+        Size = UDim2.new(1, -146, 1, -44),
+        Position = UDim2.new(0, 144, 0, 42),
         BackgroundTransparency = 1,
         Parent = Main,
     })
     Window.ContentArea = ContentArea
 
-    --// Bildirim Konteyneri
+    --// Sürüm etiketi (alt sağ köşe — ince detay)
+    Create("TextLabel", {
+        Size = UDim2.new(0, 100, 0, 14),
+        Position = UDim2.new(1, -108, 1, -16),
+        BackgroundTransparency = 1,
+        Font = Enum.Font.Gotham,
+        Text = "Spectrum v3.0.0",
+        TextColor3 = Theme.SubText,
+        TextTransparency = 0.4,
+        TextSize = 9,
+        TextXAlignment = Enum.TextXAlignment.Right,
+        Parent = Main,
+    })
+
+    --// Bildirim Konteyneri — SAĞ ALT köşe
     local NotifyHolder = Create("Frame", {
         Name = "NotifyHolder",
+        AnchorPoint = Vector2.new(1, 1),
         Size = UDim2.new(0, 280, 1, -20),
-        Position = UDim2.new(1, -290, 0, 10),
+        Position = UDim2.new(1, -16, 1, -16),
         BackgroundTransparency = 1,
         Parent = ScreenGui,
     })
     Create("UIListLayout", {
         Padding = UDim.new(0, 8),
         SortOrder = Enum.SortOrder.LayoutOrder,
-        VerticalAlignment = Enum.VerticalAlignment.Top,
+        VerticalAlignment = Enum.VerticalAlignment.Bottom,
+        HorizontalAlignment = Enum.HorizontalAlignment.Right,
         Parent = NotifyHolder,
     })
     Window.NotifyHolder = NotifyHolder
 
-    --// Aç/Kapa Butonu (sürüklenebilir, sabit küçük buton)
+    --// Aç/Kapa Butonu (sürüklenebilir)
     local ToggleButton = Create("TextButton", {
         Name = "ToggleButton",
-        Size = UDim2.new(0, 46, 0, 46),
+        Size = UDim2.new(0, 44, 0, 44),
         Position = UDim2.new(0, 20, 0, 20),
         BackgroundColor3 = Theme.Accent,
         BackgroundTransparency = 0.1,
         Text = "S",
         Font = Enum.Font.GothamBold,
-        TextSize = 18,
+        TextSize = 16,
         TextColor3 = Color3.new(1, 1, 1),
         AutoButtonColor = false,
+        Visible = not KeySystemCfg.Enabled,
         Parent = ScreenGui,
     })
-    Corner(ToggleButton, 23)
-    Stroke(ToggleButton, Theme.Stroke, 1, 0.3)
+    Stroke(ToggleButton, Theme.Stroke, 1.5, 0.2)
     MakeDraggable(ToggleButton, ToggleButton)
 
+    --// Aç / Kapat / Küçült fonksiyonları
+    local Minimized = false
+
+    function Window:Show()
+        if not Window.Authenticated then return end
+        Window.Open = true
+        Main.Visible = true
+        Main.Size = UDim2.new(WindowSize.X.Scale, WindowSize.X.Offset * 0.9, WindowSize.Y.Scale, WindowSize.Y.Offset * 0.9)
+        Tween(Main, { Size = WindowSize }, 0.22, Enum.EasingStyle.Back)
+    end
+
+    function Window:Close()
+        if not Window.Authenticated then return end
+        Window.Open = false
+        local tw = Tween(Main, { Size = UDim2.new(WindowSize.X.Scale, WindowSize.X.Offset * 0.9, WindowSize.Y.Scale, WindowSize.Y.Offset * 0.9) }, 0.15)
+        tw.Completed:Connect(function()
+            if not Window.Open then Main.Visible = false end
+        end)
+    end
+
     function Window:Toggle()
-        Window.Open = not Window.Open
-        if Window.Open then
-            Main.Visible = true
-            Main.Size = UDim2.new(WindowSize.X.Scale, WindowSize.X.Offset * 0.9, WindowSize.Y.Scale, WindowSize.Y.Offset * 0.9)
-            Tween(Main, { Size = WindowSize }, 0.22, Enum.EasingStyle.Back)
+        if not Window.Authenticated then return end
+        if Window.Open then Window:Close() else Window:Show() end
+    end
+
+    CloseButton.MouseButton1Click:Connect(function()
+        ClickBounce(CloseButton)
+        PlaySound(Sounds.Click, 0.3)
+        Window:Close()
+    end)
+
+    MinimizeButton.MouseButton1Click:Connect(function()
+        ClickBounce(MinimizeButton)
+        PlaySound(Sounds.Click, 0.3)
+        Minimized = not Minimized
+        if Minimized then
+            TabList.Visible = false
+            ContentArea.Visible = false
+            Tween(Main, { Size = UDim2.new(WindowSize.X.Scale, WindowSize.X.Offset, 0, 36) }, 0.22)
         else
-            local tw = Tween(Main, { Size = UDim2.new(WindowSize.X.Scale, WindowSize.X.Offset * 0.9, WindowSize.Y.Scale, WindowSize.Y.Offset * 0.9) }, 0.15)
-            tw.Completed:Connect(function()
-                if not Window.Open then Main.Visible = false end
+            Tween(Main, { Size = WindowSize }, 0.22, Enum.EasingStyle.Back)
+            task.delay(0.1, function()
+                if not Minimized then
+                    TabList.Visible = true
+                    ContentArea.Visible = true
+                end
             end)
         end
-    end
+    end)
 
     ToggleButton.MouseButton1Click:Connect(function()
         ClickBounce(ToggleButton)
@@ -380,45 +496,55 @@ function Spectrum:AddWindow(config)
         TopBar.BackgroundColor3 = t.Secondary
         TabList.BackgroundColor3 = t.Secondary
         ToggleButton.BackgroundColor3 = t.Accent
-        for _, tab in pairs(Window.Tabs) do
-            if tab.Refresh then tab.Refresh(t) end
-        end
     end
 
-    --// Bildirim Gönderme
-    function Window:Notify(config)
-        config = config or {}
+    --// Bildirim Gönderme (sağ alt, yarı saydam, kayarak gelir)
+    function Window:Notify(config2)
+        config2 = config2 or {}
         if Window.GlobalNotifications == false then return end
-        local Title = config.Title or "Bildirim"
-        local Content = config.Content or ""
-        local Duration = config.Duration or 3
+        local Title = config2.Title or "Bildirim"
+        local Content = config2.Content or ""
+        local Duration = config2.Duration or 3
+
+        local SlideContainer = Create("Frame", {
+            Size = UDim2.new(1, 0, 0, 0),
+            AutomaticSize = Enum.AutomaticSize.Y,
+            BackgroundTransparency = 1,
+            ClipsDescendants = true,
+            Parent = NotifyHolder,
+        })
 
         local NotifFrame = Create("Frame", {
             Size = UDim2.new(1, 0, 0, 0),
             AutomaticSize = Enum.AutomaticSize.Y,
+            Position = UDim2.new(1.4, 0, 0, 0),
             BackgroundColor3 = Theme.Secondary,
-            BackgroundTransparency = 0.08,
+            BackgroundTransparency = 0.35,
             BorderSizePixel = 0,
-            ClipsDescendants = true,
-            Parent = NotifyHolder,
+            Parent = SlideContainer,
         })
-        Corner(NotifFrame, 8)
-        Stroke(NotifFrame, Theme.Accent, 1, 0.4)
+        Stroke(NotifFrame, Theme.Accent, 1, 0.35)
         Pad(NotifFrame, 12, 10, 12, 10)
-
-        local Layout = Create("UIListLayout", {
+        Create("Frame", {
+            Size = UDim2.new(0, 3, 1, 0),
+            BackgroundColor3 = Theme.Accent,
+            BackgroundTransparency = 0.1,
+            BorderSizePixel = 0,
+            Parent = NotifFrame,
+        })
+        Create("UIListLayout", {
             Padding = UDim.new(0, 2),
             SortOrder = Enum.SortOrder.LayoutOrder,
             Parent = NotifFrame,
         })
 
         Create("TextLabel", {
-            Size = UDim2.new(1, 0, 0, 18),
+            Size = UDim2.new(1, 0, 0, 16),
             BackgroundTransparency = 1,
             Font = Enum.Font.GothamBold,
             Text = Title,
             TextColor3 = Theme.Text,
-            TextSize = 14,
+            TextSize = 13,
             TextXAlignment = Enum.TextXAlignment.Left,
             Parent = NotifFrame,
         })
@@ -429,21 +555,20 @@ function Spectrum:AddWindow(config)
             Font = Enum.Font.Gotham,
             Text = Content,
             TextColor3 = Theme.SubText,
-            TextSize = 12,
+            TextSize = 11,
             TextWrapped = true,
             TextXAlignment = Enum.TextXAlignment.Left,
             Parent = NotifFrame,
         })
 
-        NotifFrame.Position = UDim2.new(1.3, 0, 0, 0)
         PlaySound(Sounds.Notify, 0.35)
-        Tween(NotifFrame, { Position = UDim2.new(0, 0, 0, 0) }, 0.3, Enum.EasingStyle.Quart)
+        Tween(NotifFrame, { Position = UDim2.new(0, 0, 0, 0) }, 0.35, Enum.EasingStyle.Back)
 
         task.delay(Duration, function()
             if NotifFrame and NotifFrame.Parent then
-                local tw = Tween(NotifFrame, { Position = UDim2.new(1.3, 0, 0, 0) }, 0.25, Enum.EasingStyle.Quart)
+                local tw = Tween(NotifFrame, { Position = UDim2.new(1.4, 0, 0, 0) }, 0.25, Enum.EasingStyle.Quart)
                 tw.Completed:Connect(function()
-                    NotifFrame:Destroy()
+                    if SlideContainer and SlideContainer.Parent then SlideContainer:Destroy() end
                 end)
             end
         end)
@@ -458,6 +583,171 @@ function Spectrum:AddWindow(config)
     end
 
     --=====================================================================
+    -- KEY SİSTEMİ (Username + Key ile giriş)
+    --=====================================================================
+    function Window:AddKey(username, key)
+        table.insert(Window.KeySystemUsers, { Username = username, Key = key })
+    end
+
+    if KeySystemCfg.Enabled then
+        local LoginFrame = Create("Frame", {
+            Name = "LoginFrame",
+            Size = UDim2.new(0, 320, 0, 240),
+            Position = UDim2.new(0.5, -160, 0.5, -120),
+            BackgroundColor3 = Theme.Background,
+            BackgroundTransparency = 0.08,
+            BorderSizePixel = 0,
+            Parent = ScreenGui,
+        })
+        Stroke(LoginFrame, Theme.Accent, 1.5, 0.25)
+
+        Create("Frame", {
+            Size = UDim2.new(1, 0, 0, 3),
+            BackgroundColor3 = Theme.Accent,
+            BorderSizePixel = 0,
+            Parent = LoginFrame,
+        })
+
+        Create("TextLabel", {
+            Size = UDim2.new(1, -30, 0, 26),
+            Position = UDim2.new(0, 16, 0, 18),
+            BackgroundTransparency = 1,
+            Font = Enum.Font.GothamBold,
+            Text = KeySystemCfg.Title or "Giriş Yap",
+            TextColor3 = Theme.Text,
+            TextSize = 16,
+            TextXAlignment = Enum.TextXAlignment.Left,
+            Parent = LoginFrame,
+        })
+        Create("TextLabel", {
+            Size = UDim2.new(1, -30, 0, 18),
+            Position = UDim2.new(0, 16, 0, 44),
+            BackgroundTransparency = 1,
+            Font = Enum.Font.Gotham,
+            Text = KeySystemCfg.Subtitle or "Kullanıcı adı ve anahtarınızı girin",
+            TextColor3 = Theme.SubText,
+            TextSize = 12,
+            TextXAlignment = Enum.TextXAlignment.Left,
+            Parent = LoginFrame,
+        })
+
+        local UserBox = Create("TextBox", {
+            Size = UDim2.new(1, -32, 0, 32),
+            Position = UDim2.new(0, 16, 0, 76),
+            BackgroundColor3 = Theme.Secondary,
+            Text = "",
+            PlaceholderText = "Kullanıcı Adı",
+            Font = Enum.Font.Gotham,
+            TextSize = 12,
+            TextColor3 = Theme.Text,
+            PlaceholderColor3 = Theme.SubText,
+            ClearTextOnFocus = false,
+            Parent = LoginFrame,
+        })
+        Stroke(UserBox, Theme.Stroke, 1, 0.4)
+        Pad(UserBox, 10, 0, 10, 0)
+
+        local KeyBox = Create("TextBox", {
+            Size = UDim2.new(1, -32, 0, 32),
+            Position = UDim2.new(0, 16, 0, 116),
+            BackgroundColor3 = Theme.Secondary,
+            Text = "",
+            PlaceholderText = "Anahtar (Key)",
+            Font = Enum.Font.Gotham,
+            TextSize = 12,
+            TextColor3 = Theme.Text,
+            PlaceholderColor3 = Theme.SubText,
+            ClearTextOnFocus = false,
+            Parent = LoginFrame,
+        })
+        Stroke(KeyBox, Theme.Stroke, 1, 0.4)
+        Pad(KeyBox, 10, 0, 10, 0)
+
+        -- Anahtar alanını gizlemek için basit maskeleme
+        local RealKey = ""
+        KeyBox:GetPropertyChangedSignal("Text"):Connect(function()
+            local t = KeyBox.Text
+            if #t > #RealKey then
+                RealKey = RealKey .. t:sub(#RealKey + 1)
+            else
+                RealKey = RealKey:sub(1, #t)
+            end
+            local masked = string.rep("•", #RealKey)
+            if KeyBox.Text ~= masked then
+                KeyBox.Text = masked
+            end
+        end)
+
+        local ErrorLabel = Create("TextLabel", {
+            Size = UDim2.new(1, -32, 0, 16),
+            Position = UDim2.new(0, 16, 0, 152),
+            BackgroundTransparency = 1,
+            Font = Enum.Font.Gotham,
+            Text = "",
+            TextColor3 = Theme.Danger,
+            TextSize = 10,
+            TextXAlignment = Enum.TextXAlignment.Left,
+            Parent = LoginFrame,
+        })
+
+        local LoginButton = Create("TextButton", {
+            Size = UDim2.new(1, -32, 0, 34),
+            Position = UDim2.new(0, 16, 1, -50),
+            BackgroundColor3 = Theme.Accent,
+            Text = "Giriş Yap",
+            Font = Enum.Font.GothamBold,
+            TextSize = 13,
+            TextColor3 = Color3.new(1, 1, 1),
+            AutoButtonColor = false,
+            Parent = LoginFrame,
+        })
+
+        LoginButton.MouseEnter:Connect(function() Tween(LoginButton, { BackgroundColor3 = Theme.AccentDark }, 0.12) end)
+        LoginButton.MouseLeave:Connect(function() Tween(LoginButton, { BackgroundColor3 = Theme.Accent }, 0.12) end)
+
+        local function AttemptLogin()
+            ClickBounce(LoginButton)
+            PlaySound(Sounds.Click, 0.3)
+            local uname = UserBox.Text
+            local kkey = RealKey
+            local valid = false
+            for _, u in ipairs(Window.KeySystemUsers) do
+                if u.Username == uname and u.Key == kkey then
+                    valid = true
+                    break
+                end
+            end
+
+            if valid then
+                PlaySound(Sounds.Success, 0.5)
+                ErrorLabel.Text = ""
+                Window.Authenticated = true
+                local tw = Tween(LoginFrame, { BackgroundTransparency = 1 }, 0.25)
+                Tween(LoginFrame, { Size = LoginFrame.Size - UDim2.new(0, 20, 0, 20) }, 0.25)
+                tw.Completed:Connect(function()
+                    LoginFrame:Destroy()
+                end)
+                ToggleButton.Visible = true
+                Window:Notify({ Title = "Giriş Başarılı", Content = "Hoş geldin, " .. uname .. "!", Duration = 3 })
+                Window:Show()
+            else
+                PlaySound(Sounds.Error, 0.5)
+                ErrorLabel.Text = "Kullanıcı adı veya anahtar hatalı!"
+                ShakeFrame(LoginFrame)
+            end
+        end
+
+        LoginButton.MouseButton1Click:Connect(AttemptLogin)
+        KeyBox.FocusLost:Connect(function(enterPressed)
+            if enterPressed then AttemptLogin() end
+        end)
+
+        MakeDraggable(LoginFrame, LoginFrame)
+    else
+        Window:Show()
+    end
+
+    --=====================================================================
     -- TAB (SEKME)
     --=====================================================================
     function Window:AddTab(tabName)
@@ -466,23 +756,23 @@ function Spectrum:AddWindow(config)
         Tab.Sections = {}
 
         local TabButton = Create("TextButton", {
-            Size = UDim2.new(1, 0, 0, 34),
+            Size = UDim2.new(1, 0, 0, 32),
             BackgroundColor3 = Theme.Tertiary,
-            BackgroundTransparency = 0.3,
+            BackgroundTransparency = 0.35,
             Text = "",
             AutoButtonColor = false,
             Parent = TabList,
         })
-        Corner(TabButton, 6)
+        Stroke(TabButton, Theme.Stroke, 1, 0.55)
 
-        Create("TextLabel", {
+        local TabLabel = Create("TextLabel", {
             Size = UDim2.new(1, -10, 1, 0),
             Position = UDim2.new(0, 10, 0, 0),
             BackgroundTransparency = 1,
             Font = Enum.Font.GothamMedium,
             Text = tabName,
             TextColor3 = Theme.SubText,
-            TextSize = 13,
+            TextSize = 12,
             TextXAlignment = Enum.TextXAlignment.Left,
             Parent = TabButton,
         })
@@ -498,7 +788,7 @@ function Spectrum:AddWindow(config)
             Visible = false,
             Parent = ContentArea,
         })
-        local PageLayout = Create("UIListLayout", {
+        Create("UIListLayout", {
             Padding = UDim.new(0, 8),
             SortOrder = Enum.SortOrder.LayoutOrder,
             Parent = Page,
@@ -510,14 +800,13 @@ function Spectrum:AddWindow(config)
         local function SelectTab()
             for _, t in pairs(Window.Tabs) do
                 t.Page.Visible = false
-                Tween(t.Button, { BackgroundTransparency = 0.3 }, 0.15)
+                Tween(t.Button, { BackgroundColor3 = Theme.Tertiary, BackgroundTransparency = 0.35 }, 0.15)
                 local lbl = t.Button:FindFirstChildOfClass("TextLabel")
-                if lbl then Tween(lbl, {}, 0.1) ; lbl.TextColor3 = Theme.SubText end
+                if lbl then lbl.TextColor3 = Theme.SubText end
             end
             Page.Visible = true
             Tween(TabButton, { BackgroundColor3 = Theme.Accent, BackgroundTransparency = 0.1 }, 0.15)
-            local lbl = TabButton:FindFirstChildOfClass("TextLabel")
-            if lbl then lbl.TextColor3 = Color3.new(1, 1, 1) end
+            TabLabel.TextColor3 = Color3.new(1, 1, 1)
         end
 
         TabButton.MouseButton1Click:Connect(function()
@@ -539,28 +828,35 @@ function Spectrum:AddWindow(config)
                 Size = UDim2.new(1, -10, 0, 0),
                 AutomaticSize = Enum.AutomaticSize.Y,
                 BackgroundColor3 = Theme.Secondary,
-                BackgroundTransparency = 0.25,
+                BackgroundTransparency = 0.12,
                 BorderSizePixel = 0,
                 Parent = Page,
             })
-            Corner(SectionFrame, 8)
-            Stroke(SectionFrame, Theme.Stroke, 1, 0.5)
+            Stroke(SectionFrame, Theme.Stroke, 1.5, 0.4)
 
             Create("TextLabel", {
-                Size = UDim2.new(1, -20, 0, 26),
+                Size = UDim2.new(1, -20, 0, 24),
                 Position = UDim2.new(0, 12, 0, 6),
                 BackgroundTransparency = 1,
                 Font = Enum.Font.GothamBold,
                 Text = sectionName,
                 TextColor3 = Theme.Accent,
-                TextSize = 13,
+                TextSize = 12,
                 TextXAlignment = Enum.TextXAlignment.Left,
+                Parent = SectionFrame,
+            })
+            Create("Frame", { -- başlık altı ince ayırıcı
+                Size = UDim2.new(1, -24, 0, 1),
+                Position = UDim2.new(0, 12, 0, 30),
+                BackgroundColor3 = Theme.Accent,
+                BackgroundTransparency = 0.6,
+                BorderSizePixel = 0,
                 Parent = SectionFrame,
             })
 
             local ElementHolder = Create("Frame", {
                 Size = UDim2.new(1, -20, 0, 0),
-                Position = UDim2.new(0, 10, 0, 32),
+                Position = UDim2.new(0, 10, 0, 36),
                 AutomaticSize = Enum.AutomaticSize.Y,
                 BackgroundTransparency = 1,
                 Parent = SectionFrame,
@@ -572,16 +868,24 @@ function Spectrum:AddWindow(config)
             })
             Pad(SectionFrame, 0, 0, 0, 10)
 
-            --// Ortak buton tabanlı element çerçevesi
+            --// Ortak, "belirgin" element tabanı: kalın kenarlık + sol vurgu çizgisi
             local function BaseElement(height)
                 local Frame = Create("Frame", {
-                    Size = UDim2.new(1, 0, 0, height or 34),
+                    Size = UDim2.new(1, 0, 0, height or 36),
                     BackgroundColor3 = Theme.Tertiary,
-                    BackgroundTransparency = 0.25,
+                    BackgroundTransparency = 0.06,
                     BorderSizePixel = 0,
+                    ClipsDescendants = true,
                     Parent = ElementHolder,
                 })
-                Corner(Frame, 6)
+                Stroke(Frame, Theme.Stroke, 1, 0.3)
+                Create("Frame", {
+                    Size = UDim2.new(0, 3, 1, 0),
+                    BackgroundColor3 = Theme.Accent,
+                    BackgroundTransparency = 0.1,
+                    BorderSizePixel = 0,
+                    Parent = Frame,
+                })
                 return Frame
             end
 
@@ -594,7 +898,7 @@ function Spectrum:AddWindow(config)
                 local Callback = cfg.Callback or function() end
                 local Notifications = cfg.Notifications
 
-                local Frame = BaseElement(34)
+                local Frame = BaseElement(36)
                 local Btn = Create("TextButton", {
                     Size = UDim2.new(1, 0, 1, 0),
                     BackgroundTransparency = 1,
@@ -606,27 +910,27 @@ function Spectrum:AddWindow(config)
                     Size = UDim2.new(1, -20, 1, 0),
                     Position = UDim2.new(0, 12, 0, 0),
                     BackgroundTransparency = 1,
-                    Font = Enum.Font.GothamMedium,
+                    Font = Enum.Font.GothamBold,
                     Text = Name,
                     TextColor3 = Theme.Text,
-                    TextSize = 13,
+                    TextSize = 12,
                     TextXAlignment = Enum.TextXAlignment.Left,
                     Parent = Frame,
                 })
 
                 Btn.MouseEnter:Connect(function()
-                    Tween(Frame, { BackgroundColor3 = Theme.Accent, BackgroundTransparency = 0.5 }, 0.15)
+                    Tween(Frame, { BackgroundColor3 = Theme.Accent, BackgroundTransparency = 0.55 }, 0.15)
                 end)
                 Btn.MouseLeave:Connect(function()
-                    Tween(Frame, { BackgroundColor3 = Theme.Tertiary, BackgroundTransparency = 0.25 }, 0.15)
+                    Tween(Frame, { BackgroundColor3 = Theme.Tertiary, BackgroundTransparency = 0.06 }, 0.15)
                 end)
 
                 Btn.MouseButton1Click:Connect(function()
                     ClickBounce(Frame)
-                    Tween(Frame, { BackgroundColor3 = Theme.Accent, BackgroundTransparency = 0.1 }, 0.1)
+                    Tween(Frame, { BackgroundColor3 = Theme.Accent, BackgroundTransparency = 0.05 }, 0.1)
                     task.delay(0.15, function()
                         if Frame and Frame.Parent then
-                            Tween(Frame, { BackgroundColor3 = Theme.Tertiary, BackgroundTransparency = 0.25 }, 0.2)
+                            Tween(Frame, { BackgroundColor3 = Theme.Tertiary, BackgroundTransparency = 0.06 }, 0.2)
                         end
                     end)
                     PlaySound(Sounds.Click, 0.4)
@@ -648,7 +952,7 @@ function Spectrum:AddWindow(config)
                 local Notifications = cfg.Notifications
                 local State = Default
 
-                local Frame = BaseElement(34)
+                local Frame = BaseElement(36)
                 local Btn = Create("TextButton", {
                     Size = UDim2.new(1, 0, 1, 0),
                     BackgroundTransparency = 1,
@@ -660,10 +964,10 @@ function Spectrum:AddWindow(config)
                     Size = UDim2.new(1, -70, 1, 0),
                     Position = UDim2.new(0, 12, 0, 0),
                     BackgroundTransparency = 1,
-                    Font = Enum.Font.GothamMedium,
+                    Font = Enum.Font.GothamBold,
                     Text = Name,
                     TextColor3 = Theme.Text,
-                    TextSize = 13,
+                    TextSize = 12,
                     TextXAlignment = Enum.TextXAlignment.Left,
                     Parent = Frame,
                 })
@@ -675,7 +979,7 @@ function Spectrum:AddWindow(config)
                     BorderSizePixel = 0,
                     Parent = Frame,
                 })
-                Corner(SwitchBG, 10)
+                Stroke(SwitchBG, Theme.Stroke, 1, 0.4)
                 local Knob = Create("Frame", {
                     Size = UDim2.new(0, 16, 0, 16),
                     Position = State and UDim2.new(1, -18, 0.5, -8) or UDim2.new(0, 2, 0.5, -8),
@@ -683,7 +987,6 @@ function Spectrum:AddWindow(config)
                     BorderSizePixel = 0,
                     Parent = SwitchBG,
                 })
-                Corner(Knob, 8)
 
                 local function UpdateVisual()
                     Tween(SwitchBG, { BackgroundColor3 = State and Theme.Accent or Theme.Stroke }, 0.18)
@@ -724,15 +1027,15 @@ function Spectrum:AddWindow(config)
                 local CurrentKey = Default
                 local Listening = false
 
-                local Frame = BaseElement(34)
+                local Frame = BaseElement(36)
                 Create("TextLabel", {
                     Size = UDim2.new(1, -110, 1, 0),
                     Position = UDim2.new(0, 12, 0, 0),
                     BackgroundTransparency = 1,
-                    Font = Enum.Font.GothamMedium,
+                    Font = Enum.Font.GothamBold,
                     Text = Name,
                     TextColor3 = Theme.Text,
-                    TextSize = 13,
+                    TextSize = 12,
                     TextXAlignment = Enum.TextXAlignment.Left,
                     Parent = Frame,
                 })
@@ -743,12 +1046,12 @@ function Spectrum:AddWindow(config)
                     BackgroundColor3 = Theme.Secondary,
                     Text = CurrentKey.Name,
                     Font = Enum.Font.GothamMedium,
-                    TextSize = 12,
+                    TextSize = 11,
                     TextColor3 = Theme.Text,
                     AutoButtonColor = false,
                     Parent = Frame,
                 })
-                Corner(KeyBtn, 5)
+                Stroke(KeyBtn, Theme.Stroke, 1, 0.3)
 
                 KeyBtn.MouseButton1Click:Connect(function()
                     if Listening then return end
@@ -801,15 +1104,15 @@ function Spectrum:AddWindow(config)
                 local Notifications = cfg.Notifications
                 local Value = Default
 
-                local Frame = BaseElement(46)
+                local Frame = BaseElement(48)
                 Create("TextLabel", {
                     Size = UDim2.new(1, -60, 0, 20),
                     Position = UDim2.new(0, 12, 0, 4),
                     BackgroundTransparency = 1,
-                    Font = Enum.Font.GothamMedium,
+                    Font = Enum.Font.GothamBold,
                     Text = Name,
                     TextColor3 = Theme.Text,
-                    TextSize = 13,
+                    TextSize = 12,
                     TextXAlignment = Enum.TextXAlignment.Left,
                     Parent = Frame,
                 })
@@ -819,27 +1122,25 @@ function Spectrum:AddWindow(config)
                     BackgroundTransparency = 1,
                     Font = Enum.Font.GothamMedium,
                     Text = tostring(Value),
-                    TextColor3 = Theme.SubText,
-                    TextSize = 12,
+                    TextColor3 = Theme.Accent,
+                    TextSize = 11,
                     TextXAlignment = Enum.TextXAlignment.Right,
                     Parent = Frame,
                 })
 
                 local Track = Create("Frame", {
                     Size = UDim2.new(1, -24, 0, 6),
-                    Position = UDim2.new(0, 12, 0, 30),
+                    Position = UDim2.new(0, 12, 0, 32),
                     BackgroundColor3 = Theme.Stroke,
                     BorderSizePixel = 0,
                     Parent = Frame,
                 })
-                Corner(Track, 3)
                 local Fill = Create("Frame", {
                     Size = UDim2.new((Value - Min) / (Max - Min), 0, 1, 0),
                     BackgroundColor3 = Theme.Accent,
                     BorderSizePixel = 0,
                     Parent = Track,
                 })
-                Corner(Fill, 3)
                 local Knob = Create("Frame", {
                     Size = UDim2.new(0, 12, 0, 12),
                     Position = UDim2.new((Value - Min) / (Max - Min), -6, 0.5, -6),
@@ -847,7 +1148,6 @@ function Spectrum:AddWindow(config)
                     BorderSizePixel = 0,
                     Parent = Track,
                 })
-                Corner(Knob, 6)
 
                 local function SetValue(alpha, silent)
                     alpha = math.clamp(alpha, 0, 1)
@@ -911,15 +1211,15 @@ function Spectrum:AddWindow(config)
                 local Callback = cfg.Callback or function() end
                 local Notifications = cfg.Notifications
 
-                local Frame = BaseElement(34)
+                local Frame = BaseElement(36)
                 Create("TextLabel", {
                     Size = UDim2.new(0, 90, 1, 0),
                     Position = UDim2.new(0, 12, 0, 0),
                     BackgroundTransparency = 1,
-                    Font = Enum.Font.GothamMedium,
+                    Font = Enum.Font.GothamBold,
                     Text = Name,
                     TextColor3 = Theme.Text,
-                    TextSize = 13,
+                    TextSize = 12,
                     TextXAlignment = Enum.TextXAlignment.Left,
                     Parent = Frame,
                 })
@@ -931,13 +1231,13 @@ function Spectrum:AddWindow(config)
                     Text = Default,
                     PlaceholderText = Placeholder,
                     Font = Enum.Font.Gotham,
-                    TextSize = 12,
+                    TextSize = 11,
                     TextColor3 = Theme.Text,
                     PlaceholderColor3 = Theme.SubText,
                     ClearTextOnFocus = false,
                     Parent = Frame,
                 })
-                Corner(InputBox, 5)
+                Stroke(InputBox, Theme.Stroke, 1, 0.3)
                 Pad(InputBox, 8, 0, 8, 0)
 
                 InputBox.Focused:Connect(function()
@@ -977,15 +1277,15 @@ function Spectrum:AddWindow(config)
                 local h, s, v = Default:ToHSV()
                 local Hue, Sat, Val = h, s, v
 
-                local Frame = BaseElement(34)
+                local Frame = BaseElement(36)
                 Create("TextLabel", {
                     Size = UDim2.new(1, -60, 1, 0),
                     Position = UDim2.new(0, 12, 0, 0),
                     BackgroundTransparency = 1,
-                    Font = Enum.Font.GothamMedium,
+                    Font = Enum.Font.GothamBold,
                     Text = Name,
                     TextColor3 = Theme.Text,
-                    TextSize = 13,
+                    TextSize = 12,
                     TextXAlignment = Enum.TextXAlignment.Left,
                     Parent = Frame,
                 })
@@ -998,10 +1298,8 @@ function Spectrum:AddWindow(config)
                     AutoButtonColor = false,
                     Parent = Frame,
                 })
-                Corner(Swatch, 5)
                 Stroke(Swatch, Theme.Stroke, 1, 0.2)
 
-                -- Açılır panel
                 local Panel = Create("Frame", {
                     Size = UDim2.new(1, 0, 0, 150),
                     Position = UDim2.new(0, 0, 1, 4),
@@ -1011,7 +1309,6 @@ function Spectrum:AddWindow(config)
                     ZIndex = 5,
                     Parent = Frame,
                 })
-                Corner(Panel, 6)
                 Stroke(Panel, Theme.Stroke, 1, 0.3)
                 Pad(Panel, 10, 10, 10, 10)
 
@@ -1022,7 +1319,6 @@ function Spectrum:AddWindow(config)
                     ZIndex = 6,
                     Parent = Panel,
                 })
-                Corner(SVBox, 4)
                 local WhiteGrad = Create("Frame", {
                     Size = UDim2.new(1, 0, 1, 0),
                     BackgroundColor3 = Color3.new(1, 1, 1),
@@ -1030,7 +1326,6 @@ function Spectrum:AddWindow(config)
                     ZIndex = 6,
                     Parent = SVBox,
                 })
-                Corner(WhiteGrad, 4)
                 Create("UIGradient", {
                     Color = ColorSequence.new(Color3.new(1, 1, 1), Color3.new(1, 1, 1)),
                     Transparency = NumberSequence.new({
@@ -1046,7 +1341,6 @@ function Spectrum:AddWindow(config)
                     ZIndex = 6,
                     Parent = SVBox,
                 })
-                Corner(BlackGrad, 4)
                 Create("UIGradient", {
                     Rotation = 90,
                     Color = ColorSequence.new(Color3.new(0, 0, 0), Color3.new(0, 0, 0)),
@@ -1065,7 +1359,6 @@ function Spectrum:AddWindow(config)
                     ZIndex = 7,
                     Parent = SVBox,
                 })
-                Corner(SVCursor, 4)
                 Stroke(SVCursor, Color3.new(0, 0, 0), 1, 0)
 
                 local HueBar = Create("Frame", {
@@ -1075,7 +1368,6 @@ function Spectrum:AddWindow(config)
                     ZIndex = 6,
                     Parent = Panel,
                 })
-                Corner(HueBar, 4)
                 Create("UIGradient", {
                     Color = ColorSequence.new({
                         ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255, 0, 0)),
@@ -1096,7 +1388,6 @@ function Spectrum:AddWindow(config)
                     ZIndex = 7,
                     Parent = HueBar,
                 })
-                Corner(HueCursor, 2)
 
                 local function UpdateColor(silent)
                     local color = Color3.fromHSV(Hue, Sat, Val)
@@ -1180,15 +1471,15 @@ function Spectrum:AddWindow(config)
                     for _, v in ipairs(Default) do Selected[v] = true end
                 end
 
-                local Frame = BaseElement(34)
+                local Frame = BaseElement(36)
                 Create("TextLabel", {
                     Size = UDim2.new(0, 90, 1, 0),
                     Position = UDim2.new(0, 12, 0, 0),
                     BackgroundTransparency = 1,
-                    Font = Enum.Font.GothamMedium,
+                    Font = Enum.Font.GothamBold,
                     Text = Name,
                     TextColor3 = Theme.Text,
-                    TextSize = 13,
+                    TextSize = 12,
                     TextXAlignment = Enum.TextXAlignment.Left,
                     Parent = Frame,
                 })
@@ -1199,14 +1490,14 @@ function Spectrum:AddWindow(config)
                     BackgroundColor3 = Theme.Secondary,
                     Text = "  " .. (Multi and "Seçiniz..." or tostring(Selected or "Seçiniz...")),
                     Font = Enum.Font.Gotham,
-                    TextSize = 12,
+                    TextSize = 11,
                     TextColor3 = Theme.Text,
                     TextXAlignment = Enum.TextXAlignment.Left,
                     AutoButtonColor = false,
                     ZIndex = 5,
                     Parent = Frame,
                 })
-                Corner(DropBtn, 5)
+                Stroke(DropBtn, Theme.Stroke, 1, 0.3)
 
                 local ListFrame = Create("Frame", {
                     Size = UDim2.new(0, DropBtn.AbsoluteSize.X, 0, 0),
@@ -1219,9 +1510,8 @@ function Spectrum:AddWindow(config)
                     ZIndex = 10,
                     Parent = Frame,
                 })
-                Corner(ListFrame, 5)
                 Stroke(ListFrame, Theme.Stroke, 1, 0.3)
-                local ListLayout = Create("UIListLayout", {
+                Create("UIListLayout", {
                     SortOrder = Enum.SortOrder.LayoutOrder,
                     Parent = ListFrame,
                 })
@@ -1244,20 +1534,20 @@ function Spectrum:AddWindow(config)
                         if c:IsA("TextButton") then c:Destroy() end
                     end
                     for _, opt in ipairs(Options) do
+                        local isSel = (Multi and Selected[opt]) or (not Multi and Selected == opt)
                         local OptBtn = Create("TextButton", {
                             Size = UDim2.new(1, 0, 0, 22),
                             BackgroundColor3 = Theme.Tertiary,
-                            BackgroundTransparency = (Multi and Selected[opt]) or (not Multi and Selected == opt) and 0.1 or 1,
+                            BackgroundTransparency = isSel and 0.1 or 1,
                             Text = "  " .. tostring(opt),
                             Font = Enum.Font.Gotham,
-                            TextSize = 12,
+                            TextSize = 11,
                             TextColor3 = Theme.Text,
                             TextXAlignment = Enum.TextXAlignment.Left,
                             AutoButtonColor = false,
                             ZIndex = 11,
                             Parent = ListFrame,
                         })
-                        Corner(OptBtn, 4)
                         OptBtn.MouseButton1Click:Connect(function()
                             PlaySound(Sounds.Click, 0.25)
                             if Multi then
@@ -1313,7 +1603,7 @@ function Spectrum:AddWindow(config)
                     Font = Enum.Font.Gotham,
                     Text = Text,
                     TextColor3 = Theme.SubText,
-                    TextSize = 12,
+                    TextSize = 11,
                     TextXAlignment = Enum.TextXAlignment.Left,
                     TextWrapped = true,
                     Parent = Frame,
