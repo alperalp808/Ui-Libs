@@ -1,13 +1,13 @@
 --[[
     ============================================================
-    SPECTRUM UI LIBRARY  |  v3.3.0
+    SPECTRUM UI LIBRARY  |  v3.4.0
     ------------------------------------------------------------
     Yenilikler ve Güncellemeler:
-    - Yeni Temalar Eklendi: Green, Dark, Foggy, Sun
-    - AddWindow üzerinden açılış boyutu (Size) ve Toggle butonu (ToggleKeybind / ToggleButton) 
-      özelleştirmeleri eklendi.
-    - Key Sistemi (KeySystem) yeniden aktif edildi ve entegre edildi.
-    - Toggle nesnesine doğrudan eklenen AddKeybind metodu düzeltildi.
+    - Sağ üstteki kapatma (X) tuşu artık menüyü gizlemek yerine tamamen siliyor (Destroy).
+    - Key Sistemi güncellendi: Artık hem Kullanıcı Adı hem de Şifre zorunlu; 
+      özel/tekli key kalktı, tamamen listedeki kullanıcılar üzerinden doğrulanıyor 
+      ve açılıp kapanabilir (aktif/pasif) hale getirildi.
+    - Tüm mevcut temalar, bileşenler ve performans iyileştirmeleri korundu.
     ============================================================
 ]]
 
@@ -15,7 +15,7 @@ local TweenService     = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
 local Players           = game:GetService("Players")
 local SoundService      = game:GetService("SoundService")
-local Debris             = game:GetService("Debris")
+local Debris            = game:GetService("Debris")
 
 local LocalPlayer = Players.LocalPlayer
 local PlayerGui     = LocalPlayer:WaitForChild("PlayerGui")
@@ -30,7 +30,7 @@ else
 end
 
 --=====================================================================
--- TEMALAR (Green, Dark, Foggy, Sun, Aqua, Crimson, Light)
+-- TEMALAR
 --=====================================================================
 local Themes = {
     Green = {
@@ -116,11 +116,11 @@ local Themes = {
 -- SES EFEKTLERİ
 --=====================================================================
 local Sounds = {
-    Click  = "rbxassetid://876939830",
-    Hover  = "rbxassetid://6042053626",
-    Toggle = "rbxassetid://6042056524",
-    Notify = "rbxassetid://6518811702",
-    Error  = "rbxassetid://6042055414",
+    Click   = "rbxassetid://876939830",
+    Hover   = "rbxassetid://6042053626",
+    Toggle  = "rbxassetid://6042056524",
+    Notify  = "rbxassetid://6518811702",
+    Error   = "rbxassetid://6042055414",
     Success = "rbxassetid://6042539569",
 }
 
@@ -440,7 +440,7 @@ function Spectrum:AddWindow(config)
         Position = UDim2.new(1, -108, 1, -16),
         BackgroundTransparency = 1,
         Font = Enum.Font.Gotham,
-        Text = "Spectrum v3.3.0",
+        Text = "Spectrum v3.4.0",
         TextColor3 = Theme.SubText,
         TextTransparency = 0.4,
         TextSize = 9,
@@ -503,6 +503,14 @@ function Spectrum:AddWindow(config)
         end)
     end
 
+    -- Kapatma tuşu artık arayüzü tamamen yok eder (Destroy)
+    function Window:Destroy()
+        Window.Open = false
+        if ScreenGui and ScreenGui.Parent then
+            ScreenGui:Destroy()
+        end
+    end
+
     function Window:Toggle()
         if not Window.Authenticated then return end
         if Window.Open then Window:Close() else Window:Show() end
@@ -511,7 +519,7 @@ function Spectrum:AddWindow(config)
     CloseButton.MouseButton1Click:Connect(function()
         ClickBounce(CloseButton)
         PlaySound(Sounds.Click, 0.3)
-        Window:Close()
+        Window:Destroy()
     end)
 
     MinimizeButton.MouseButton1Click:Connect(function()
@@ -670,13 +678,13 @@ function Spectrum:AddWindow(config)
     end
 
     --=====================================================
-    -- KEY SYSTEM
+    -- YENİLENMİŞ KEY SİSTEMİ (Kullanıcı Adı + Şifre, Çoklu Liste)
     --=====================================================
     if KeySystemCfg.Enabled then
         local KeyScreen = Create("Frame", {
             Name = "KeyScreen",
-            Size = UDim2.new(0, 360, 0, 200),
-            Position = UDim2.new(0.5, -180, 0.5, -100),
+            Size = UDim2.new(0, 380, 0, 240),
+            Position = UDim2.new(0.5, -190, 0.5, -120),
             BackgroundColor3 = Theme.Background,
             BackgroundTransparency = 0.15,
             BorderSizePixel = 0,
@@ -690,7 +698,7 @@ function Spectrum:AddWindow(config)
             Size = UDim2.new(1, 0, 0, 24),
             BackgroundTransparency = 1,
             Font = Enum.Font.GothamBold,
-            Text = KeySystemCfg.Title or "Key Sistemi",
+            Text = KeySystemCfg.Title or "Güvenlik Doğrulaması",
             TextColor3 = Theme.Text,
             TextSize = 16,
             TextXAlignment = Enum.TextXAlignment.Center,
@@ -698,11 +706,11 @@ function Spectrum:AddWindow(config)
         }), "TextColor3", "Text")
 
         Themed(Create("TextLabel", {
-            Size = UDim2.new(1, 0, 0, 34),
-            Position = UDim2.new(0, 0, 0, 30),
+            Size = UDim2.new(1, 0, 0, 28),
+            Position = UDim2.new(0, 0, 0, 26),
             BackgroundTransparency = 1,
             Font = Enum.Font.Gotham,
-            Text = KeySystemCfg.Note or "Devam etmek için lütfen anahtarı girin.",
+            Text = KeySystemCfg.Note or "Devam etmek için kullanıcı adı ve şifrenizi girin.",
             TextColor3 = Theme.SubText,
             TextSize = 11,
             TextWrapped = true,
@@ -710,12 +718,13 @@ function Spectrum:AddWindow(config)
             Parent = KeyScreen,
         }), "TextColor3", "SubText")
 
-        local KeyInput = Create("TextBox", {
+        -- Kullanıcı Adı Kutusu
+        local UserInput = Create("TextBox", {
             Size = UDim2.new(1, 0, 0, 34),
-            Position = UDim2.new(0, 0, 0, 75),
+            Position = UDim2.new(0, 0, 0, 65),
             BackgroundColor3 = Theme.Secondary,
             Text = "",
-            PlaceholderText = "Anahtarı buraya girin...",
+            PlaceholderText = "Kullanıcı Adı...",
             Font = Enum.Font.Gotham,
             TextSize = 12,
             TextColor3 = Theme.Text,
@@ -723,15 +732,35 @@ function Spectrum:AddWindow(config)
             ClearTextOnFocus = false,
             Parent = KeyScreen,
         })
-        Themed(KeyInput, "BackgroundColor3", "Secondary")
-        Themed(KeyInput, "TextColor3", "Text")
-        Themed(KeyInput, "PlaceholderColor3", "SubText")
-        Themed(Stroke(KeyInput, Theme.Stroke, 1, 0.3), "Color", "Stroke")
-        Pad(KeyInput, 10, 0, 10, 0)
+        Themed(UserInput, "BackgroundColor3", "Secondary")
+        Themed(UserInput, "TextColor3", "Text")
+        Themed(UserInput, "PlaceholderColor3", "SubText")
+        Themed(Stroke(UserInput, Theme.Stroke, 1, 0.3), "Color", "Stroke")
+        Pad(UserInput, 10, 0, 10, 0)
+
+        -- Şifre Kutusu
+        local PassInput = Create("TextBox", {
+            Size = UDim2.new(1, 0, 0, 34),
+            Position = UDim2.new(0, 0, 0, 107),
+            BackgroundColor3 = Theme.Secondary,
+            Text = "",
+            PlaceholderText = "Şifre / Key...",
+            Font = Enum.Font.Gotham,
+            TextSize = 12,
+            TextColor3 = Theme.Text,
+            PlaceholderColor3 = Theme.SubText,
+            ClearTextOnFocus = false,
+            Parent = KeyScreen,
+        })
+        Themed(PassInput, "BackgroundColor3", "Secondary")
+        Themed(PassInput, "TextColor3", "Text")
+        Themed(PassInput, "PlaceholderColor3", "SubText")
+        Themed(Stroke(PassInput, Theme.Stroke, 1, 0.3), "Color", "Stroke")
+        Pad(PassInput, 10, 0, 10, 0)
 
         local SubmitBtn = Create("TextButton", {
-            Size = UDim2.new(0, 150, 0, 34),
-            Position = UDim2.new(0.5, -75, 0, 125),
+            Size = UDim2.new(0, 160, 0, 34),
+            Position = UDim2.new(0.5, -80, 0, 155),
             BackgroundColor3 = Theme.Accent,
             Text = "Giriş Yap",
             Font = Enum.Font.GothamBold,
@@ -746,15 +775,18 @@ function Spectrum:AddWindow(config)
         SubmitBtn.MouseButton1Click:Connect(function()
             ClickBounce(SubmitBtn)
             PlaySound(Sounds.Click, 0.3)
-            local entered = KeyInput.Text
+            local enteredUser = UserInput.Text
+            local enteredPass = PassInput.Text
             local success = false
-            for _, u in ipairs(KeySystemCfg.Users or {}) do
-                if u.Key == entered then
+
+            for _, account in ipairs(KeySystemCfg.Users or {}) do
+                if account.User == enteredUser and account.Pass == enteredPass then
                     success = true
                     break
                 end
             end
-            if success or entered == (KeySystemCfg.DefaultKey or "") then
+
+            if success then
                 Window.Authenticated = true
                 PlaySound(Sounds.Success, 0.4)
                 Tween(KeyScreen, { Size = UDim2.new(0, 0, 0, 0), Position = UDim2.new(0.5, 0, 0.5, 0) }, 0.25, Enum.EasingStyle.Back, Enum.EasingDirection.In)
@@ -764,8 +796,8 @@ function Spectrum:AddWindow(config)
                 end)
             else
                 PlaySound(Sounds.Error, 0.4)
-                KeyInput.Text = ""
-                KeyInput.PlaceholderText = "Geçersiz Anahtar!"
+                PassInput.Text = ""
+                PassInput.PlaceholderText = "Hatalı Kullanıcı veya Şifre!"
             end
         end)
     else
@@ -942,9 +974,6 @@ function Spectrum:AddWindow(config)
                 }), "TextColor3", "Text")
             end
 
-            --=====================================================
-            -- BUTTON
-            --=====================================================
             function Section:AddButton(cfg)
                 cfg = cfg or {}
                 local Name = cfg.Name or "Button"
@@ -994,9 +1023,6 @@ function Spectrum:AddWindow(config)
                 return { Instance = Frame }
             end
 
-            --=====================================================
-            -- TOGGLE
-            --=====================================================
             function Section:AddToggle(cfg)
                 cfg = cfg or {}
                 local Name = cfg.Name or "Toggle"
@@ -1117,9 +1143,6 @@ function Spectrum:AddWindow(config)
                 return API
             end
 
-            --=====================================================
-            -- KEYBIND
-            --=====================================================
             function Section:AddKeybind(cfg)
                 cfg = cfg or {}
                 local Name = cfg.Name or "Keybind"
@@ -1207,9 +1230,6 @@ function Spectrum:AddWindow(config)
                 return API
             end
 
-            --=====================================================
-            -- SLIDER
-            --=====================================================
             function Section:AddSlider(cfg)
                 cfg = cfg or {}
                 local Name = cfg.Name or "Slider"
@@ -1320,9 +1340,6 @@ function Spectrum:AddWindow(config)
                 return API
             end
 
-            --=====================================================
-            -- TEXTBOX
-            --=====================================================
             function Section:AddTextbox(cfg)
                 cfg = cfg or {}
                 local Name = cfg.Name or "Textbox"
@@ -1378,9 +1395,6 @@ function Spectrum:AddWindow(config)
                 return API
             end
 
-            --=====================================================
-            -- COLORPICKER
-            --=====================================================
             function Section:AddColorpicker(cfg)
                 cfg = cfg or {}
                 local Name = cfg.Name or "Colorpicker"
@@ -1564,9 +1578,6 @@ function Spectrum:AddWindow(config)
                 return API
             end
 
-            --=====================================================
-            -- DROPDOWN
-            --=====================================================
             function Section:AddDropdown(cfg)
                 cfg = cfg or {}
                 local Name = cfg.Name or "Dropdown"
@@ -1698,9 +1709,6 @@ function Spectrum:AddWindow(config)
                 return API
             end
 
-            --=====================================================
-            -- LABEL
-            --=====================================================
             function Section:AddLabel(cfg)
                 cfg = cfg or {}
                 local Text = cfg.Text or "Label"
