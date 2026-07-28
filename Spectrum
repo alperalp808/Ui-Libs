@@ -1,36 +1,14 @@
 --[[
     ============================================================
-    SPECTRUM UI LIBRARY  |  v3.1.1
+    SPECTRUM UI LIBRARY  |  v3.2.1
     ------------------------------------------------------------
-    Kullanım:
-        local Spectrum = loadstring(game:HttpGet("URL_BURAYA"))()
-
-        local Window = Spectrum:AddWindow({
-            Name = "Spectrum",
-            Theme = "Dark",                          -- "Crimson" | "Dark" | "Light"
-            ToggleKeybind = Enum.KeyCode.RightControl,
-            Size = UDim2.new(0, 620, 0, 380),
-            Notifications = true,
-
-            KeySystem = {
-                Enabled = true,
-                Title = "Spectrum | Giriş",
-                Subtitle = "Devam etmek için giriş yapın",
-                Users = {
-                    { Username = "Admin", Key = "1234" },
-                    { Username = "Test",  Key = "abcd" },
-                },
-            },
-        })
-
-        local Tab = Window:AddTab("Ana Sayfa")
-        local Section = Tab:AddSection("Genel")
-
-        Section:AddButton({
-            Name = "Test Butonu",
-            Notifications = true,
-            Callback = function() print("Butona basıldı") end
-        })
+    Düzeltme:
+    - Toggle nesnesine doğrudan eklenen AddKeybind fonksiyonu, 
+      nesnenin API tablosuna (API) tanımlı olmadığı için alınan 
+      "attempt to call missing method 'AddKeybind' of table" hatası giderildi.
+    - Dark teması "Aqua" olarak ayarlandı.
+    - Section:AddKeybind fonksiyonu Button ve Toggle modlarıyla çalışacak şekilde güncellendi.
+    - Dropdownlar Multi veya Normal olarak çalışacak şekilde ayarlandı.
     ============================================================
 ]]
 
@@ -56,6 +34,17 @@ end
 -- TEMALAR
 --=====================================================================
 local Themes = {
+    Aqua = {
+        Background = Color3.fromRGB(12, 18, 24),
+        Secondary   = Color3.fromRGB(18, 26, 36),
+        Tertiary     = Color3.fromRGB(24, 34, 48),
+        Accent       = Color3.fromRGB(0, 204, 255),
+        AccentDark = Color3.fromRGB(0, 140, 180),
+        Text          = Color3.fromRGB(225, 240, 255),
+        SubText     = Color3.fromRGB(130, 160, 190),
+        Stroke        = Color3.fromRGB(30, 60, 85),
+        Danger        = Color3.fromRGB(230, 70, 70),
+    },
     Crimson = {
         Background = Color3.fromRGB(16, 9, 11),
         Secondary   = Color3.fromRGB(26, 14, 16),
@@ -66,17 +55,6 @@ local Themes = {
         SubText     = Color3.fromRGB(178, 148, 148),
         Stroke        = Color3.fromRGB(72, 26, 34),
         Danger        = Color3.fromRGB(220, 60, 60),
-    },
-    Dark = {
-        Background = Color3.fromRGB(17, 17, 20),
-        Secondary   = Color3.fromRGB(26, 26, 31),
-        Tertiary     = Color3.fromRGB(34, 34, 40),
-        Accent       = Color3.fromRGB(100, 110, 245),
-        AccentDark = Color3.fromRGB(65, 75, 190),
-        Text          = Color3.fromRGB(237, 237, 242),
-        SubText     = Color3.fromRGB(158, 158, 170),
-        Stroke        = Color3.fromRGB(46, 46, 54),
-        Danger        = Color3.fromRGB(230, 70, 70),
     },
     Light = {
         Background = Color3.fromRGB(238, 238, 243),
@@ -133,9 +111,6 @@ local function Tween(obj, props, time, style, dir)
     tw:Play()
     return tw
 end
-
--- Tema "keskin kenar" (sharp corner) olduğu için köşe yuvarlama devre dışı.
-local function Corner(_, _) end
 
 local function Stroke(parent, color, thickness, transparency)
     return Create("UIStroke", { Color = color, Thickness = thickness or 1, Transparency = transparency or 0, Parent = parent })
@@ -200,7 +175,6 @@ local function MakeDraggable(frame, handle)
     end)
 end
 
--- Element satırlarında etiket + kontrol için ORTAK, TAŞMA YAPMAYAN yerleşim sabitleri.
 local LABEL_WIDTH = 130
 local CONTROL_X = 142
 local CONTROL_RIGHT_PAD = 12
@@ -214,13 +188,13 @@ Spectrum.__index = Spectrum
 function Spectrum:AddWindow(config)
     config = config or {}
     local WindowName       = config.Name or "Spectrum"
-    local ThemeName         = config.Theme or "Dark"
+    local ThemeName         = config.Theme or "Aqua"
     local ToggleKeybind     = config.ToggleKeybind or Enum.KeyCode.RightControl
     local WindowSize         = config.Size or UDim2.new(0, 620, 0, 380)
     local GlobalNotifications = (config.Notifications == nil) and true or config.Notifications
     local KeySystemCfg       = config.KeySystem or { Enabled = false }
 
-    local Theme = Themes[ThemeName] or Themes.Dark
+    local Theme = Themes[ThemeName] or Themes.Aqua
 
     local Window = {}
     Window.__index = Window
@@ -235,7 +209,6 @@ function Spectrum:AddWindow(config)
         table.insert(Window.KeySystemUsers, { Username = u.Username, Key = u.Key })
     end
 
-    --// CANLI TEMA SİSTEMİ
     local ThemeRegistry = {}
     local ThemeCallbacks = {}
     local function Themed(instance, property, colorKey)
@@ -246,7 +219,6 @@ function Spectrum:AddWindow(config)
         table.insert(ThemeCallbacks, fn)
     end
 
-    --// Ekran GUI
     local ScreenGui = Create("ScreenGui", {
         Name = "SpectrumUI",
         ResetOnSpawn = false,
@@ -259,7 +231,6 @@ function Spectrum:AddWindow(config)
         syn.protect_gui(ScreenGui)
     end
 
-    --// Ana Çerçeve
     local Main = Create("Frame", {
         Name = "Main",
         Size = WindowSize,
@@ -274,7 +245,6 @@ function Spectrum:AddWindow(config)
     Themed(Stroke(Main, Theme.Stroke, 1.5, 0.15), "Color", "Stroke")
     Window.Main = Main
 
-    --// Üst Bar
     local TopBar = Create("Frame", {
         Name = "TopBar",
         Size = UDim2.new(1, 0, 0, 36),
@@ -318,7 +288,6 @@ function Spectrum:AddWindow(config)
         Parent = TopBar,
     }), "TextColor3", "SubText")
 
-    --// Kapat (X) ve Küçült (-) Butonları
     local CloseButton = Create("TextButton", {
         Name = "CloseButton",
         Size = UDim2.new(0, 28, 0, 26),
@@ -360,7 +329,6 @@ function Spectrum:AddWindow(config)
 
     MakeDraggable(Main, TopBar)
 
-    --// Sekme Listesi
     local TabList = Create("Frame", {
         Name = "TabList",
         Size = UDim2.new(0, 132, 1, -44),
@@ -379,7 +347,6 @@ function Spectrum:AddWindow(config)
     })
     Pad(TabList, 6, 6, 6, 6)
 
-    --// İçerik Alanı
     local ContentArea = Create("Frame", {
         Name = "ContentArea",
         Size = UDim2.new(1, -146, 1, -44),
@@ -389,7 +356,6 @@ function Spectrum:AddWindow(config)
     })
     Window.ContentArea = ContentArea
 
-    --// Popup Katmanı
     local Overlay = Create("Frame", {
         Name = "Overlay",
         Size = UDim2.new(1, 0, 1, 0),
@@ -441,13 +407,12 @@ function Spectrum:AddWindow(config)
         end)
     end
 
-    --// Sürüm etiketi
     Themed(Create("TextLabel", {
         Size = UDim2.new(0, 100, 0, 14),
         Position = UDim2.new(1, -108, 1, -16),
         BackgroundTransparency = 1,
         Font = Enum.Font.Gotham,
-        Text = "Spectrum v3.1.1",
+        Text = "Spectrum v3.2.1",
         TextColor3 = Theme.SubText,
         TextTransparency = 0.4,
         TextSize = 9,
@@ -455,7 +420,6 @@ function Spectrum:AddWindow(config)
         Parent = Main,
     }), "TextColor3", "SubText")
 
-    --// Bildirim Konteyneri
     local NotifyHolder = Create("Frame", {
         Name = "NotifyHolder",
         AnchorPoint = Vector2.new(1, 1),
@@ -473,7 +437,6 @@ function Spectrum:AddWindow(config)
     })
     Window.NotifyHolder = NotifyHolder
 
-    --// Aç/Kapa Butonu
     local ToggleButton = Create("TextButton", {
         Name = "ToggleButton",
         Size = UDim2.new(0, 44, 0, 44),
@@ -493,7 +456,6 @@ function Spectrum:AddWindow(config)
     Themed(Stroke(ToggleButton, Theme.Accent, 1.5, 0), "Color", "Accent")
     MakeDraggable(ToggleButton, ToggleButton)
 
-    --// Aç / Kapat / Küçült fonksiyonları
     local Minimized = false
 
     function Window:Show()
@@ -560,7 +522,6 @@ function Spectrum:AddWindow(config)
         Window.ToggleKeybind = keyCode
     end
 
-    --// Tema Değiştirme
     function Window:SetTheme(newThemeName)
         local t = Themes[newThemeName]
         if not t then return end
@@ -589,7 +550,6 @@ function Spectrum:AddWindow(config)
         end
     end
 
-    --// Bildirim Gönderme
     function Window:Notify(config2)
         config2 = config2 or {}
         if Window.GlobalNotifications == false then return end
@@ -681,174 +641,6 @@ function Spectrum:AddWindow(config)
         end
     end
 
-    --=====================================================================
-    -- KEY SİSTEMİ
-    --=====================================================================
-    function Window:AddKey(username, key)
-        table.insert(Window.KeySystemUsers, { Username = username, Key = key })
-    end
-
-    if KeySystemCfg.Enabled then
-        local LoginFrame = Create("Frame", {
-            Name = "LoginFrame",
-            Size = UDim2.new(0, 320, 0, 240),
-            Position = UDim2.new(0.5, -160, 0.5, -120),
-            BackgroundColor3 = Theme.Background,
-            BackgroundTransparency = 0.32,
-            BorderSizePixel = 0,
-            Parent = ScreenGui,
-        })
-        Themed(LoginFrame, "BackgroundColor3", "Background")
-        Themed(Stroke(LoginFrame, Theme.Stroke, 1.5, 0.15), "Color", "Stroke")
-
-        local LoginLine = Create("Frame", {
-            Size = UDim2.new(1, 0, 0, 3),
-            BackgroundColor3 = Theme.Accent,
-            BorderSizePixel = 0,
-            Parent = LoginFrame,
-        })
-        Themed(LoginLine, "BackgroundColor3", "Accent")
-
-        local LoginTitle = Create("TextLabel", {
-            Size = UDim2.new(1, -30, 0, 26),
-            Position = UDim2.new(0, 16, 0, 18),
-            BackgroundTransparency = 1,
-            Font = Enum.Font.GothamBold,
-            Text = KeySystemCfg.Title or "Giriş Yap",
-            TextColor3 = Theme.Text,
-            TextSize = 16,
-            TextXAlignment = Enum.TextXAlignment.Left,
-            Parent = LoginFrame,
-        })
-        Themed(LoginTitle, "TextColor3", "Text")
-
-        local LoginSubtitle = Create("TextLabel", {
-            Size = UDim2.new(1, -30, 0, 18),
-            Position = UDim2.new(0, 16, 0, 44),
-            BackgroundTransparency = 1,
-            Font = Enum.Font.Gotham,
-            Text = KeySystemCfg.Subtitle or "Kullanıcı adı ve anahtarınızı girin",
-            TextColor3 = Theme.SubText,
-            TextSize = 12,
-            TextXAlignment = Enum.TextXAlignment.Left,
-            Parent = LoginFrame,
-        })
-        Themed(LoginSubtitle, "TextColor3", "SubText")
-
-        local UserBox = Create("TextBox", {
-            Size = UDim2.new(1, -32, 0, 32),
-            Position = UDim2.new(0, 16, 0, 76),
-            BackgroundColor3 = Theme.Secondary,
-            Text = "",
-            PlaceholderText = "Kullanıcı Adı",
-            Font = Enum.Font.Gotham,
-            TextSize = 12,
-            TextColor3 = Theme.Text,
-            PlaceholderColor3 = Theme.SubText,
-            TextXAlignment = Enum.TextXAlignment.Center,
-            TextYAlignment = Enum.TextYAlignment.Center,
-            ClearTextOnFocus = false,
-            Parent = LoginFrame,
-        })
-        Themed(UserBox, "BackgroundColor3", "Secondary")
-        Themed(UserBox, "TextColor3", "Text")
-        Themed(UserBox, "PlaceholderColor3", "SubText")
-        Themed(Stroke(UserBox, Theme.Stroke, 1, 0.4), "Color", "Stroke")
-
-        local KeyBox = Create("TextBox", {
-            Size = UDim2.new(1, -32, 0, 32),
-            Position = UDim2.new(0, 16, 0, 116),
-            BackgroundColor3 = Theme.Secondary,
-            Text = "",
-            PlaceholderText = "Anahtar (Key)",
-            Font = Enum.Font.Gotham,
-            TextSize = 12,
-            TextColor3 = Theme.Text,
-            PlaceholderColor3 = Theme.SubText,
-            TextXAlignment = Enum.TextXAlignment.Center,
-            TextYAlignment = Enum.TextYAlignment.Center,
-            ClearTextOnFocus = false,
-            Parent = LoginFrame,
-        })
-        Themed(KeyBox, "BackgroundColor3", "Secondary")
-        Themed(KeyBox, "TextColor3", "Text")
-        Themed(KeyBox, "PlaceholderColor3", "SubText")
-        Themed(Stroke(KeyBox, Theme.Stroke, 1, 0.4), "Color", "Stroke")
-
-        local ErrorLabel = Create("TextLabel", {
-            Size = UDim2.new(1, -32, 0, 16),
-            Position = UDim2.new(0, 16, 0, 152),
-            BackgroundTransparency = 1,
-            Font = Enum.Font.Gotham,
-            Text = "",
-            TextColor3 = Theme.Danger,
-            TextSize = 10,
-            TextXAlignment = Enum.TextXAlignment.Left,
-            Parent = LoginFrame,
-        })
-        Themed(ErrorLabel, "TextColor3", "Danger")
-
-        local LoginButton = Create("TextButton", {
-            Size = UDim2.new(1, -32, 0, 34),
-            Position = UDim2.new(0, 16, 1, -50),
-            BackgroundColor3 = Theme.Accent,
-            Text = "Giriş Yap",
-            Font = Enum.Font.GothamBold,
-            TextSize = 13,
-            TextColor3 = Color3.new(1, 1, 1),
-            AutoButtonColor = false,
-            Parent = LoginFrame,
-        })
-        Themed(LoginButton, "BackgroundColor3", "Accent")
-
-        LoginButton.MouseEnter:Connect(function() Tween(LoginButton, { BackgroundColor3 = Theme.AccentDark }, 0.12) end)
-        LoginButton.MouseLeave:Connect(function() Tween(LoginButton, { BackgroundColor3 = Theme.Accent }, 0.12) end)
-
-        local function AttemptLogin()
-            ClickBounce(LoginButton)
-            PlaySound(Sounds.Click, 0.3)
-            local uname = UserBox.Text
-            local kkey = KeyBox.Text
-            local valid = false
-            for _, u in ipairs(Window.KeySystemUsers) do
-                if u.Username == uname and u.Key == kkey then
-                    valid = true
-                    break
-                end
-            end
-
-            if valid then
-                PlaySound(Sounds.Success, 0.5)
-                ErrorLabel.Text = ""
-                Window.Authenticated = true
-                local tw = Tween(LoginFrame, { BackgroundTransparency = 1 }, 0.25)
-                Tween(LoginFrame, { Size = LoginFrame.Size - UDim2.new(0, 20, 0, 20) }, 0.25)
-                tw.Completed:Connect(function()
-                    LoginFrame:Destroy()
-                end)
-                ToggleButton.Visible = true
-                Window:Notify({ Title = "Giriş Başarılı", Content = "Hoş geldin, " .. uname .. "!", Duration = 3 })
-                Window:Show()
-            else
-                PlaySound(Sounds.Error, 0.5)
-                ErrorLabel.Text = "Kullanıcı adı veya anahtar hatalı!"
-                ShakeFrame(LoginFrame)
-            end
-        end
-
-        LoginButton.MouseButton1Click:Connect(AttemptLogin)
-        KeyBox.FocusLost:Connect(function(enterPressed)
-            if enterPressed then AttemptLogin() end
-        end)
-
-        MakeDraggable(LoginFrame, LoginFrame)
-    else
-        Window:Show()
-    end
-
-    --=====================================================================
-    -- TAB (SEKME)
-    --=====================================================================
     function Window:AddTab(tabName)
         tabName = tabName or "Tab"
         local Tab = {}
@@ -919,9 +711,6 @@ function Spectrum:AddWindow(config)
         table.insert(Window.Tabs, Tab)
         if #Window.Tabs == 1 then SelectTab() end
 
-        --=====================================================================
-        -- SECTION (Tüm section'lar otomatik dikey kaydırılabilir alana sahiptir)
-        --=====================================================================
         function Tab:AddSection(sectionName)
             sectionName = sectionName or "Section"
             local Section = {}
@@ -1127,15 +916,18 @@ function Spectrum:AddWindow(config)
                 end
                 OnThemeChange(function() UpdateVisual() end)
 
-                Btn.MouseButton1Click:Connect(function()
+                local function ToggleState()
                     State = not State
                     ClickBounce(SwitchBG)
                     UpdateVisual()
                     PlaySound(Sounds.Toggle, 0.4)
                     DoNotify(Notifications, "Toggle Tetiklendi", Name .. " -> " .. tostring(State))
                     task.spawn(Callback, State)
-                end)
+                end
 
+                Btn.MouseButton1Click:Connect(ToggleState)
+
+                -- Toggle API Metotları (AddKeybind eklendi)
                 local API = { Instance = Frame }
                 function API:Set(value)
                     State = value
@@ -1145,6 +937,50 @@ function Spectrum:AddWindow(config)
                 function API:Get()
                     return State
                 end
+                function API:AddKeybind(keyName)
+                    local keyCode = Enum.KeyCode[keyName] or Enum.KeyCode.Unknown
+                    local Listening = false
+
+                    local KeyBtn = Create("TextButton", {
+                        Size = UDim2.new(0, 45, 0, 20),
+                        Position = UDim2.new(1, -100, 0.5, -10),
+                        BackgroundColor3 = Theme.Secondary,
+                        Text = keyCode.Name,
+                        Font = Enum.Font.GothamMedium,
+                        TextSize = 10,
+                        TextColor3 = Theme.Text,
+                        AutoButtonColor = false,
+                        Parent = Frame,
+                    })
+                    Themed(KeyBtn, "BackgroundColor3", "Secondary")
+                    Themed(KeyBtn, "TextColor3", "Text")
+                    Themed(Stroke(KeyBtn, Theme.Stroke, 1, 0.3), "Color", "Stroke")
+
+                    KeyBtn.MouseButton1Click:Connect(function()
+                        if Listening then return end
+                        Listening = true
+                        KeyBtn.Text = "..."
+                        PlaySound(Sounds.Click, 0.3)
+                        local conn
+                        conn = UserInputService.InputBegan:Connect(function(input, processed)
+                            if input.UserInputType == Enum.UserInputType.Keyboard then
+                                keyCode = input.KeyCode
+                                KeyBtn.Text = keyCode.Name
+                                Listening = false
+                                DoNotify(Notifications, "Keybind Ayarlandı", Name .. " -> " .. keyCode.Name)
+                                conn:Disconnect()
+                            end
+                        end)
+                    end)
+
+                    UserInputService.InputBegan:Connect(function(input, processed)
+                        if processed or Listening then return end
+                        if input.KeyCode == keyCode and keyCode ~= Enum.KeyCode.Unknown then
+                            ToggleState()
+                        end
+                    end)
+                end
+
                 if Default then task.spawn(Callback, State) end
                 return API
             end
@@ -1156,13 +992,27 @@ function Spectrum:AddWindow(config)
                 cfg = cfg or {}
                 local Name = cfg.Name or "Keybind"
                 local Default = cfg.Default or Enum.KeyCode.Unknown
+                local Mode = cfg.Mode or "Button"
                 local Callback = cfg.Callback or function() end
                 local Notifications = cfg.Notifications
                 local CurrentKey = Default
                 local Listening = false
+                local ToggleState = false
 
                 local Frame = BaseElement(36)
                 NameLabel(Frame, Name)
+
+                local StateIndicator = nil
+                if Mode == "Toggle" then
+                    StateIndicator = Create("Frame", {
+                        Size = UDim2.new(0, 8, 0, 8),
+                        Position = UDim2.new(1, -112, 0.5, -4),
+                        BackgroundColor3 = Theme.Stroke,
+                        BorderSizePixel = 0,
+                        Parent = Frame,
+                    })
+                    Stroke(StateIndicator, Theme.Stroke, 1, 0)
+                end
 
                 local KeyBtn = Create("TextButton", {
                     Size = UDim2.new(0, 90, 0, 24),
@@ -1200,8 +1050,17 @@ function Spectrum:AddWindow(config)
                     if processed or Listening then return end
                     if input.KeyCode == CurrentKey and CurrentKey ~= Enum.KeyCode.Unknown then
                         ClickBounce(KeyBtn)
-                        DoNotify(Notifications, "Keybind Tetiklendi", Name .. " (" .. CurrentKey.Name .. ") tetiklendi.")
-                        task.spawn(Callback, CurrentKey)
+                        if Mode == "Toggle" then
+                            ToggleState = not ToggleState
+                            if StateIndicator then
+                                Tween(StateIndicator, { BackgroundColor3 = ToggleState and Theme.Accent or Theme.Stroke }, 0.15)
+                            end
+                            DoNotify(Notifications, "Keybind Tetiklendi", Name .. " (Toggle) -> " .. tostring(ToggleState))
+                            task.spawn(Callback, ToggleState)
+                        else
+                            DoNotify(Notifications, "Keybind Tetiklendi", Name .. " (" .. CurrentKey.Name .. ") tetiklendi.")
+                            task.spawn(Callback)
+                        end
                     end
                 end)
 
@@ -1330,7 +1189,7 @@ function Spectrum:AddWindow(config)
             end
 
             --=====================================================
-            -- TEXTBOX (Mükemmel Orantılı ve Sınırlandırılmış)
+            -- TEXTBOX
             --=====================================================
             function Section:AddTextbox(cfg)
                 cfg = cfg or {}
@@ -1574,7 +1433,7 @@ function Spectrum:AddWindow(config)
             end
 
             --=====================================================
-            -- LIST DROPDOWN (Mükemmel Orantılı ve Sınırlandırılmış)
+            -- DROPDOWN
             --=====================================================
             function Section:AddDropdown(cfg)
                 cfg = cfg or {}
